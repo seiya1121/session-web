@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
-const ExternalsPlugin = webpack.ExternalsPlugin;
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const DEBUG = !process.argv.includes('--release');
@@ -34,13 +33,13 @@ const config = [
       filename: '[name].bundle.js',
       sourceMapFilename: '[name].map',
     },
+    target: 'web',
     resolve: {
       extensions: ['', '.js', '.jsx', '.json'],
       root: [
         `${__dirname}/node_modules`,
         path.resolve('./app'),
       ],
-      packageMains: ['webpack', 'browser', 'web', 'browserify', ['jam', 'main'], 'main'],
     },
 
     module: {
@@ -69,26 +68,6 @@ const config = [
 
     plugins: [
       new webpack.NoErrorsPlugin(),
-      new ExternalsPlugin('commonjs', [
-        'app',
-        'auto-updater',
-        'browser-window',
-        'content-tracing',
-        'dialog',
-        'global-shortcut',
-        'ipc',
-        'menu',
-        'menu-item',
-        'power-monitor',
-        'protocol',
-        'tray',
-        'remote',
-        'web-frame',
-        'clipboard',
-        'crash-reporter',
-        'screen',
-        'shell',
-      ]),
       new NodeTargetPlugin(),
     ],
     eslint: {
