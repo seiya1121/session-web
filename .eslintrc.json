@@ -1,0 +1,13 @@
+{
+  "extends": "airbnb",
+  "plugins": ["react"],
+  "rules": { "import/no-unresolved": [0, { "ignore": ["app/**", "app/**/**"] }] },
+  "parser": "babel-eslint",
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "webpack.config.js"
+      }
+    }
+  }
+}
