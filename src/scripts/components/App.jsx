@@ -13,7 +13,6 @@ const SyncStates = [
   { state: 'playing', asArray: false },
   { state: 'played', asArray: false },
 ];
-
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 
 class App extends ReactBaseComponent {
@@ -37,13 +36,10 @@ class App extends ReactBaseComponent {
       comments: [],
       users: [],
     };
-
     this.bind('onChangeText', 'videoSearch', 'setPlayingVideo', 'notification');
-    this.bind('onKeyPressForSearch', 'onKeyPressForComment');
-    this.bind('onClickSetQue', 'onClickDeleteQue');
+    this.bind('onClickSetQue', 'onClickDeleteQue', 'onKeyPressForSearch', 'onKeyPressForComment');
     // For YouTube Player
-    this.bind('playPause', 'stop', 'setVolume',
-    'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange');
+    this.bind('playPause', 'stop', 'setVolume', 'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange')
     this.bind('onEnded', 'onPlay', 'onProgress', 'onReady');
   }
 
@@ -54,16 +50,10 @@ class App extends ReactBaseComponent {
     });
   }
 
-  componentDidMount() {
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.syncState(state, { context: this, state, asArray });
-    });
-  }
-
   playPause() {
     this.setState({ playing: !this.state.playing });
   }
+
   stop() {
     if (this.state.que.length > 0) {
       this.setPlayingVideo(this.state.que[0]);
@@ -72,27 +62,20 @@ class App extends ReactBaseComponent {
     }
   }
 
-  setVolume(e) {
-    this.setState({ volume: parseFloat(e.target.value) });
+  componentDidMount() {
+    SyncStates.forEach((obj) => {
+      const { state, asArray } = obj;
+      base.syncState(state, { context: this, state, asArray });
+    });
   }
 
-  onSeekMouseDown() {
-    this.setState({ seeking: true });
-  }
-
-  onSeekMouseUp(e) {
-    this.setState({ seeking: false });
-    this.player.seekTo(parseFloat(e.target.value));
-  }
-
-  onSeekChange(e) {
-    this.setState({ played: parseFloat(e.target.value) });
-  }
-
-  onProgress(state) {
-    if (!this.state.seeking) {
-      this.setState(state);
-    }
+  setPlayingVideo(video) {
+    this.setState({
+      playing: true,
+      playingVideo: video,
+      que: this.state.que.filter((item) => item.key !== video.key),
+      comments: [...this.state.comments, `play ${video.title}`],
+    });
   }
 
   notification(title, option) {
@@ -103,12 +86,14 @@ class App extends ReactBaseComponent {
     return notification;
   }
 
-  setPlayingVideo(video) {
-    this.setState({
-      playingVideo: video,
-      que: this.state.que.filter((item) => item.key !== video.key),
-      comments: [...this.state.comments, `play ${video.title}`],
-    });
+  onClickSetPlayingVideo(video) {
+    this.setPlayingVideo(video);
+  }
+
+  onProgress(state) {
+    if (!this.state.seeking) {
+      this.setState(state);
+    }
   }
 
   onPlay(video) {
@@ -128,8 +113,19 @@ class App extends ReactBaseComponent {
     console.log('onReady');
   }
 
-  onClickSetPlayingVideo(video) {
-    this.setPlayingVideo(video);
+  onClickSetQue(video) {
+    const { que } = this.state;
+    const { title, thumbnail } = video;
+    if (que.length === 0 && this.state.playingVideo === '') {
+      this.setState({ playingVideo: video });
+    } else {
+      this.setState({ que: [...que, video] });
+      this.notification('New Video Added!', { body: title, icon: thumbnail.url });
+    }
+  }
+
+  onClickDeleteQue(video) {
+    this.setState({ que: this.state.que.filter((item) => item.key !== video.key) });
   }
 
   onKeyPressForSearch(e) {
@@ -146,23 +142,25 @@ class App extends ReactBaseComponent {
     return true;
   }
 
-  onClickSetQue(video) {
-    const { que } = this.state;
-    const { title, thumbnail } = video;
-    if (que.length === 0 && this.state.playingVideo === '') {
-      this.setState({ playingVideo: video });
-    } else {
-      this.setState({ que: [...que, video] });
-      this.notification('New Video Added!', { body: title, icon: thumbnail.url });
-    }
-  }
-
-  onClickDeleteQue(video) {
-    this.setState({ que: this.state.que.filter((item) => item.key !== video.key) });
-  }
-
   onChangeText(type, value) {
     this.setState({ [type]: value });
+  }
+
+  setVolume(e) {
+    this.setState({ volume: parseFloat(e.target.value) });
+  }
+
+  onSeekMouseDown() {
+    this.setState({ seeking: true });
+  }
+
+  onSeekMouseUp(e) {
+    this.setState({ seeking: false });
+    this.player.seekTo(parseFloat(e.target.value));
+  }
+
+  onSeekChange(e) {
+    this.setState({ played: parseFloat(e.target.value) });
   }
 
   videoSearch() {
@@ -194,13 +192,11 @@ class App extends ReactBaseComponent {
     const { playing, volume, played, loaded, playbackRate } = this.state;
     const { soundcloudConfig, vimeoConfig, youtubeConfig, fileConfig } = this.state;
     const { playingVideo } = this.state;
-
     const headerNode = (
       <header className="sss-header">
         <span className="text-small">Now Playing</span> {this.state.playingVideo.title}
       </header>
     );
-
     const searchResultNode = this.state.searchResult.map((result, i) => (
       <ul key={i} className="list-group" onClick={() => this.onClickSetQue(result)}>
         <li className="list-group-item">
@@ -217,7 +213,6 @@ class App extends ReactBaseComponent {
         </li>
       </ul>
     ));
-
     const queNode = this.state.que.map((video, i) => (
       <div key={i}>
         <li
@@ -246,7 +241,6 @@ class App extends ReactBaseComponent {
         {comment}
       </li>
     ));
-
     return (
       <div>
         <div className="sss-youtube-wrapper is-covered">
@@ -313,10 +307,6 @@ class App extends ReactBaseComponent {
         </tbody></table>
         <table><tbody>
           <tr>
-            <th>volume</th>
-            <td>{volume.toFixed(3)}</td>
-          </tr>
-          <tr>
             <th>played</th>
             <td>{played.toFixed(3)}</td>
           </tr>
@@ -377,4 +367,4 @@ class App extends ReactBaseComponent {
   }
 }
 
-export { App };
+export default App;
