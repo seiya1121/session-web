@@ -10,8 +10,9 @@ const SyncStates = [
   { state: 'users', asArray: true },
   { state: 'comments', asArray: true },
   { state: 'playingVideo', asArray: false },
+  { state: 'seeking', asArray: false },
   { state: 'playing', asArray: false },
-  { state: 'played', asArray: false },
+  { state: 'startTime', asArray: false},
 ];
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -21,6 +22,7 @@ class App extends ReactBaseComponent {
     this.state = {
       playing: true,
       volume: 0.8,
+      startTime: 0,
       played: 0,
       loaded: 0,
       duration: 0,
@@ -37,7 +39,8 @@ class App extends ReactBaseComponent {
       users: [],
     };
     this.bind('onChangeText', 'videoSearch', 'setPlayingVideo', 'notification');
-    this.bind('onClickSetQue', 'onClickDeleteQue', 'onKeyPressForSearch', 'onKeyPressForComment');
+    this.bind('onKeyPressForSearch', 'onKeyPressForComment');
+    this.bind('onClickSetQue', 'onClickDeleteQue');
     // For YouTube Player
     this.bind('playPause', 'stop', 'setVolume', 'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange')
     this.bind('onEnded', 'onPlay', 'onProgress', 'onReady');
@@ -50,8 +53,23 @@ class App extends ReactBaseComponent {
     });
   }
 
+  componentDidMount() {
+    SyncStates.forEach((obj) => {
+      const { state, asArray } = obj;
+      base.syncState(state, { context: this, state, asArray });
+    });
+    base.listenTo('startTime',{
+      context: this,
+      asArray: false,
+      then(startTime) { this.onSeekChange(startTime); },
+    });
+  }
+
   playPause() {
-    this.setState({ playing: !this.state.playing });
+    this.setState({
+      playing: !this.state.playing,
+      startTime: this.state.played,
+    });
   }
 
   stop() {
@@ -60,13 +78,6 @@ class App extends ReactBaseComponent {
     } else {
       this.setState({ playing: false, playingVideo: '' });
     }
-  }
-
-  componentDidMount() {
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.syncState(state, { context: this, state, asArray });
-    });
   }
 
   setPlayingVideo(video) {
