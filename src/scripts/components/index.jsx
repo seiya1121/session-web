@@ -71,6 +71,7 @@ class App extends ReactBaseComponent {
 
   setPlayingVideo(video) {
     this.setState({
+      playing: true,
       playingVideo: video,
       que: this.state.que.filter((item) => item.key !== video.key),
       comments: [...this.state.comments, `play ${video.title}`],
@@ -305,10 +306,6 @@ class App extends ReactBaseComponent {
           </tr>
         </tbody></table>
         <table><tbody>
-          <tr>
-            <th>volume</th>
-            <td>{volume.toFixed(3)}</td>
-          </tr>
           <tr>
             <th>played</th>
             <td>{played.toFixed(3)}</td>
