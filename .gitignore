@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-
 # dependencies
 node_modules
 
@@ -14,9 +11,6 @@ build
 .DS_Store
 .env
 npm-debug.log
-=======
-node_modules
 app/scripts/secret.js
 firebase-debug.log
 app/dist
->>>>>>> 69f0a8c9e80c84724c8e69c6a35e470cee3b2d90
