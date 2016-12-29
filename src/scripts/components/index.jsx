@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import ReactBaseComponent from './reactBaseComponent';
+import ReactPlayer from 'react-player';
+
+const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 
 class App extends ReactBaseComponent {
   constructor(props) {
@@ -22,6 +25,11 @@ class App extends ReactBaseComponent {
       comments: [],
       users: [],
     };
+    this.bind('onChangeText');
+  }
+
+  onChangeText(type, value) {
+    this.setState({ [type]: value });
   }
 
   render() {
@@ -80,7 +88,29 @@ class App extends ReactBaseComponent {
     return (
       <div>
         <div className="sss-youtube-wrapper is-covered">
-          hello
+          <ReactPlayer
+            ref={(player) => { this.player = player; }}
+            className="react-player"
+            width={480}
+            height={270}
+            url={youtubeUrl(playingVideo.videoId)}
+            playing={playing}
+            playbackRate={playbackRate}
+            volume={volume}
+            soundcloudConfig={soundcloudConfig}
+            vimeoConfig={vimeoConfig}
+            youtubeConfig={youtubeConfig}
+            fileConfig={fileConfig}
+            onReady={this.onReady}
+            onStart={() => console.log('onStart')}
+            onPlay={() => this.onPlay(playingVideo)}
+            onPause={() => this.setState({ playing: false })}
+            onBuffer={() => console.log('onBuffer')}
+            onEnded={() => this.setState({ playing: false })}
+            onError={(e) => console.log('onError', e)}
+            onProgress={this.onProgress}
+            onDuration={(duration) => this.setState({ duration })}
+          />
         </div>
         <table><tbody>
           <tr>
