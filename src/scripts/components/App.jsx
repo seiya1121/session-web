@@ -10,7 +10,6 @@ const SyncStates = [
   { state: 'users', asArray: true },
   { state: 'comments', asArray: true },
   { state: 'playingVideo', asArray: false },
-  { state: 'seeking', asArray: false },
   { state: 'playing', asArray: false },
   { state: 'startTime', asArray: false},
 ];
@@ -27,7 +26,6 @@ class App extends ReactBaseComponent {
       loaded: 0,
       duration: 0,
       seeking: false,
-      playbackRate: 1.0,
       playingVideo: '',
       searchText: '',
       commentText: '',
@@ -61,22 +59,22 @@ class App extends ReactBaseComponent {
     base.listenTo('startTime',{
       context: this,
       asArray: false,
-      then(startTime) { this.onSeekChange(startTime); },
+      then(startTime) {
+        this.setState({ played: startTime, seeking: false });
+        this.player.seekTo(startTime)
+      },
     });
   }
 
   playPause() {
-    this.setState({
-      playing: !this.state.playing,
-      startTime: this.state.played,
-    });
+    this.setState({ playing: !this.state.playing, startTime: this.state.played });
   }
 
   stop() {
     if (this.state.que.length > 0) {
       this.setPlayingVideo(this.state.que[0]);
     } else {
-      this.setState({ playing: false, playingVideo: '' });
+      this.setState({ playing: false, playingVideo: '', startTime: 0 });
     }
   }
 
@@ -84,6 +82,7 @@ class App extends ReactBaseComponent {
     this.setState({
       playing: true,
       playingVideo: video,
+      startTime: 0,
       que: this.state.que.filter((item) => item.key !== video.key),
       comments: [...this.state.comments, `play ${video.title}`],
     });
@@ -102,9 +101,7 @@ class App extends ReactBaseComponent {
   }
 
   onProgress(state) {
-    if (!this.state.seeking) {
-      this.setState(state);
-    }
+    if (!this.state.seeking) { this.setState(state); }
   }
 
   onPlay(video) {
@@ -116,7 +113,7 @@ class App extends ReactBaseComponent {
     if (this.state.que.length > 0) {
       this.setPlayingVideo(this.state.que[0]);
     } else {
-      this.setState({ playingVideo: '' });
+      this.setState({ playingVideo: '', startTime: 0 });
     }
   }
 
@@ -166,12 +163,14 @@ class App extends ReactBaseComponent {
   }
 
   onSeekMouseUp(e) {
-    this.setState({ seeking: false });
+    this.setState({ seeking: false, startTime: parseFloat(e.target.value) });
     this.player.seekTo(parseFloat(e.target.value));
   }
 
   onSeekChange(e) {
-    this.setState({ played: parseFloat(e.target.value) });
+    this.setState({
+      played: parseFloat(e.target.value),
+    });
   }
 
   videoSearch() {
@@ -200,7 +199,7 @@ class App extends ReactBaseComponent {
   }
 
   render() {
-    const { playing, volume, played, loaded, playbackRate } = this.state;
+    const { playing, volume, played, loaded } = this.state;
     const { soundcloudConfig, vimeoConfig, youtubeConfig, fileConfig } = this.state;
     const { playingVideo } = this.state;
     const headerNode = (
@@ -262,7 +261,6 @@ class App extends ReactBaseComponent {
             height={270}
             url={youtubeUrl(playingVideo.videoId)}
             playing={playing}
-            playbackRate={playbackRate}
             volume={volume}
             soundcloudConfig={soundcloudConfig}
             vimeoConfig={vimeoConfig}
