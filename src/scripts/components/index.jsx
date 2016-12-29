@@ -1,9 +1,18 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
-import ReactPlayer from 'react-player';
 import { YOUTUBE_API_KEY } from '../secret';
+import { base } from '../firebaseApp';
 import YouTubeNode from 'youtube-node';
+import ReactPlayer from 'react-player';
 
+const SyncStates = [
+  { state: 'que', asArray: true },
+  { state: 'users', asArray: true },
+  { state: 'comments', asArray: true },
+  { state: 'playingVideo', asArray: false },
+  { state: 'playing', asArray: false },
+  { state: 'played', asArray: false },
+];
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 
 class App extends ReactBaseComponent {
@@ -27,10 +36,37 @@ class App extends ReactBaseComponent {
       comments: [],
       users: [],
     };
-    this.bind('onChangeText','setVolume', 'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange',
-    'videoSearch', 'onKeyPressForSearch', 'onKeyPressForComment', 'setPlayingVideo', 'notification');
-    this.bind('onClickSetQue', 'onClickDeleteQue');
+    this.bind('onChangeText', 'videoSearch', 'setPlayingVideo', 'notification');
+    this.bind('onClickSetQue', 'onClickDeleteQue', 'onKeyPressForSearch', 'onKeyPressForComment');
+    // For YouTube Player
+    this.bind('playPause', 'stop', 'setVolume', 'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange')
     this.bind('onEnded', 'onPlay', 'onProgress', 'onReady');
+  }
+
+  componentWillMount() {
+    SyncStates.forEach((obj) => {
+      const { state, asArray } = obj;
+      base.bindToState(state, { context: this, state, asArray });
+    });
+  }
+
+  playPause() {
+    this.setState({ playing: !this.state.playing });
+  }
+
+  stop() {
+    if (this.state.que.length > 0) {
+      this.setPlayingVideo(this.state.que[0]);
+    } else {
+      this.setState({ playing: false, playingVideo: '' });
+    }
+  }
+
+  componentDidMount() {
+    SyncStates.forEach((obj) => {
+      const { state, asArray } = obj;
+      base.syncState(state, { context: this, state, asArray });
+    });
   }
 
   setPlayingVideo(video) {

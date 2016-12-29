@@ -43,7 +43,7 @@ class App extends ReactBaseComponent {
     this.bind('onClickSetQue', 'onClickDeleteQue');
     // For YouTube Player
     this.bind('playPause', 'stop', 'setVolume',
-    'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange', 'onConfigSubmit');
+    'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange');
     this.bind('onEnded', 'onPlay', 'onProgress', 'onReady');
   }
 
@@ -93,17 +93,6 @@ class App extends ReactBaseComponent {
     if (!this.state.seeking) {
       this.setState(state);
     }
-  }
-
-  onConfigSubmit() {
-    let config;
-    try {
-      config = JSON.parse(this.configInput.value);
-    } catch (error) {
-      config = {};
-      console.error('Error setting config:', error);
-    }
-    this.setState(config);
   }
 
   notification(title, option) {
