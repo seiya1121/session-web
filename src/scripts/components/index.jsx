@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
 import ReactPlayer from 'react-player';
+import { YOUTUBE_API_KEY } from '../secret';
+import YouTubeNode from 'youtube-node';
 
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -25,11 +27,128 @@ class App extends ReactBaseComponent {
       comments: [],
       users: [],
     };
-    this.bind('onChangeText');
+    this.bind('onChangeText','setVolume', 'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange',
+    'videoSearch', 'onKeyPressForSearch', 'onKeyPressForComment', 'setPlayingVideo', 'notification');
+    this.bind('onClickSetQue', 'onClickDeleteQue');
+    this.bind('onEnded', 'onPlay', 'onProgress', 'onReady');
+  }
+
+  setPlayingVideo(video) {
+    this.setState({
+      playingVideo: video,
+      que: this.state.que.filter((item) => item.key !== video.key),
+      comments: [...this.state.comments, `play ${video.title}`],
+    });
+  }
+
+  notification(title, option) {
+    const notification = new Notification(
+      `${title} (${this.state.que.length + 1} remained)`,
+      { body: option.body, icon: option.icon, silent: true }
+    );
+    return notification;
+  }
+
+  onClickSetPlayingVideo(video) {
+    this.setPlayingVideo(video);
+  }
+
+  onProgress(state) {
+    if (!this.state.seeking) {
+      this.setState(state);
+    }
+  }
+
+  onPlay(video) {
+    this.setState({ playing: true });
+    this.notification('Now Playing♪', { body: video.title, icon: video.thumbnail.url });
+  }
+
+  onEnded() {
+    if (this.state.que.length > 0) {
+      this.setPlayingVideo(this.state.que[0]);
+    } else {
+      this.setState({ playingVideo: '' });
+    }
+  }
+
+  onReady() {
+    console.log('onReady');
+  }
+
+  onClickSetQue(video) {
+    const { que } = this.state;
+    const { title, thumbnail } = video;
+    if (que.length === 0 && this.state.playingVideo === '') {
+      this.setState({ playingVideo: video });
+    } else {
+      this.setState({ que: [...que, video] });
+      this.notification('New Video Added!', { body: title, icon: thumbnail.url });
+    }
+  }
+
+  onClickDeleteQue(video) {
+    this.setState({ que: this.state.que.filter((item) => item.key !== video.key) });
+  }
+
+  onKeyPressForSearch(e) {
+    if (e.which !== 13) return false;
+    e.preventDefault();
+    this.videoSearch();
+    return true;
+  }
+
+  onKeyPressForComment(e) {
+    if (e.which !== 13) return false;
+    e.preventDefault();
+    this.setState({ comments: [...this.state.comments, e.target.value], commentText: '' });
+    return true;
   }
 
   onChangeText(type, value) {
     this.setState({ [type]: value });
+  }
+
+  setVolume(e) {
+    this.setState({ volume: parseFloat(e.target.value) });
+  }
+
+  onSeekMouseDown() {
+    this.setState({ seeking: true });
+  }
+
+  onSeekMouseUp(e) {
+    this.setState({ seeking: false });
+    this.player.seekTo(parseFloat(e.target.value));
+  }
+
+  onSeekChange(e) {
+    this.setState({ played: parseFloat(e.target.value) });
+  }
+
+  videoSearch() {
+    const youTubeNode = new YouTubeNode();
+    youTubeNode.setKey(YOUTUBE_API_KEY);
+    youTubeNode.search(
+      this.state.searchText,
+      50,
+      (error, result) => {
+        if (error) {
+          console.log(error);
+        } else {
+          this.setState({
+            searchResultNum: result.items.length,
+            searchResult: result.items.map((it) => (
+              {
+                videoId: it.id.videoId,
+                title: it.snippet.title,
+                thumbnail: it.snippet.thumbnails.default,
+              }
+            )),
+          });
+        }
+      }
+    );
   }
 
   render() {

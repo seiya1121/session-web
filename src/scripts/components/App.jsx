@@ -71,6 +71,7 @@ class App extends ReactBaseComponent {
       this.setState({ playing: false, playingVideo: '' });
     }
   }
+
   setVolume(e) {
     this.setState({ volume: parseFloat(e.target.value) });
   }
