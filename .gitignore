@@ -11,6 +11,6 @@ build
 .DS_Store
 .env
 npm-debug.log
-app/scripts/secret.js
+src/scripts/secret.js
 firebase-debug.log
 app/dist

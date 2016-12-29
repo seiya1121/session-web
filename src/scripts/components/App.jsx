@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import ReactBaseComponent from './reactBaseComponent';
 import { YOUTUBE_API_KEY } from '../secret';
 import { base } from '../firebaseApp';
@@ -17,7 +16,7 @@ const SyncStates = [
 
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 
-class Index extends ReactBaseComponent {
+class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -388,4 +387,4 @@ class Index extends ReactBaseComponent {
   }
 }
 
-ReactDOM.render(<Index />, document.getElementById('root'));
+export { App };
