@@ -119,6 +119,7 @@ class App extends ReactBaseComponent {
 
   onReady() {
     console.log('onReady');
+    this.setState({ playing: true });
   }
 
   onClickSetQue(video) {
