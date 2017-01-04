@@ -26,6 +26,7 @@ const defaultCurrentUser = Object.assign(
 };
 const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, userName, type) => Object.assign({}, { content, userName, type });
+const commandType = { giphy: '/ giphy ' };
 
 class App extends ReactBaseComponent {
   constructor(props) {
@@ -63,13 +64,22 @@ class App extends ReactBaseComponent {
   }
 
   setLoginUser(user) {
-     const { displayName, photoURL } = user;
-     this.setState({
-       currentUser: Object.assign({}, this.state.currentUser,
-         { name: displayName, photoURL, isLogin: true }
-       ),
-     });
-   }
+    const { displayName, photoURL } = user;
+    this.setState({
+      currentUser: Object.assign({}, this.state.currentUser,
+        { name: displayName, photoURL, isLogin: true }
+      ),
+    });
+  }
+
+  setLoginUserForSignUp(user, displayName) {
+    const { photoURL } = user;
+    this.setState({
+      currentUser: Object.assign({}, this.state.currentUser,
+        { name: displayName, photoURL, isLogin: true }
+      ),
+    });
+  }
 
   componentWillMount() {
     SyncStates.forEach((obj) => {
@@ -112,11 +122,19 @@ class App extends ReactBaseComponent {
   onClickSignUp() {
     const { mailAddressForSignUp, passwordForSignUp, displayName } = this.state;
     firebaseAuth.createUserWithEmailAndPassword(mailAddressForSignUp, passwordForSignUp)
-      .then((user) => user.updateProfile({ displayName }))
+      .then((user) => {
+        user.updateProfile({ displayName });
+      })
       .catch((error) => {
         console.log(error.code);
         console.log(error.message);
       });
+    firebaseAuth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        this.setLoginUserForSignUp(user, displayName);
+      }
+    });
   }
 
   onClickSignIn() {
@@ -131,7 +149,7 @@ class App extends ReactBaseComponent {
 
   onClickSignOut() {
     firebaseAuth.signOut()
-      .then(() => this.setState({ currentUser: null }));
+      .then(() => this.setState({ currentUser: defaultCurrentUser }));
   }
 
   playPause() {
@@ -229,7 +247,7 @@ class App extends ReactBaseComponent {
     if (e.which !== 13) return false;
     if (e.target.value === '') return false;
     e.preventDefault();
-    const isGif = e.target.value.includes('/ giphy');
+    const isGif = e.target.value.includes(commandType.giphy);
     if (isGif) {
       this.setGifUrl(e.target.value);
     } else {
@@ -258,7 +276,7 @@ class App extends ReactBaseComponent {
   }
 
   setGifUrl(keyword) {
-    const key = keyword.replace('/ giphy ', '');
+    const key = keyword.replace(commandType.giphy, '');
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
