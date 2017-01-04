@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
 import { YOUTUBE_API_KEY } from '../secret';
-import { base } from '../firebaseApp';
+import { base, firebaseAuth } from '../firebaseApp';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
+import { getAnimalName } from '../animal';
+import giphy from 'giphy-api';
 
 const SyncStates = [
   { state: 'que', asArray: true },
@@ -14,6 +16,16 @@ const SyncStates = [
   { state: 'startTime', asArray: false},
 ];
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
+const videoObject = (video, userName) => Object.assign({}, video, { userName });
+const defaultCurrentUser = Object.assign(
+  {}, { name: getAnimalName(), photoURL: '', isLogin: false }
+);
+ const PlayingVideoStatusText = {
+  playing: 'Now Playing',
+  noVideos: "There're no videos to play.",
+};
+const CommentType = { text: 'text', log: 'log', gif: 'gif' };
+const commentObj = (content, userName, type) => Object.assign({}, { content, userName, type });
 
 class App extends ReactBaseComponent {
   constructor(props) {
@@ -29,25 +41,46 @@ class App extends ReactBaseComponent {
       playingVideo: '',
       searchText: '',
       commentText: '',
-      userName: '',
       searchResult: [],
       searchResultNum: '',
+      displayName: '',
+      mailAddressForSignIn: '',
+      mailAddressForSignUp: '',
+      passwordForSignIn: '',
+      passwordForSignUp: '',
       que: [],
       comments: [],
       users: [],
+      currentUser: defaultCurrentUser,
     };
-    this.bind('onChangeText', 'videoSearch', 'setPlayingVideo', 'notification');
+    this.bind('onChangeText', 'videoSearch', 'setPlayingVideo', 'notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue', 'onClickDeleteQue');
+    this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
     this.bind('playPause', 'stop', 'setVolume', 'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange')
     this.bind('onEnded', 'onPlay', 'onProgress', 'onReady');
   }
 
+  setLoginUser(user) {
+     const { displayName, photoURL } = user;
+     this.setState({
+       currentUser: Object.assign({}, this.state.currentUser,
+         { name: displayName, photoURL, isLogin: true }
+       ),
+     });
+   }
+
   componentWillMount() {
     SyncStates.forEach((obj) => {
       const { state, asArray } = obj;
       base.bindToState(state, { context: this, state, asArray });
+    });
+    firebaseAuth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        this.setLoginUser(user);
+      }
     });
   }
 
@@ -64,6 +97,41 @@ class App extends ReactBaseComponent {
         this.player.seekTo(startTime)
       },
     });
+    base.listenTo('que', {
+      context: this,
+      asArray: false,
+      then(que) {
+        if (typeof que !== 'object') {
+          const addedVideo = que.pop();
+          this.notification('Added♪', { body: addedVideo.title, icon: addedVideo.thumbnail.url });
+        }
+      },
+    });
+  }
+
+  onClickSignUp() {
+    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.state;
+    firebaseAuth.createUserWithEmailAndPassword(mailAddressForSignUp, passwordForSignUp)
+      .then((user) => user.updateProfile({ displayName }))
+      .catch((error) => {
+        console.log(error.code);
+        console.log(error.message);
+      });
+  }
+
+  onClickSignIn() {
+    const { mailAddressForSignIn, passwordForSignIn } = this.state;
+    firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
+      .then((user) => this.setLoginUser(user))
+      .catch((error) => {
+        console.log(error.code);
+        console.log(error.message);
+      });
+  }
+
+  onClickSignOut() {
+    firebaseAuth.signOut()
+      .then(() => this.setState({ currentUser: null }));
   }
 
   playPause() {
@@ -78,14 +146,36 @@ class App extends ReactBaseComponent {
     }
   }
 
-  setPlayingVideo(video) {
-    this.setState({
-      playing: true,
-      playingVideo: video,
-      startTime: 0,
-      que: this.state.que.filter((item) => item.key !== video.key),
-      comments: [...this.state.comments, `play ${video.title}`],
-    });
+  setVolume(e) {
+    this.setState({ volume: parseFloat(e.target.value) });
+  }
+
+  onSeekMouseDown() {
+    this.setState({ seeking: true });
+  }
+
+  onSeekMouseUp(e) {
+    this.setState({ seeking: false, startTime: parseFloat(e.target.value) });
+    this.player.seekTo(parseFloat(e.target.value));
+  }
+
+  onSeekChange(e) {
+    this.setState({ played: parseFloat(e.target.value) });
+  }
+
+  onProgress(state) {
+    if (!this.state.seeking) { this.setState(state); }
+  }
+
+  onConfigSubmit() {
+    let config;
+    try {
+      config = JSON.parse(this.configInput.value);
+    } catch (error) {
+      config = {};
+      console.error('Error setting config:', error);
+    }
+    this.setState(config);
   }
 
   notification(title, option) {
@@ -96,12 +186,14 @@ class App extends ReactBaseComponent {
     return notification;
   }
 
-  onClickSetPlayingVideo(video) {
-    this.setPlayingVideo(video);
-  }
-
-  onProgress(state) {
-    if (!this.state.seeking) { this.setState(state); }
+  setPlayingVideo(video) {
+    this.setState({
+      playing: true,
+      playingVideo: video,
+      startTime: 0,
+      que: this.state.que.filter((item) => item.key !== video.key),
+      comments: [...this.state.comments, commentObj(`play ${video.title}`, '', CommentType.log)],
+    });
   }
 
   onPlay(video) {
@@ -122,19 +214,8 @@ class App extends ReactBaseComponent {
     this.setState({ playing: true });
   }
 
-  onClickSetQue(video) {
-    const { que } = this.state;
-    const { title, thumbnail } = video;
-    if (que.length === 0 && this.state.playingVideo === '') {
-      this.setState({ playingVideo: video });
-    } else {
-      this.setState({ que: [...que, video] });
-      this.notification('New Video Added!', { body: title, icon: thumbnail.url });
-    }
-  }
-
-  onClickDeleteQue(video) {
-    this.setState({ que: this.state.que.filter((item) => item.key !== video.key) });
+  onClickSetPlayingVideo(video) {
+    this.setPlayingVideo(video);
   }
 
   onKeyPressForSearch(e) {
@@ -146,54 +227,63 @@ class App extends ReactBaseComponent {
 
   onKeyPressForComment(e) {
     if (e.which !== 13) return false;
+    if (e.target.value === '') return false;
     e.preventDefault();
-    this.setState({ comments: [...this.state.comments, e.target.value], commentText: '' });
+    const isGif = e.target.value.includes('/ giphy');
+    if (isGif) {
+      this.setGifUrl(e.target.value);
+    } else {
+      const comment = commentObj(e.target.value, this.state.currentUser.name, CommentType.text);
+      this.setState({ comments: [...this.state.comments, comment], commentText: '' });
+    }
     return true;
+  }
+
+  onClickSetQue(video) {
+    const { que, currentUser } = this.state;
+    const targetVideo = videoObject(video, currentUser.name);
+    if (que.length === 0 && this.state.playingVideo === '') {
+      this.setState({ playingVideo: targetVideo });
+    } else {
+      this.setState({ que: [...que, targetVideo] });
+    }
+  }
+
+  onClickDeleteQue(video) {
+    this.setState({ que: this.state.que.filter((item) => item.key !== video.key) });
   }
 
   onChangeText(type, value) {
     this.setState({ [type]: value });
   }
 
-  setVolume(e) {
-    this.setState({ volume: parseFloat(e.target.value) });
-  }
-
-  onSeekMouseDown() {
-    this.setState({ seeking: true });
-  }
-
-  onSeekMouseUp(e) {
-    this.setState({ seeking: false, startTime: parseFloat(e.target.value) });
-    this.player.seekTo(parseFloat(e.target.value));
-  }
-
-  onSeekChange(e) {
-    this.setState({
-      played: parseFloat(e.target.value),
+  setGifUrl(keyword) {
+    const key = keyword.replace('/ giphy ', '');
+    const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
+    giphyApp.random(key).then((res) => {
+      const imageUrl = res.data.fixed_height_downsampled_url;
+      const comment = commentObj(imageUrl, this.state.currentUser.name, CommentType.gif);
+      this.setState({ comments: [...this.state.comments, comment], commentText: '' });
     });
   }
 
   videoSearch() {
     const youTubeNode = new YouTubeNode();
+    const searchResultObj = (result) => ({
+      videoId: result.id.videoId,
+      title: result.snippet.title,
+      thumbnail: result.snippet.thumbnails.default,
+    });
     youTubeNode.setKey(YOUTUBE_API_KEY);
-    youTubeNode.search(
-      this.state.searchText,
-      50,
+    youTubeNode.search(this.state.searchText, 50,
       (error, result) => {
         if (error) {
-          console.log(error);
+          // console.log(error);
         } else {
           this.setState({
             searchResultNum: result.items.length,
-            searchResult: result.items.map((it) => (
-              {
-                videoId: it.id.videoId,
-                title: it.snippet.title,
-                thumbnail: it.snippet.thumbnails.default,
-              }
-            )),
-          });
+            searchResult: result.items.map((item) => searchResultObj(item)),
+          })
         }
       }
     );
@@ -202,12 +292,90 @@ class App extends ReactBaseComponent {
   render() {
     const { playing, volume, played, loaded } = this.state;
     const { soundcloudConfig, vimeoConfig, youtubeConfig, fileConfig } = this.state;
-    const { playingVideo } = this.state;
+    const { playingVideo, currentUser } = this.state;
+    const { isLogin, name, photoURL } = currentUser;
+    const isSetPlayingVideo = playingVideo !== '';
+
+    const headerForNotLogin = (
+      <div>
+        <div>
+          <input
+            className="comment-input"
+            type="text"
+            placeholder="user name"
+            onChange={(e) => this.onChangeText('displayName', e.target.value)}
+            value={this.state.displayName}
+          >
+          </input>
+          <input
+            className="comment-input"
+            type="text"
+            placeholder="mail address"
+            onChange={(e) => this.onChangeText('mailAddressForSignUp', e.target.value)}
+            value={this.state.mailAddressForSignUp}
+          >
+          </input>
+          <input
+            className="comment-input"
+            type="text"
+            placeholder="password"
+            onChange={(e) => this.onChangeText('passwordForSignUp', e.target.value)}
+            value={this.state.passwordForSignUp}
+          >
+          </input>
+          <button onClick={this.onClickSignUp}>Sign Up</button>
+        </div>
+        <div>
+          <input
+            className="comment-input"
+            type="text"
+            placeholder="mail address"
+            onChange={(e) => this.onChangeText('mailAddressForSignIn', e.target.value)}
+            value={this.state.mailAddressForSignIn}
+          >
+          </input>
+          <input
+            className="comment-input"
+            type="text"
+            placeholder="password"
+            onChange={(e) => this.onChangeText('passwordForSignIn', e.target.value)}
+            value={this.state.passwordForSignIn}
+          >
+          </input>
+          <button onClick={this.onClickSignIn}>Sign In</button>
+        </div>
+      </div>
+    );
+
+    const headerForLogedin = (
+      <div>
+        <div>
+          <p>{name}</p>
+          <p>{photoURL}</p>
+        </div>
+        <button onClick={this.onClickSignOut}>Sign Out</button>
+      </div>
+    );
+
     const headerNode = (
       <header className="sss-header">
-        <span className="text-small">Now Playing</span> {this.state.playingVideo.title}
+        {(isLogin) ? headerForLogedin : headerForNotLogin}
+        {
+          isSetPlayingVideo &&
+            <p>
+              <span className="text-small">{PlayingVideoStatusText.playing}</span>
+              {playingVideo.title} {playingVideo.displayName}
+            </p>
+        }
+        {
+          !isSetPlayingVideo &&
+            <p>
+              <span className="text-small">{PlayingVideoStatusText.noVideos}</span>
+            </p>
+        }
       </header>
     );
+
     const searchResultNode = this.state.searchResult.map((result, i) => (
       <ul key={i} className="list-group" onClick={() => this.onClickSetQue(result)}>
         <li className="list-group-item">
@@ -240,6 +408,7 @@ class App extends ReactBaseComponent {
           <div className="media-body">
             <strong>{video.title}</strong>
           </div>
+          <p>added by {video.userName}</p>
         </li>
         <div>
           <span className="icon icon-cancel" onClick={() => this.onClickDeleteQue(video)}>x</span>
@@ -247,13 +416,39 @@ class App extends ReactBaseComponent {
       </div>
     ));
 
-    const commentsNode = this.state.comments.map((comment, i) => (
-      <li key={i}>
-        {comment}
-      </li>
-    ));
+    const commentsNode = this.state.comments.map((comment, i) => {
+      switch (comment.type) {
+        case CommentType.text:
+          return (
+            <li key={i}>
+              <p>{comment.content}</p>
+              <p>{comment.userName}</p>
+            </li>
+          );
+        case CommentType.log:
+          return (
+            <li key={i}>
+              <p>{comment.content}</p>
+              <p>{comment.userName}</p>
+            </li>
+          );
+        case CommentType.gif:
+          return (
+            <li key={i}>
+              <img src={comment.content} alt=""></img>
+              <p>{comment.userName}</p>
+            </li>
+          );
+        default:
+          return '';
+      }
+    });
+
     return (
       <div>
+        <br />
+        <br />
+        {headerNode}
         <div className="sss-youtube-wrapper is-covered">
           <ReactPlayer
             ref={(player) => { this.player = player; }}
@@ -325,7 +520,6 @@ class App extends ReactBaseComponent {
             <td>{loaded.toFixed(3)}</td>
           </tr>
         </tbody></table>
-        {headerNode}
         <div className="controlls">
           <div className="pane comment-box">
             <ul className="comment-list-group">

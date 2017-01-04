@@ -13,11 +13,12 @@
     "react-scripts": "0.8.4"
   },
   "dependencies": {
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
     "classnames": "^2.2.5",
     "firebase": "^3.6.2",
+    "giphy-api": "^1.2.3",
     "re-base": "^2.5.1",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
     "react-player": "^0.14.0",
     "react-swipe-to-reveal-options": "^0.3.6",
     "react-youtube": "^7.3.0",
