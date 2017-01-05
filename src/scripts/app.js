@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
-import { YOUTUBE_API_KEY } from '../key.js';
-import { base, firebaseAuth } from '../firebaseApp';
+import { YOUTUBE_API_KEY } from './key';
+import { base, firebaseAuth } from './firebaseApp';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
-import { getAnimalName } from '../animal';
+import { getAnimalName } from './animal';
 import giphy from 'giphy-api';
 
 const SyncStates = [
