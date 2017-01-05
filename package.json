@@ -2,6 +2,7 @@
   "name": "session-web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://tune-in.herokuapp.com/",
   "devDependencies": {
     "babel-eslint": "7.1.1",
     "eslint": "3.8.1",
