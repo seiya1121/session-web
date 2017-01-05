@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
-import { YOUTUBE_API_KEY } from './key.js';
+import { YOUTUBE_API_KEY } from './api_key.js';
 import { base, firebaseAuth } from './firebaseApp.js';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
