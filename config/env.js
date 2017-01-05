@@ -24,7 +24,8 @@ function getClientEnvironment(publicUrl) {
       'FIREBASE_DEV_API_KEY': JSON.stringify(process.env.FIREBASE_DEV_API_KEY),
       'FIREBASE_DEV_AUTH_DOMAIN': JSON.stringify(process.env.FIREBASE_DEV_AUTH_DOMAIN),
       'FIREBASE_DEV_DATABASE_URL': JSON.stringify(process.env.FIREBASE_DEV_DATABASE_URL),
-      'FIREBASE_DEV_STORAGE_BUCKET': JSON.stringify(process.env.FIREBASE_DEV_STORAGE_BUCKET)
+      'FIREBASE_DEV_STORAGE_BUCKET': JSON.stringify(process.env.FIREBASE_DEV_STORAGE_BUCKET),
+      'YOUTUBE_API_KEY': JSON.stringify(process.env.YOUTUBE_API_KEY)
     });
   return {'process.env': processEnv};
 }
