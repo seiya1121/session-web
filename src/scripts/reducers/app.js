@@ -28,14 +28,13 @@ const app = (state = initialState, action) => {
   const newState = (obj) => Object.assign({}, state, obj);
   switch (action.type) {
     case App.CHANGE_TEXT:
-      return newState(state, { [action.textType]: action.text })
+      return newState({ [action.textType]: action.text })
     case App.SET_PLAYING_VIDEO:
-      return newState(state, {
+      return newState({
         playing: true,
         startTime: 0,
         playingVideo: action.video,
         que: state.que.filter((item) => item.key !== action.video.key),
-        comments: [...state.comments, action.comment],
       })
     case App.SET_USER:
       return newState({ currentUser: action.user })
@@ -54,7 +53,7 @@ const app = (state = initialState, action) => {
     case App.SEEK_UP:
       return newState({ seeking: false, startTime: action.played })
     case App.CHANGE_PLAYED:
-      return newState({ played: action.played })
+      return newState({ played: action.played, seekin: false })
     case App.PLAY:
       return newState({ playing: true })
     case App.PAUSE:

@@ -13,11 +13,14 @@ export const seekUp = (played) => ({ type: App.SEEK_UP, played });
 export const changePlayed = (played) => ({ type: App.CHANGE_PLAYED, played });
 export const play = () => ({ type: App.PLAY });
 export const paunse = () => ({ type: App.PLAY });
-export const progress = (played, loaded) => ({ type: App.PROGRESS });
+export const progress = (state) => {
+  console.log(state);
+  return { type: App.PROGRESS, played: state.played, loaded: state.loaded };
+}
 export const setComment = (comment) => ({ type: App.SET_COMMENT, comment });
 export const setSearchResult = (result) => ({
     type: App.SET_SEARCH_RESULT,
     result: result.items.map((item) => ({
       videoId: item.id.videoId, title: item.snippet.title, thumbnail: item.snippet.thumbnails.default
     })),
-})
+});

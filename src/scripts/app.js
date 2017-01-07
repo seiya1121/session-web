@@ -37,7 +37,7 @@ class App extends ReactBaseComponent {
     this.bind('onClickSetQue');
     this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
-    this.bind('onSeekMouseUp')
+    this.bind('onSeekMouseUp', 'onProgress')
   }
 
   componentWillMount() {
@@ -59,7 +59,7 @@ class App extends ReactBaseComponent {
       context: this,
       asArray: false,
       then(startTime) {
-        this.setState({ played: startTime, seeking: false });
+        this.props.appActions.changePlayed(startTime);
         this.player.seekTo(startTime)
       },
     });
@@ -112,20 +112,9 @@ class App extends ReactBaseComponent {
     this.player.seekTo(played);
   }
 
-  onConfigSubmit() {
-    let config;
-    try {
-      config = JSON.parse(this.configInput.value);
-    } catch (error) {
-      config = {};
-      console.error('Error setting config:', error);
-    }
-    this.setState(config);
-  }
-
   notification(title, option) {
     const notification = new Notification(
-      `${title} (${this.state.que.length + 1} remained)`,
+      `${title} (${this.props.app.que.length + 1} remained)`,
       { body: option.body, icon: option.icon, silent: true }
     );
     return notification;
@@ -167,7 +156,7 @@ class App extends ReactBaseComponent {
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
-      const comment = commentObj(imageUrl, this.state.currentUser.name, CommentType.gif);
+      const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif);
       this.props.appActions.setComment(comment);
     });
   }
@@ -178,11 +167,16 @@ class App extends ReactBaseComponent {
     }
     const youTubeNode = new YouTubeNode();
     youTubeNode.setKey(YOUTUBE_API_KEY);
-    youTubeNode.search(this.state.searchText, 50, (error, result) => searchFunc(error, result));
+    youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
+  }
+
+  onProgress(state) {
+    this.props.appActions.progress(state);
   }
 
   render() {
     const { app, appActions } = this.props;
+    console.log(app);
     const { isLogin, name, photoURL } = app.currentUser;
     const isSetPlayingVideo = app.playingVideo !== '';
 
@@ -359,7 +353,7 @@ class App extends ReactBaseComponent {
             onBuffer={() => Reactotron.log('onBuffer')}
             onEnded={() => appActions.setPlayingVideo(app.que[0])}
             onError={(e) => Reactotron.log('onError', e)}
-            onProgress={(state) => appActions.progress(state.played, state.loaded)}
+            onProgress={this.onProgress}
             onDuration={(duration) => this.setState({ duration })}
           />
         </div>
