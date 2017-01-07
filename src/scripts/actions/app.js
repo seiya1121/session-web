@@ -14,8 +14,9 @@ export const changePlayed = (played) => ({ type: App.CHANGE_PLAYED, played });
 export const play = () => ({ type: App.PLAY });
 export const paunse = () => ({ type: App.PLAY });
 export const progress = (state) => {
-  console.log(state);
-  return { type: App.PROGRESS, played: state.played, loaded: state.loaded };
+  const { played, loaded } = state;
+  const playingStatus = (state.loaded) ? { played, loaded } : { played }
+  return { type: App.PROGRESS, playingStatus };
 }
 export const setComment = (comment) => ({ type: App.SET_COMMENT, comment });
 export const setSearchResult = (result) => ({

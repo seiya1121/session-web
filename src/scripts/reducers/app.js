@@ -59,7 +59,7 @@ const app = (state = initialState, action) => {
     case App.PAUSE:
       return newState({ playing: false })
     case App.PROGRESS:
-      return !state.seeking ? newState({ played: action.played, loaded: action.loaded }) : state
+      return !state.seeking ? newState(action.playingStatus) : state
     case App.SET_COMMENT:
       return newState({ comments: [...state.comments, action.comment], commentText: '' })
     case App.SET_SEARCH_RESULT:

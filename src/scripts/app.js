@@ -398,16 +398,6 @@ class App extends ReactBaseComponent {
             <td><progress max={1} value={app.loaded} /></td>
           </tr>
         </tbody></table>
-        <table><tbody>
-          <tr>
-            <th>played</th>
-            <td>{app.played.toFixed(3)}</td>
-          </tr>
-          <tr>
-            <th>loaded</th>
-            <td>{app.loaded.toFixed(3)}</td>
-          </tr>
-        </tbody></table>
         <div className="controlls">
           <div className="pane comment-box">
             <ul className="comment-list-group">
