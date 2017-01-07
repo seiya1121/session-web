@@ -1,2 +1,11 @@
 export const CHANGE_TEXT = 'CHANGE_TEXT';
 export const SET_PLAYING_VIDEO = 'SET_PLAYING_VIDEO';
+export const SET_USER = 'SET_USER';
+export const SET_QUE = 'SET_QUE';
+export const DELETE_QUE = 'DELETE_QUE';
+export const PLAY_PAUSE = 'PLAY_PAUSE';
+export const SET_VOLUME = 'SET_VOLUME';
+export const SEEK_DOWN = 'SEEK_DOWN';
+export const SEEK_UP = 'SEEK_UP';
+export const CHANGE_PLAYED = 'CHANGE_PLAYED';
+export const PLAYING_ON = 'PLAYING_ON';
