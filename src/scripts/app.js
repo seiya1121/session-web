@@ -34,30 +34,10 @@ const commandType = { giphy: '/ giphy ' };
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      playing: true,
-      volume: 0.8,
-      startTime: 0,
-      played: 0,
-      loaded: 0,
-      duration: 0,
-      seeking: false,
-      playingVideo: '',
-      searchText: '',
-      commentText: '',
-      searchResult: [],
-      searchResultNum: '',
-      displayName: '',
-      mailAddressForSignIn: '',
-      mailAddressForSignUp: '',
-      passwordForSignIn: '',
-      passwordForSignUp: '',
-      que: [],
-      comments: [],
-      users: [],
-      currentUser: defaultCurrentUser,
-    };
-    this.bind('onChangeText', 'videoSearch', 'setPlayingVideo', 'notification', 'setGifUrl');
+    this.state = this.props.app;
+    this.appActions = this.props.appActions;
+
+    this.bind('videoSearch', 'setPlayingVideo', 'notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue', 'onClickDeleteQue');
     this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
@@ -87,6 +67,7 @@ class App extends ReactBaseComponent {
   componentWillMount() {
     SyncStates.forEach((obj) => {
       const { state, asArray } = obj;
+      console.log(state);
       base.bindToState(state, { context: this, state, asArray });
     });
     firebaseAuth.onAuthStateChanged((user) => {
@@ -123,7 +104,7 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignUp() {
-    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.state;
+    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.props.state;
     firebaseAuth.createUserWithEmailAndPassword(mailAddressForSignUp, passwordForSignUp)
       .then((user) => {
         user.updateProfile({ displayName });
@@ -141,7 +122,7 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignIn() {
-    const { mailAddressForSignIn, passwordForSignIn } = this.state;
+    const { mailAddressForSignIn, passwordForSignIn } = this.props.state;
     firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
       .then((user) => this.setLoginUser(user))
       .catch((error) => {
@@ -274,10 +255,6 @@ class App extends ReactBaseComponent {
     this.setState({ que: this.state.que.filter((item) => item.key !== video.key) });
   }
 
-  onChangeText(type, value) {
-    this.setState({ [type]: value });
-  }
-
   setGifUrl(keyword) {
     const key = keyword.replace(commandType.giphy, '');
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
@@ -302,7 +279,6 @@ class App extends ReactBaseComponent {
           // console.log(error);
         } else {
           this.setState({
-            searchResultNum: result.items.length,
             searchResult: result.items.map((item) => searchResultObj(item)),
           })
         }
@@ -311,11 +287,12 @@ class App extends ReactBaseComponent {
   }
 
   render() {
-    const { playing, volume, played, loaded } = this.state;
-    const { soundcloudConfig, vimeoConfig, youtubeConfig, fileConfig } = this.state;
-    const { playingVideo, currentUser } = this.state;
+    const { playerStatus, text } = this.state;
+    const { playing, soundcloudConfig, vimeoConfig, youtubeConfig, fileConfig, playingVideo,
+      currentUser } = this.state;
     const { isLogin, name, photoURL } = currentUser;
     const isSetPlayingVideo = playingVideo !== '';
+    const { appActions } = this.appActions;
 
     const headerForNotLogin = (
       <div>
@@ -324,24 +301,24 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="user name"
-            onChange={(e) => this.onChangeText('displayName', e.target.value)}
-            value={this.state.displayName}
+            onChange={(e) => appActions.changeText('displayName', e.target.value)}
+            value={text.displayName}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => this.onChangeText('mailAddressForSignUp', e.target.value)}
-            value={this.state.mailAddressForSignUp}
+            onChange={(e) => appActions.changeText('mailAddressForSignUp', e.target.value)}
+            value={text.mailAddressForSignUp}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => this.onChangeText('passwordForSignUp', e.target.value)}
-            value={this.state.passwordForSignUp}
+            onChange={(e) => appActions.changeText('passwordForSignUp', e.target.value)}
+            value={text.passwordForSignUp}
           >
           </input>
           <button onClick={this.onClickSignUp}>Sign Up</button>
@@ -351,16 +328,16 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => this.onChangeText('mailAddressForSignIn', e.target.value)}
-            value={this.state.mailAddressForSignIn}
+            onChange={(e) => appActions.changeText('mailAddressForSignIn', e.target.value)}
+            value={text.mailAddressForSignIn}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => this.onChangeText('passwordForSignIn', e.target.value)}
-            value={this.state.passwordForSignIn}
+            onChange={(e) => appActions.changeText('passwordForSignIn', e.target.value)}
+            value={text.passwordForSignIn}
           >
           </input>
           <button onClick={this.onClickSignIn}>Sign In</button>
@@ -478,7 +455,7 @@ class App extends ReactBaseComponent {
             height={270}
             url={youtubeUrl(playingVideo.videoId)}
             playing={playing}
-            volume={volume}
+            volume={playerStatus.volume}
             soundcloudConfig={soundcloudConfig}
             vimeoConfig={vimeoConfig}
             youtubeConfig={youtubeConfig}
@@ -507,7 +484,7 @@ class App extends ReactBaseComponent {
             <td>
               <input
                 type="range" min={0} max={1} step="any"
-                value={played}
+                value={playerStatus.played}
                 onMouseDown={this.onSeekMouseDown}
                 onChange={this.onSeekChange}
                 onMouseUp={this.onSeekMouseUp}
@@ -518,27 +495,27 @@ class App extends ReactBaseComponent {
             <th>Volume</th>
             <td>
               <input
-                type="range" min={0} max={1} step="any" value={volume} onChange={this.setVolume}
+                type="range" min={0} max={1} step="any" value={playerStatus.volume} onChange={this.setVolume}
               />
             </td>
           </tr>
           <tr>
             <th>Played</th>
-            <td><progress max={1} value={played} /></td>
+            <td><progress max={1} value={playerStatus.played} /></td>
           </tr>
           <tr>
             <th>Loaded</th>
-            <td><progress max={1} value={loaded} /></td>
+            <td><progress max={1} value={playerStatus.loaded} /></td>
           </tr>
         </tbody></table>
         <table><tbody>
           <tr>
             <th>played</th>
-            <td>{played.toFixed(3)}</td>
+            <td>{playerStatus.played.toFixed(3)}</td>
           </tr>
           <tr>
             <th>loaded</th>
-            <td>{loaded.toFixed(3)}</td>
+            <td>{playerStatus.loaded.toFixed(3)}</td>
           </tr>
         </tbody></table>
         <div className="controlls">
@@ -550,10 +527,9 @@ class App extends ReactBaseComponent {
               className="comment-input"
               type="text"
               placeholder="type comment"
-              onChange={
-                (e) => this.props.appActions.changeText(e.target.value)}
+              onChange={(e) => appActions.changeText('commentText', e.target.value)}
               onKeyPress={this.onKeyPressForComment}
-              value={this.props.commentText}
+              value={text.commentText}
             >
             </input>
           </div>
@@ -576,9 +552,9 @@ class App extends ReactBaseComponent {
                   className="form-control"
                   type="text"
                   placeholder="Search for something you want"
-                  onChange={(e) => this.onChangeText('searchText', e.target.value)}
+                  onChange={(e) => appActions.changeText('searchText', e.target.value)}
                   onKeyPress={this.onKeyPressForSearch}
-                  value={this.state.searchText}
+                  value={text.searchText}
                 >
                 </input>
               </li>
@@ -594,7 +570,7 @@ class App extends ReactBaseComponent {
 }
 
 const mapStateToProps = (state) => {
-  return { comments: state.comments };
+  return { app: state.app };
 }
 
 const mapDispatchToProps = (dispatch) => {
