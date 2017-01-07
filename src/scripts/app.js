@@ -1,10 +1,13 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as AppActions from './actions/app';
+import Reactotron from 'reactotron-react-js'
 import { YOUTUBE_API_KEY } from './api_key.js';
 import { base, firebaseAuth } from './firebaseApp.js';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
-import { getAnimalName } from './animal.js';
 import giphy from 'giphy-api';
 
 const SyncStates = [
@@ -17,10 +20,7 @@ const SyncStates = [
 ];
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 const videoObject = (video, userName) => Object.assign({}, video, { userName });
-const defaultCurrentUser = Object.assign(
-  {}, { name: getAnimalName(), photoURL: '', isLogin: false }
-);
- const PlayingVideoStatusText = {
+const PlayingVideoStatusText = {
   playing: 'Now Playing',
   noVideos: "There're no videos to play.",
 };
@@ -31,54 +31,13 @@ const commandType = { giphy: '/ giphy ' };
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      playing: true,
-      volume: 0.8,
-      startTime: 0,
-      played: 0,
-      loaded: 0,
-      duration: 0,
-      seeking: false,
-      playingVideo: '',
-      searchText: '',
-      commentText: '',
-      searchResult: [],
-      searchResultNum: '',
-      displayName: '',
-      mailAddressForSignIn: '',
-      mailAddressForSignUp: '',
-      passwordForSignIn: '',
-      passwordForSignUp: '',
-      que: [],
-      comments: [],
-      users: [],
-      currentUser: defaultCurrentUser,
-    };
-    this.bind('onChangeText', 'videoSearch', 'setPlayingVideo', 'notification', 'setGifUrl');
+    this.state = this.props.app;
+    this.bind('videoSearch', 'notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
-    this.bind('onClickSetQue', 'onClickDeleteQue');
+    this.bind('onClickSetQue');
     this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
-    this.bind('playPause', 'stop', 'setVolume', 'onSeekMouseDown', 'onSeekMouseUp', 'onSeekChange')
-    this.bind('onEnded', 'onPlay', 'onProgress', 'onReady');
-  }
-
-  setLoginUser(user) {
-    const { displayName, photoURL } = user;
-    this.setState({
-      currentUser: Object.assign({}, this.state.currentUser,
-        { name: displayName, photoURL, isLogin: true }
-      ),
-    });
-  }
-
-  setLoginUserForSignUp(user, displayName) {
-    const { photoURL } = user;
-    this.setState({
-      currentUser: Object.assign({}, this.state.currentUser,
-        { name: displayName, photoURL, isLogin: true }
-      ),
-    });
+    this.bind('onSeekMouseUp', 'onProgress')
   }
 
   componentWillMount() {
@@ -87,10 +46,7 @@ class App extends ReactBaseComponent {
       base.bindToState(state, { context: this, state, asArray });
     });
     firebaseAuth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        this.setLoginUser(user);
-      }
+      user && this.props.appActions.setUser(user, true)
     });
   }
 
@@ -103,7 +59,7 @@ class App extends ReactBaseComponent {
       context: this,
       asArray: false,
       then(startTime) {
-        this.setState({ played: startTime, seeking: false });
+        this.props.appActions.changePlayed(startTime);
         this.player.seekTo(startTime)
       },
     });
@@ -120,120 +76,48 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignUp() {
-    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.state;
+    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.props.app;
     firebaseAuth.createUserWithEmailAndPassword(mailAddressForSignUp, passwordForSignUp)
       .then((user) => {
         user.updateProfile({ displayName });
       })
       .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
+        Reactotron.log(error.code);
+        Reactotron.log(error.message);
       });
     firebaseAuth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        this.setLoginUserForSignUp(user, displayName);
-      }
+      user && this.props.appActions.setUser({ name: displayName, photoURL: user.photoURL }, true)
     });
   }
 
   onClickSignIn() {
-    const { mailAddressForSignIn, passwordForSignIn } = this.state;
+    const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
     firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
-      .then((user) => this.setLoginUser(user))
+      .then((user) => {
+        this.props.appActions.setUser({ name: user.displayName, photoURL: user.photoURL }, true)
+      })
       .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
+        Reactotron.log(error.code);
+        Reactotron.log(error.message);
       });
   }
 
   onClickSignOut() {
-    firebaseAuth.signOut()
-      .then(() => this.setState({ currentUser: defaultCurrentUser }));
-  }
-
-  playPause() {
-    this.setState({ playing: !this.state.playing, startTime: this.state.played });
-  }
-
-  stop() {
-    if (this.state.que.length > 0) {
-      this.setPlayingVideo(this.state.que[0]);
-    } else {
-      this.setState({ playing: false, playingVideo: '', startTime: 0 });
-    }
-  }
-
-  setVolume(e) {
-    this.setState({ volume: parseFloat(e.target.value) });
-  }
-
-  onSeekMouseDown() {
-    this.setState({ seeking: true });
+    firebaseAuth.signOut().then(() => this.props.appActions.setDefaultUser());
   }
 
   onSeekMouseUp(e) {
-    this.setState({ seeking: false, startTime: parseFloat(e.target.value) });
-    this.player.seekTo(parseFloat(e.target.value));
-  }
-
-  onSeekChange(e) {
-    this.setState({ played: parseFloat(e.target.value) });
-  }
-
-  onProgress(state) {
-    if (!this.state.seeking) { this.setState(state); }
-  }
-
-  onConfigSubmit() {
-    let config;
-    try {
-      config = JSON.parse(this.configInput.value);
-    } catch (error) {
-      config = {};
-      console.error('Error setting config:', error);
-    }
-    this.setState(config);
+    const played = parseFloat(e.target.value)
+    this.props.appActions.seekUp(played);
+    this.player.seekTo(played);
   }
 
   notification(title, option) {
     const notification = new Notification(
-      `${title} (${this.state.que.length + 1} remained)`,
+      `${title} (${this.props.app.que.length + 1} remained)`,
       { body: option.body, icon: option.icon, silent: true }
     );
     return notification;
-  }
-
-  setPlayingVideo(video) {
-    this.setState({
-      playing: true,
-      playingVideo: video,
-      startTime: 0,
-      que: this.state.que.filter((item) => item.key !== video.key),
-      comments: [...this.state.comments, commentObj(`play ${video.title}`, '', CommentType.log)],
-    });
-  }
-
-  onPlay(video) {
-    this.setState({ playing: true });
-    this.notification('Now Playing♪', { body: video.title, icon: video.thumbnail.url });
-  }
-
-  onEnded() {
-    if (this.state.que.length > 0) {
-      this.setPlayingVideo(this.state.que[0]);
-    } else {
-      this.setState({ playingVideo: '', startTime: 0 });
-    }
-  }
-
-  onReady() {
-    console.log('onReady');
-    this.setState({ playing: true });
-  }
-
-  onClickSetPlayingVideo(video) {
-    this.setPlayingVideo(video);
   }
 
   onKeyPressForSearch(e) {
@@ -251,28 +135,20 @@ class App extends ReactBaseComponent {
     if (isGif) {
       this.setGifUrl(e.target.value);
     } else {
-      const comment = commentObj(e.target.value, this.state.currentUser.name, CommentType.text);
-      this.setState({ comments: [...this.state.comments, comment], commentText: '' });
+      const comment = commentObj(e.target.value, this.props.app.currentUser.name, CommentType.text);
+      this.props.appActions.setComment(comment);
     }
     return true;
   }
 
   onClickSetQue(video) {
-    const { que, currentUser } = this.state;
+    const { que, currentUser, playingVideo } = this.props.app;
     const targetVideo = videoObject(video, currentUser.name);
-    if (que.length === 0 && this.state.playingVideo === '') {
-      this.setState({ playingVideo: targetVideo });
+    if (que.length === 0 && playingVideo === '') {
+      this.props.appActions.setPlayingVideo(targetVideo);
     } else {
-      this.setState({ que: [...que, targetVideo] });
+      this.props.appActions.setQue(targetVideo);
     }
-  }
-
-  onClickDeleteQue(video) {
-    this.setState({ que: this.state.que.filter((item) => item.key !== video.key) });
-  }
-
-  onChangeText(type, value) {
-    this.setState({ [type]: value });
   }
 
   setGifUrl(keyword) {
@@ -280,39 +156,29 @@ class App extends ReactBaseComponent {
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
-      const comment = commentObj(imageUrl, this.state.currentUser.name, CommentType.gif);
-      this.setState({ comments: [...this.state.comments, comment], commentText: '' });
+      const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif);
+      this.props.appActions.setComment(comment);
     });
   }
 
   videoSearch() {
+    const searchFunc = (error, result) => {
+      (error) ?  Reactotron.log(error) : this.props.appActions.setSearchResult(result)
+    }
     const youTubeNode = new YouTubeNode();
-    const searchResultObj = (result) => ({
-      videoId: result.id.videoId,
-      title: result.snippet.title,
-      thumbnail: result.snippet.thumbnails.default,
-    });
     youTubeNode.setKey(YOUTUBE_API_KEY);
-    youTubeNode.search(this.state.searchText, 50,
-      (error, result) => {
-        if (error) {
-          // console.log(error);
-        } else {
-          this.setState({
-            searchResultNum: result.items.length,
-            searchResult: result.items.map((item) => searchResultObj(item)),
-          })
-        }
-      }
-    );
+    youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
+  }
+
+  onProgress(state) {
+    this.props.appActions.progress(state);
   }
 
   render() {
-    const { playing, volume, played, loaded } = this.state;
-    const { soundcloudConfig, vimeoConfig, youtubeConfig, fileConfig } = this.state;
-    const { playingVideo, currentUser } = this.state;
-    const { isLogin, name, photoURL } = currentUser;
-    const isSetPlayingVideo = playingVideo !== '';
+    const { app, appActions } = this.props;
+    console.log(app);
+    const { isLogin, name, photoURL } = app.currentUser;
+    const isSetPlayingVideo = app.playingVideo !== '';
 
     const headerForNotLogin = (
       <div>
@@ -321,24 +187,24 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="user name"
-            onChange={(e) => this.onChangeText('displayName', e.target.value)}
-            value={this.state.displayName}
+            onChange={(e) => appActions.changeText('displayName', e.target.value)}
+            value={app.displayName}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => this.onChangeText('mailAddressForSignUp', e.target.value)}
-            value={this.state.mailAddressForSignUp}
+            onChange={(e) => appActions.changeText('mailAddressForSignUp', e.target.value)}
+            value={app.mailAddressForSignUp}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => this.onChangeText('passwordForSignUp', e.target.value)}
-            value={this.state.passwordForSignUp}
+            onChange={(e) => appActions.changeText('passwordForSignUp', e.target.value)}
+            value={app.passwordForSignUp}
           >
           </input>
           <button onClick={this.onClickSignUp}>Sign Up</button>
@@ -348,16 +214,16 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => this.onChangeText('mailAddressForSignIn', e.target.value)}
-            value={this.state.mailAddressForSignIn}
+            onChange={(e) => appActions.changeText('mailAddressForSignIn', e.target.value)}
+            value={app.mailAddressForSignIn}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => this.onChangeText('passwordForSignIn', e.target.value)}
-            value={this.state.passwordForSignIn}
+            onChange={(e) => appActions.changeText('passwordForSignIn', e.target.value)}
+            value={app.passwordForSignIn}
           >
           </input>
           <button onClick={this.onClickSignIn}>Sign In</button>
@@ -382,7 +248,7 @@ class App extends ReactBaseComponent {
           isSetPlayingVideo &&
             <p>
               <span className="text-small">{PlayingVideoStatusText.playing}</span>
-              {playingVideo.title} {playingVideo.displayName}
+              {app.playingVideo.title} {app.playingVideo.displayName}
             </p>
         }
         {
@@ -394,7 +260,7 @@ class App extends ReactBaseComponent {
       </header>
     );
 
-    const searchResultNode = this.state.searchResult.map((result, i) => (
+    const searchResultNode = app.searchResult.map((result, i) => (
       <ul key={i} className="list-group" onClick={() => this.onClickSetQue(result)}>
         <li className="list-group-item">
           <img
@@ -410,11 +276,11 @@ class App extends ReactBaseComponent {
         </li>
       </ul>
     ));
-    const queNode = this.state.que.map((video, i) => (
+    const queNode = app.que.map((video, i) => (
       <div key={i}>
         <li
           className="slist-group-item"
-          onClick={() => this.onClickSetPlayingVideo(video)}
+          onClick={() => appActions.setPlayingVideo(video)}
         >
           <img
             className="img-circle media-object pull-left"
@@ -429,12 +295,12 @@ class App extends ReactBaseComponent {
           <p>added by {video.userName}</p>
         </li>
         <div>
-          <span className="icon icon-cancel" onClick={() => this.onClickDeleteQue(video)}>x</span>
+          <span className="icon icon-cancel" onClick={() => appActions.deleteQue(video)}>x</span>
         </div>
       </div>
     ));
 
-    const commentsNode = this.state.comments.map((comment, i) => {
+    const commentsNode = app.comments.map((comment, i) => {
       switch (comment.type) {
         case CommentType.text:
           return (
@@ -473,20 +339,20 @@ class App extends ReactBaseComponent {
             className="react-player"
             width={480}
             height={270}
-            url={youtubeUrl(playingVideo.videoId)}
-            playing={playing}
-            volume={volume}
-            soundcloudConfig={soundcloudConfig}
-            vimeoConfig={vimeoConfig}
-            youtubeConfig={youtubeConfig}
-            fileConfig={fileConfig}
-            onReady={this.onReady}
-            onStart={() => console.log('onStart')}
-            onPlay={() => this.onPlay(playingVideo)}
-            onPause={() => this.setState({ playing: false })}
-            onBuffer={() => console.log('onBuffer')}
-            onEnded={this.onEnded}
-            onError={(e) => console.log('onError', e)}
+            url={youtubeUrl(app.playingVideo.videoId)}
+            playing={app.playing}
+            volume={app.volume}
+            soundcloudConfig={app.soundcloudConfig}
+            vimeoConfig={app.vimeoConfig}
+            youtubeConfig={app.youtubeConfig}
+            fileConfig={app.fileConfig}
+            onReady={() => appActions.play()}
+            onStart={() => Reactotron.log('onStart')}
+            onPlay={() => appActions.play()}
+            onPause={() => appActions.pause()}
+            onBuffer={() => Reactotron.log('onBuffer')}
+            onEnded={() => appActions.setPlayingVideo(app.que[0])}
+            onError={(e) => Reactotron.log('onError', e)}
             onProgress={this.onProgress}
             onDuration={(duration) => this.setState({ duration })}
           />
@@ -495,8 +361,8 @@ class App extends ReactBaseComponent {
           <tr>
             <th>Controls</th>
             <td>
-              <button onClick={this.stop}>Stop</button>
-              <button onClick={this.playPause}>{playing ? 'Pause' : 'Play'}</button>
+              <button onClick={() => appActions.setPlayingVideo(app.que[0])}>Skip</button>
+              <button onClick={() => appActions.layPause}>{app.playing ? 'Pause' : 'Play'}</button>
             </td>
           </tr>
           <tr>
@@ -504,9 +370,9 @@ class App extends ReactBaseComponent {
             <td>
               <input
                 type="range" min={0} max={1} step="any"
-                value={played}
-                onMouseDown={this.onSeekMouseDown}
-                onChange={this.onSeekChange}
+                value={app.played}
+                onMouseDown={appActions.seekDown}
+                onChange={(e) => appActions.changePlayed(parseFloat(e.target.value))}
                 onMouseUp={this.onSeekMouseUp}
               />
             </td>
@@ -515,27 +381,21 @@ class App extends ReactBaseComponent {
             <th>Volume</th>
             <td>
               <input
-                type="range" min={0} max={1} step="any" value={volume} onChange={this.setVolume}
+                type="range"
+                min={0}
+                max={1}
+                step="any"
+                value={app.volume} onChange={(e) => appActions.setVolume(e.target.value)}
               />
             </td>
           </tr>
           <tr>
             <th>Played</th>
-            <td><progress max={1} value={played} /></td>
+            <td><progress max={1} value={app.played} /></td>
           </tr>
           <tr>
             <th>Loaded</th>
-            <td><progress max={1} value={loaded} /></td>
-          </tr>
-        </tbody></table>
-        <table><tbody>
-          <tr>
-            <th>played</th>
-            <td>{played.toFixed(3)}</td>
-          </tr>
-          <tr>
-            <th>loaded</th>
-            <td>{loaded.toFixed(3)}</td>
+            <td><progress max={1} value={app.loaded} /></td>
           </tr>
         </tbody></table>
         <div className="controlls">
@@ -547,17 +407,16 @@ class App extends ReactBaseComponent {
               className="comment-input"
               type="text"
               placeholder="type comment"
-              onChange={(e) => this.onChangeText('commentText', e.target.value)}
+              onChange={(e) => appActions.changeText('commentText', e.target.value)}
               onKeyPress={this.onKeyPressForComment}
-              value={this.state.commentText}
+              value={app.commentText}
             >
             </input>
           </div>
-
           <div className="pane list-box">
             <h5 className="nav-group-title">
               <span className="icon icon-music"></span>
-              Up Coming({this.state.que.length} videos}
+              Up Coming({app.que.length} videos}
             </h5>
             <ul className="list-group">
               {queNode}
@@ -572,9 +431,9 @@ class App extends ReactBaseComponent {
                   className="form-control"
                   type="text"
                   placeholder="Search for something you want"
-                  onChange={(e) => this.onChangeText('searchText', e.target.value)}
+                  onChange={(e) => appActions.changeText('searchText', e.target.value)}
                   onKeyPress={this.onKeyPressForSearch}
-                  value={this.state.searchText}
+                  value={app.searchText}
                 >
                 </input>
               </li>
@@ -589,4 +448,19 @@ class App extends ReactBaseComponent {
   }
 }
 
-export default App;
+App.propTypes = {
+  app: React.PropTypes.object,
+  appActions: React.PropTypes.object,
+}
+
+const mapStateToProps = (state) => {
+  return { app: state.app };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(AppActions, dispatch),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
