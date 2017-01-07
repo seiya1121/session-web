@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as AppActions from './actions/app';
 import { YOUTUBE_API_KEY } from './api_key.js';
 import { base, firebaseAuth } from './firebaseApp.js';
 import YouTubeNode from 'youtube-node';
@@ -547,9 +550,10 @@ class App extends ReactBaseComponent {
               className="comment-input"
               type="text"
               placeholder="type comment"
-              onChange={(e) => this.onChangeText('commentText', e.target.value)}
+              onChange={
+                (e) => this.props.appActions.changeText(e.target.value)}
               onKeyPress={this.onKeyPressForComment}
-              value={this.state.commentText}
+              value={this.props.commentText}
             >
             </input>
           </div>
@@ -589,4 +593,14 @@ class App extends ReactBaseComponent {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return { comments: state.comments };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(AppActions, dispatch),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
