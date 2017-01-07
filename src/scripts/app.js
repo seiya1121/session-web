@@ -3,6 +3,7 @@ import ReactBaseComponent from './reactBaseComponent';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from './actions/app';
+import Reactotron from 'reactotron-react-js'
 import { YOUTUBE_API_KEY } from './api_key.js';
 import { base, firebaseAuth } from './firebaseApp.js';
 import YouTubeNode from 'youtube-node';
@@ -35,8 +36,7 @@ class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.state = this.props.app;
-    this.appActions = this.props.appActions;
-
+    this.bindRedux('changeText');
     this.bind('videoSearch', 'notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue', 'onClickDeleteQue');
@@ -67,15 +67,9 @@ class App extends ReactBaseComponent {
   componentWillMount() {
     SyncStates.forEach((obj) => {
       const { state, asArray } = obj;
-      console.log(state);
       base.bindToState(state, { context: this, state, asArray });
     });
-    firebaseAuth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        this.setLoginUser(user);
-      }
-    });
+    firebaseAuth.onAuthStateChanged((user) => {user && this.setLoginUser(user)});
   }
 
   componentDidMount() {
@@ -110,8 +104,8 @@ class App extends ReactBaseComponent {
         user.updateProfile({ displayName });
       })
       .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
+        Reactotron.log(error.code);
+        Reactotron.log(error.message);
       });
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
@@ -126,8 +120,8 @@ class App extends ReactBaseComponent {
     firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
       .then((user) => this.setLoginUser(user))
       .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
+        Reactotron.log(error.code);
+        Reactotron.log(error.message);
       });
   }
 
@@ -202,7 +196,7 @@ class App extends ReactBaseComponent {
   }
 
   onReady() {
-    console.log('onReady');
+    Reactotron.log('onReady');
     this.setState({ playing: true });
   }
 
@@ -266,7 +260,7 @@ class App extends ReactBaseComponent {
     youTubeNode.search(this.state.searchText, 50,
       (error, result) => {
         if (error) {
-          // console.log(error);
+          // Reactotron.log(error);
         } else {
           this.setState({
             searchResult: result.items.map((item) => searchResultObj(item)),
@@ -277,7 +271,7 @@ class App extends ReactBaseComponent {
   }
 
   render() {
-    const { playerStatus, text } = this.state;
+    const { playerStatus } = this.state;
     const { playing, soundcloudConfig, vimeoConfig, youtubeConfig, fileConfig, playingVideo,
       currentUser } = this.state;
     const { isLogin, name, photoURL } = currentUser;
@@ -290,24 +284,24 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="user name"
-            onChange={(e) => this.appActions.changeText('displayName', e.target.value)}
-            value={text.displayName}
+            onChange={(e) => this.changeText('displayName', e.target.value)}
+            value={this.state.displayName}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => this.appActions.changeText('mailAddressForSignUp', e.target.value)}
-            value={text.mailAddressForSignUp}
+            onChange={(e) => this.changeText('mailAddressForSignUp', e.target.value)}
+            value={this.state.mailAddressForSignUp}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => this.appActions.changeText('passwordForSignUp', e.target.value)}
-            value={text.passwordForSignUp}
+            onChange={(e) => this.changeText('passwordForSignUp', e.target.value)}
+            value={this.state.passwordForSignUp}
           >
           </input>
           <button onClick={this.onClickSignUp}>Sign Up</button>
@@ -317,16 +311,16 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => this.appActions.changeText('mailAddressForSignIn', e.target.value)}
-            value={text.mailAddressForSignIn}
+            onChange={(e) => this.changeText('mailAddressForSignIn', e.target.value)}
+            value={this.state.mailAddressForSignIn}
           >
           </input>
           <input
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => this.appActions.changeText('passwordForSignIn', e.target.value)}
-            value={text.passwordForSignIn}
+            onChange={(e) => this.changeText('passwordForSignIn', e.target.value)}
+            value={this.state.passwordForSignIn}
           >
           </input>
           <button onClick={this.onClickSignIn}>Sign In</button>
@@ -450,12 +444,12 @@ class App extends ReactBaseComponent {
             youtubeConfig={youtubeConfig}
             fileConfig={fileConfig}
             onReady={this.onReady}
-            onStart={() => console.log('onStart')}
+            onStart={() => Reactotron.log('onStart')}
             onPlay={() => this.onPlay(playingVideo)}
             onPause={() => this.setState({ playing: false })}
-            onBuffer={() => console.log('onBuffer')}
+            onBuffer={() => Reactotron.log('onBuffer')}
             onEnded={this.onEnded}
-            onError={(e) => console.log('onError', e)}
+            onError={(e) => Reactotron.log('onError', e)}
             onProgress={this.onProgress}
             onDuration={(duration) => this.setState({ duration })}
           />
@@ -516,9 +510,9 @@ class App extends ReactBaseComponent {
               className="comment-input"
               type="text"
               placeholder="type comment"
-              onChange={(e) => this.appActions.changeText('commentText', e.target.value)}
+              onChange={(e) => this.changeText('commentText', e.target.value)}
               onKeyPress={this.onKeyPressForComment}
-              value={text.commentText}
+              value={this.state.commentText}
             >
             </input>
           </div>
@@ -541,9 +535,9 @@ class App extends ReactBaseComponent {
                   className="form-control"
                   type="text"
                   placeholder="Search for something you want"
-                  onChange={(e) => this.appActions.changeText('searchText', e.target.value)}
+                  onChange={(e) => this.changeText('searchText', e.target.value)}
                   onKeyPress={this.onKeyPressForSearch}
-                  value={text.searchText}
+                  value={this.state.searchText}
                 >
                 </input>
               </li>
@@ -556,6 +550,11 @@ class App extends ReactBaseComponent {
       </div>
     );
   }
+}
+
+App.propTypes = {
+  app: React.PropTypes.object,
+  appActions: React.PropTypes.object,
 }
 
 const mapStateToProps = (state) => {

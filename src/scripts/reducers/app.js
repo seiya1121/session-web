@@ -12,15 +12,13 @@ const initialState = {
   playingVideo: {},
   playing: true,
   startTime: 0,
-  text: {
-    commentText: '',
-    displayName: '',
-    mailAddressForSignUp: '',
-    passwordForSignUp: '',
-    mailAddressForSignIn: '',
-    passwordForSignIn: '',
-    searchText: '',
-  },
+  commentText: '',
+  displayName: '',
+  mailAddressForSignUp: '',
+  passwordForSignUp: '',
+  mailAddressForSignIn: '',
+  passwordForSignIn: '',
+  searchText: '',
   playerStatus: {
     volume: 0.8,
     played: 0,
@@ -32,7 +30,7 @@ const initialState = {
 const app = (state = initialState, action) => {
   switch (action.type) {
     case App.CHANGE_TEXT:
-      return Object.assign({}, state, {[state.text[action.textType]]: action.text});
+      return Object.assign({}, state, { [action.textType]: action.text })
     case App.SET_PLAYING_VIDEO:
       return Object.assign({}, state, {
         playing: true,
