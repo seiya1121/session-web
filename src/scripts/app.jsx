@@ -413,7 +413,6 @@ class App extends ReactBaseComponent {
             >
             </input>
           </div>
-
           <div className="pane list-box">
             <h5 className="nav-group-title">
               <span className="icon icon-music"></span>
