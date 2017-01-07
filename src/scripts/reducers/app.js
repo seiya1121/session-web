@@ -1,11 +1,10 @@
 import * as App from '../constants/app';
 import { getAnimalName } from '../animal.js';
 
-const defaultCurrentUser = Object.assign(
-  {}, { name: getAnimalName(), photoURL: '', isLogin: false }
-);
+const defaultUser = Object.assign({}, { name: getAnimalName(), photoURL: '', isLogin: false });
+
 const initialState = {
-  currentUser: defaultCurrentUser,
+  currentUser: defaultUser,
   searchResult: [],
   comments: [],
   que: [],
@@ -26,11 +25,12 @@ const initialState = {
 };
 
 const app = (state = initialState, action) => {
+  const newState = (obj) => Object.assign({}, state, obj);
   switch (action.type) {
     case App.CHANGE_TEXT:
-      return Object.assign({}, state, { [action.textType]: action.text })
+      return newState(state, { [action.textType]: action.text })
     case App.SET_PLAYING_VIDEO:
-      return Object.assign({}, state, {
+      return newState(state, {
         playing: true,
         startTime: 0,
         playingVideo: action.video,
@@ -38,25 +38,33 @@ const app = (state = initialState, action) => {
         comments: [...state.comments, action.comment],
       })
     case App.SET_USER:
-      return Object.assign({}, state, {
-        currentUser: { name: action.name, photoURL: action.photoURL, isLogin: action.isLogin }
-      })
+      return newState({ currentUser: action.user })
+    case App.SET_DEFAULT_USER:
+      return newState({ currentUser: defaultUser })
     case App.SET_QUE:
-      return Object.assign({}, state, { que: [...state.que, action.video] })
+      return newState({ que: [...state.que, action.video] })
     case App.DELETE_QUE:
-      return Object.assign({}, state, { que: state.que.filter((q) => q.key !== action.video.key) })
+      return newState({ que: state.que.filter((q) => q.key !== action.video.key) })
     case App.PLAY_PAUSE:
-      return Object.assign({}, state, { playing: !state.playing, startTime: state.played })
+      return newState({ playing: !state.playing, startTime: state.played })
     case App.SET_VOLUME:
-      return Object.assign({}, state, { volume: parseFloat(action.volume) })
+      return newState({ volume: parseFloat(action.volume) })
     case App.SEEK_DOWN:
-      return Object.assign({}, state, { seeking: true })
+      return newState({ seeking: true })
     case App.SEEK_UP:
-      return Object.assign({}, state, { seeking: false, startTime: action.played })
+      return newState({ seeking: false, startTime: action.played })
     case App.CHANGE_PLAYED:
-      return Object.assign({}, state, { played: action.played })
-    case App.PLAYING_ON:
-      return Object.assign({}, state, { playing: true })
+      return newState({ played: action.played })
+    case App.PLAY:
+      return newState({ playing: true })
+    case App.PAUSE:
+      return newState({ playing: false })
+    case App.PROGRESS:
+      return !state.seeking ? newState({ played: action.played, loaded: action.loaded }) : state
+    case App.SET_COMMENT:
+      return newState({ comments: [...state.comments, action.comment], commentText: '' })
+    case App.SET_SEARCH_RESULT:
+      return newState({searchResult: action.result})
     default:
       return state;
   }

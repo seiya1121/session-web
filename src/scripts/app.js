@@ -8,7 +8,6 @@ import { YOUTUBE_API_KEY } from './api_key.js';
 import { base, firebaseAuth } from './firebaseApp.js';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
-import { getAnimalName } from './animal.js';
 import giphy from 'giphy-api';
 
 const SyncStates = [
@@ -20,9 +19,6 @@ const SyncStates = [
   { state: 'startTime', asArray: false},
 ];
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
-const defaultCurrentUser = Object.assign(
-  {}, { name: getAnimalName(), photoURL: '', isLogin: false }
-);
 const videoObject = (video, userName) => Object.assign({}, video, { userName });
 const PlayingVideoStatusText = {
   playing: 'Now Playing',
@@ -42,7 +38,6 @@ class App extends ReactBaseComponent {
     this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
     this.bind('onSeekMouseUp')
-    this.bind('onPlay', 'onProgress', 'onReady');
   }
 
   componentWillMount() {
@@ -51,7 +46,7 @@ class App extends ReactBaseComponent {
       base.bindToState(state, { context: this, state, asArray });
     });
     firebaseAuth.onAuthStateChanged((user) => {
-      user && this.props.appActions.setUser(user.displayName, user.photoURL, true)
+      user && this.props.appActions.setUser(user, true)
     });
   }
 
@@ -81,7 +76,7 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignUp() {
-    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.app;
+    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.props.app;
     firebaseAuth.createUserWithEmailAndPassword(mailAddressForSignUp, passwordForSignUp)
       .then((user) => {
         user.updateProfile({ displayName });
@@ -91,14 +86,16 @@ class App extends ReactBaseComponent {
         Reactotron.log(error.message);
       });
     firebaseAuth.onAuthStateChanged((user) => {
-      user && this.props.appActions.setUser(displayName, user.photoURL, true)
+      user && this.props.appActions.setUser({ name: displayName, photoURL: user.photoURL }, true)
     });
   }
 
   onClickSignIn() {
-    const { mailAddressForSignIn, passwordForSignIn } = this.app;
+    const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
     firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
-      .then((user) => this.setLoginUser(user))
+      .then((user) => {
+        this.props.appActions.setUser({ name: user.displayName, photoURL: user.photoURL }, true)
+      })
       .catch((error) => {
         Reactotron.log(error.code);
         Reactotron.log(error.message);
@@ -106,18 +103,13 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignOut() {
-    firebaseAuth.signOut()
-      .then(() => this.setState({ currentUser: defaultCurrentUser }));
+    firebaseAuth.signOut().then(() => this.props.appActions.setDefaultUser());
   }
 
   onSeekMouseUp(e) {
     const played = parseFloat(e.target.value)
     this.props.appActions.seekUp(played);
     this.player.seekTo(played);
-  }
-
-  onProgress(state) {
-    if (!this.state.seeking) { this.setState(state); }
   }
 
   onConfigSubmit() {
@@ -139,16 +131,6 @@ class App extends ReactBaseComponent {
     return notification;
   }
 
-  onPlay(video) {
-    this.props.appActions.playingOn();
-    this.notification('Now Playing♪', { body: video.title, icon: video.thumbnail.url });
-  }
-
-  onReady() {
-    Reactotron.log('onReady');
-    this.setState({ playing: true });
-  }
-
   onKeyPressForSearch(e) {
     if (e.which !== 13) return false;
     e.preventDefault();
@@ -164,8 +146,8 @@ class App extends ReactBaseComponent {
     if (isGif) {
       this.setGifUrl(e.target.value);
     } else {
-      const comment = commentObj(e.target.value, this.state.currentUser.name, CommentType.text);
-      this.setState({ comments: [...this.state.comments, comment], commentText: '' });
+      const comment = commentObj(e.target.value, this.props.app.currentUser.name, CommentType.text);
+      this.props.appActions.setComment(comment);
     }
     return true;
   }
@@ -186,29 +168,17 @@ class App extends ReactBaseComponent {
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
       const comment = commentObj(imageUrl, this.state.currentUser.name, CommentType.gif);
-      this.setState({ comments: [...this.state.comments, comment], commentText: '' });
+      this.props.appActions.setComment(comment);
     });
   }
 
   videoSearch() {
+    const searchFunc = (error, result) => {
+      (error) ?  Reactotron.log(error) : this.props.appActions.setSearchResult(result)
+    }
     const youTubeNode = new YouTubeNode();
-    const searchResultObj = (result) => ({
-      videoId: result.id.videoId,
-      title: result.snippet.title,
-      thumbnail: result.snippet.thumbnails.default,
-    });
     youTubeNode.setKey(YOUTUBE_API_KEY);
-    youTubeNode.search(this.state.searchText, 50,
-      (error, result) => {
-        if (error) {
-          // Reactotron.log(error);
-        } else {
-          this.setState({
-            searchResult: result.items.map((item) => searchResultObj(item)),
-          })
-        }
-      }
-    );
+    youTubeNode.search(this.state.searchText, 50, (error, result) => searchFunc(error, result));
   }
 
   render() {
@@ -382,14 +352,14 @@ class App extends ReactBaseComponent {
             vimeoConfig={app.vimeoConfig}
             youtubeConfig={app.youtubeConfig}
             fileConfig={app.fileConfig}
-            onReady={this.onReady}
+            onReady={() => appActions.play()}
             onStart={() => Reactotron.log('onStart')}
-            onPlay={() => this.onPlay(app.playingVideo)}
-            onPause={() => this.setState({ playing: false })}
+            onPlay={() => appActions.play()}
+            onPause={() => appActions.pause()}
             onBuffer={() => Reactotron.log('onBuffer')}
             onEnded={() => appActions.setPlayingVideo(app.que[0])}
             onError={(e) => Reactotron.log('onError', e)}
-            onProgress={this.onProgress}
+            onProgress={(state) => appActions.progress(state.played, state.loaded)}
             onDuration={(duration) => this.setState({ duration })}
           />
         </div>
