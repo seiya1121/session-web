@@ -6,6 +6,12 @@ const defaultCurrentUser = Object.assign(
 );
 const initialState = {
   currentUser: defaultCurrentUser,
+  searchResult: [],
+  comments: [],
+  que: [],
+  playingVideo: {},
+  playing: true,
+  startTime: 0,
   text: {
     commentText: '',
     displayName: '',
@@ -15,12 +21,6 @@ const initialState = {
     passwordForSignIn: '',
     searchText: '',
   },
-  searchResult: [],
-  comments: [],
-  que: [],
-  playingVideo: {},
-  playing: true,
-  startTime: 0,
   playerStatus: {
     volume: 0.8,
     played: 0,
@@ -34,7 +34,13 @@ const app = (state = initialState, action) => {
     case App.CHANGE_TEXT:
       return Object.assign({}, state, {[state.text[action.textType]]: action.text});
     case App.SET_PLAYING_VIDEO:
-      return Object.assign({}, state, {[state.text[action.textType]]: action.text});
+      return Object.assign({}, state, {
+        playing: true,
+        startTime: 0,
+        playingVideo: action.video,
+        que: state.que.filter((item) => item.key !== action.video.key),
+        comments: [...state.comments, action.comment],
+      })
     default:
       return state;
   }

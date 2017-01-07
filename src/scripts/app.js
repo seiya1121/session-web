@@ -37,7 +37,7 @@ class App extends ReactBaseComponent {
     this.state = this.props.app;
     this.appActions = this.props.appActions;
 
-    this.bind('videoSearch', 'setPlayingVideo', 'notification', 'setGifUrl');
+    this.bind('videoSearch', 'notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue', 'onClickDeleteQue');
     this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
@@ -142,7 +142,7 @@ class App extends ReactBaseComponent {
 
   stop() {
     if (this.state.que.length > 0) {
-      this.setPlayingVideo(this.state.que[0]);
+      this.appActions.setPlayingVideo(this.state.que[0]);
     } else {
       this.setState({ playing: false, playingVideo: '', startTime: 0 });
     }
@@ -188,16 +188,6 @@ class App extends ReactBaseComponent {
     return notification;
   }
 
-  setPlayingVideo(video) {
-    this.setState({
-      playing: true,
-      playingVideo: video,
-      startTime: 0,
-      que: this.state.que.filter((item) => item.key !== video.key),
-      comments: [...this.state.comments, commentObj(`play ${video.title}`, '', CommentType.log)],
-    });
-  }
-
   onPlay(video) {
     this.setState({ playing: true });
     this.notification('Now Playing♪', { body: video.title, icon: video.thumbnail.url });
@@ -205,7 +195,7 @@ class App extends ReactBaseComponent {
 
   onEnded() {
     if (this.state.que.length > 0) {
-      this.setPlayingVideo(this.state.que[0]);
+      this.appActions.setPlayingVideo(this.state.que[0]);
     } else {
       this.setState({ playingVideo: '', startTime: 0 });
     }
@@ -217,7 +207,7 @@ class App extends ReactBaseComponent {
   }
 
   onClickSetPlayingVideo(video) {
-    this.setPlayingVideo(video);
+    this.appActions.setPlayingVideo(video);
   }
 
   onKeyPressForSearch(e) {
@@ -292,7 +282,6 @@ class App extends ReactBaseComponent {
       currentUser } = this.state;
     const { isLogin, name, photoURL } = currentUser;
     const isSetPlayingVideo = playingVideo !== '';
-    const { appActions } = this.appActions;
 
     const headerForNotLogin = (
       <div>
@@ -301,7 +290,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="user name"
-            onChange={(e) => appActions.changeText('displayName', e.target.value)}
+            onChange={(e) => this.appActions.changeText('displayName', e.target.value)}
             value={text.displayName}
           >
           </input>
@@ -309,7 +298,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => appActions.changeText('mailAddressForSignUp', e.target.value)}
+            onChange={(e) => this.appActions.changeText('mailAddressForSignUp', e.target.value)}
             value={text.mailAddressForSignUp}
           >
           </input>
@@ -317,7 +306,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => appActions.changeText('passwordForSignUp', e.target.value)}
+            onChange={(e) => this.appActions.changeText('passwordForSignUp', e.target.value)}
             value={text.passwordForSignUp}
           >
           </input>
@@ -328,7 +317,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => appActions.changeText('mailAddressForSignIn', e.target.value)}
+            onChange={(e) => this.appActions.changeText('mailAddressForSignIn', e.target.value)}
             value={text.mailAddressForSignIn}
           >
           </input>
@@ -336,7 +325,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => appActions.changeText('passwordForSignIn', e.target.value)}
+            onChange={(e) => this.appActions.changeText('passwordForSignIn', e.target.value)}
             value={text.passwordForSignIn}
           >
           </input>
@@ -527,7 +516,7 @@ class App extends ReactBaseComponent {
               className="comment-input"
               type="text"
               placeholder="type comment"
-              onChange={(e) => appActions.changeText('commentText', e.target.value)}
+              onChange={(e) => this.appActions.changeText('commentText', e.target.value)}
               onKeyPress={this.onKeyPressForComment}
               value={text.commentText}
             >
@@ -552,7 +541,7 @@ class App extends ReactBaseComponent {
                   className="form-control"
                   type="text"
                   placeholder="Search for something you want"
-                  onChange={(e) => appActions.changeText('searchText', e.target.value)}
+                  onChange={(e) => this.appActions.changeText('searchText', e.target.value)}
                   onKeyPress={this.onKeyPressForSearch}
                   value={text.searchText}
                 >
