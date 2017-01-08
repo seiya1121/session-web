@@ -175,8 +175,7 @@ class App extends ReactBaseComponent {
   }
 
   render() {
-    const { app, appActions } = this.props;
-    console.log(app);
+    const { app, appActions } = this.props;  
     const { isLogin, name, photoURL } = app.currentUser;
     const isSetPlayingVideo = app.playingVideo !== '';
 
