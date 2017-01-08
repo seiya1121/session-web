@@ -2,10 +2,10 @@ import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import * as AppActions from './actions/app';
+import * as AppActions from '../actions/app';
 import Reactotron from 'reactotron-react-js'
-import { YOUTUBE_API_KEY } from './api_key.js';
-import { base, firebaseAuth } from './firebaseApp.js';
+import { YOUTUBE_API_KEY } from '../config/api_key.js';
+import { base, firebaseAuth } from '../config/firebaseApp.js';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import giphy from 'giphy-api';
@@ -175,7 +175,7 @@ class App extends ReactBaseComponent {
   }
 
   render() {
-    const { app, appActions } = this.props;  
+    const { app, appActions } = this.props;
     const { isLogin, name, photoURL } = app.currentUser;
     const isSetPlayingVideo = app.playingVideo !== '';
 

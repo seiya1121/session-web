@@ -1,5 +1,5 @@
 import * as App from '../constants/app';
-import { getAnimalName } from '../animal.js';
+import { getAnimalName } from '../scripts/animal.js';
 
 const defaultUser = Object.assign({}, { name: getAnimalName(), photoURL: '', isLogin: false });
 
