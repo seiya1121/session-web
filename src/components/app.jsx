@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactBaseComponent from './reactBaseComponent';
+import ReactBaseComponent from './reactBaseComponent.jsx';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
