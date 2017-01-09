@@ -361,7 +361,7 @@ class App extends ReactBaseComponent {
             <th>Controls</th>
             <td>
               <button onClick={() => appActions.setPlayingVideo(app.que[0])}>Skip</button>
-              <button onClick={() => appActions.layPause}>{app.playing ? 'Pause' : 'Play'}</button>
+              <button onClick={() => appActions.playPause}>{app.playing ? 'Pause' : 'Play'}</button>
             </td>
           </tr>
           <tr>

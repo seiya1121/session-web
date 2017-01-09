@@ -11,6 +11,7 @@ export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const seekDown = () => ({ type: App.SEEK_DOWN });
 export const seekUp = (played) => ({ type: App.SEEK_UP, played });
 export const changePlayed = (played) => ({ type: App.CHANGE_PLAYED, played });
+export const playPause = () => ({ type: App.PLAY_PAUSE });
 export const play = () => ({ type: App.PLAY });
 export const pause = () => ({ type: App.PAUSE });
 export const progress = (state) => {
