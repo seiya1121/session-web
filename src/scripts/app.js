@@ -9,6 +9,7 @@ import { base, firebaseAuth } from './firebaseApp.js';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import giphy from 'giphy-api';
+import '../test.scss';
 
 const SyncStates = [
   { state: 'que', asArray: true },

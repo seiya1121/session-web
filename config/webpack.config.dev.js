@@ -132,6 +132,16 @@ module.exports = {
           cacheDirectory: true
         }
       },
+      {
+        test: /\.sass$/,
+        include: paths.appSrc,
+        loaders: ["style", "css", "sass"]
+      },
+      {
+        test: /\.scss$/,
+        include: paths.appSrc,
+        loaders: ["style", "css", "sass"]
+      },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
       // "style" loader turns CSS into JS modules that inject <style> tags.
