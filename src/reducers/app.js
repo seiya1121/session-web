@@ -40,8 +40,6 @@ const app = (state = initialState, action) => {
       return newState({ currentUser: action.user })
     case App.SET_DEFAULT_USER:
       return newState({ currentUser: defaultUser })
-    case App.SET_QUE:
-      return newState({que: action.que })
     case App.FETCH_SYNC_STATE:
       return newState({ [action.key]: action.value })
     case App.ADD_VIDEO:

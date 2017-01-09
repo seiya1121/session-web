@@ -4,7 +4,6 @@ export const changeText = (textType, text) => ({ type: App.CHANGE_TEXT, textType
 export const setPlayingVideo = (video) => ({ type: App.SET_PLAYING_VIDEO, video });
 export const setUser = (user, isLogin) => ({ type: App.SET_USER, user, isLogin });
 export const setDefaultUser = () => ({ type: App.SET_DEFAULT_USER });
-export const setQue = (que) => ({ type: App.SET_QUE, que });
 export const fetchSyncState = (key, value) => ({ type: App.FETCH_SYNC_STATE, key, value });
 export const addVideo = (video) => ({ type: App.ADD_VIDEO, video });
 export const deleteVideo = (video) => ({ type: App.DELETE_VIDEO, video });

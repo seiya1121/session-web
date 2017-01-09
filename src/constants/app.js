@@ -1,7 +1,6 @@
 export const CHANGE_TEXT = 'CHANGE_TEXT';
 export const SET_PLAYING_VIDEO = 'SET_PLAYING_VIDEO';
 export const SET_USER = 'SET_USER';
-export const SET_QUE = 'SET_QUE';
 export const ADD_VIDEO = 'ADD_VIDEO';
 export const DELETE_VIDEO = 'DELETE_VIDEO';
 export const PLAY_PAUSE = 'PLAY_PAUSE';
