@@ -10,7 +10,7 @@ import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import giphy from 'giphy-api';
 // import '../styles/test.scss';
-
+//
 const SyncStates = [
   { state: 'que', asArray: true },
   { state: 'users', asArray: true },
@@ -42,20 +42,19 @@ class App extends ReactBaseComponent {
   }
 
   componentWillMount() {
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.bindToState(state, { context: this, state, asArray });
-    });
     firebaseAuth.onAuthStateChanged((user) => {
       user && this.props.appActions.setUser(user, true)
     });
+    SyncStates.forEach((obj) => {
+      const { state, asArray } = obj;
+      base.fetch(state, {
+        context: this, asArray,
+        then(data) { this.props.appActions.fetchSyncState(state, data) },
+      });
+    })
   }
 
   componentDidMount() {
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.syncState(state, { context: this, state, asArray });
-    });
     base.listenTo('startTime',{
       context: this,
       asArray: false,
@@ -137,7 +136,7 @@ class App extends ReactBaseComponent {
       this.setGifUrl(e.target.value);
     } else {
       const comment = commentObj(e.target.value, this.props.app.currentUser.name, CommentType.text);
-      this.props.appActions.setComment(comment);
+      this.props.appActions.addComment(comment);
     }
     return true;
   }
@@ -148,7 +147,7 @@ class App extends ReactBaseComponent {
     if (que.length === 0 && playingVideo === '') {
       this.props.appActions.setPlayingVideo(targetVideo);
     } else {
-      this.props.appActions.setQue(targetVideo);
+      this.props.appActions.addVideo(targetVideo);
     }
   }
 
@@ -158,13 +157,13 @@ class App extends ReactBaseComponent {
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
       const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif);
-      this.props.appActions.setComment(comment);
+      this.props.appActions.addComment(comment);
     });
   }
 
   videoSearch() {
     const searchFunc = (error, result) => {
-      (error) ?  Reactotron.log(error) : this.props.appActions.setSearchResult(result)
+      (error) ?  Reactotron.log(error) : this.props.appActions.addSearchResult(result)
     }
     const youTubeNode = new YouTubeNode();
     youTubeNode.setKey(YOUTUBE_API_KEY);
@@ -295,7 +294,7 @@ class App extends ReactBaseComponent {
           <p>added by {video.userName}</p>
         </li>
         <div>
-          <span className="icon icon-cancel" onClick={() => appActions.deleteQue(video)}>x</span>
+          <span className="icon icon-cancel" onClick={() => appActions.deleteVideo(video)}>x</span>
         </div>
       </div>
     ));
@@ -385,7 +384,7 @@ class App extends ReactBaseComponent {
                 min={0}
                 max={1}
                 step="any"
-                value={app.volume} onChange={(e) => appActions.setVolume(e.target.value)}
+                value={app.volume} onChange={(e) => appActions.changeVolume(e.target.value)}
               />
             </td>
           </tr>

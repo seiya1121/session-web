@@ -41,12 +41,16 @@ const app = (state = initialState, action) => {
     case App.SET_DEFAULT_USER:
       return newState({ currentUser: defaultUser })
     case App.SET_QUE:
+      return newState({que: action.que })
+    case App.FETCH_SYNC_STATE:
+      return newState({ [action.key]: action.value })
+    case App.ADD_VIDEO:
       return newState({ que: [...state.que, action.video] })
     case App.DELETE_QUE:
       return newState({ que: state.que.filter((q) => q.key !== action.video.key) })
     case App.PLAY_PAUSE:
       return newState({ playing: !state.playing, startTime: state.played })
-    case App.SET_VOLUME:
+    case App.CHANGE_VOLUME:
       return newState({ volume: parseFloat(action.volume) })
     case App.SEEK_DOWN:
       return newState({ seeking: true })

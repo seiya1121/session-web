@@ -6,5 +6,5 @@ const FIREBASE_CONFIG = {
 };
 
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
-
+console.log(FIREBASE_CONFIG);
 export { FIREBASE_CONFIG, YOUTUBE_API_KEY };
