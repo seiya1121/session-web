@@ -10,7 +10,7 @@ import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import giphy from 'giphy-api';
 // import '../styles/test.scss';
-//
+
 const SyncStates = [
   { state: 'que', asArray: true },
   { state: 'users', asArray: true },
