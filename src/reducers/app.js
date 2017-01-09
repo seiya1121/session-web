@@ -1,30 +1,6 @@
 import * as App from '../constants/app';
-import { getAnimalName } from '../scripts/animal.js';
 
-const defaultUser = Object.assign({}, { name: getAnimalName(), photoURL: '', isLogin: false });
-
-const initialState = {
-  currentUser: defaultUser,
-  searchResult: [],
-  comments: [],
-  que: [],
-  playingVideo: {},
-  playing: true,
-  startTime: 0,
-  commentText: '',
-  displayName: '',
-  mailAddressForSignUp: '',
-  passwordForSignUp: '',
-  mailAddressForSignIn: '',
-  passwordForSignIn: '',
-  searchText: '',
-  volume: 0.8,
-  played: 0,
-  loaded: 0,
-  seeking: false,
-};
-
-const app = (state = initialState, action) => {
+const app = (state = App.InitialState, action) => {
   const newState = (obj) => Object.assign({}, state, obj);
   switch (action.type) {
     case App.CHANGE_TEXT:
@@ -39,7 +15,7 @@ const app = (state = initialState, action) => {
     case App.SET_USER:
       return newState({ currentUser: action.user })
     case App.SET_DEFAULT_USER:
-      return newState({ currentUser: defaultUser })
+      return newState({ currentUser: App.DefaultUser})
     case App.FETCH_SYNC_STATE:
       return newState({ [action.key]: action.value })
     case App.ADD_VIDEO:

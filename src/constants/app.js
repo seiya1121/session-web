@@ -1,3 +1,31 @@
+import { getAnimalName } from '../scripts/animal.js';
+
+export const DefaultUser = Object.assign(
+  {},
+  { name: getAnimalName(), photoURL: '', isLogin: false }
+);
+
+export const InitialState = {
+  currentUser: DefaultUser,
+  searchResult: [],
+  comments: [],
+  que: [],
+  playingVideo: {},
+  playing: true,
+  startTime: 0,
+  commentText: '',
+  displayName: '',
+  mailAddressForSignUp: '',
+  passwordForSignUp: '',
+  mailAddressForSignIn: '',
+  passwordForSignIn: '',
+  searchText: '',
+  volume: 0.8,
+  played: 0,
+  loaded: 0,
+  seeking: false,
+};
+
 export const CHANGE_TEXT = 'CHANGE_TEXT';
 export const SET_PLAYING_VIDEO = 'SET_PLAYING_VIDEO';
 export const SET_USER = 'SET_USER';
