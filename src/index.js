@@ -6,7 +6,6 @@ import './config/ReactotronConfig'
 import Reactotron from 'reactotron-react-js'
 import app from './reducers/app';
 import App from './components/app.jsx';
-import './styles/index.css';
 
 const rootReducer = combineReducers({app});
 const store = Reactotron.createStore(rootReducer, compose())
