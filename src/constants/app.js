@@ -41,5 +41,5 @@ export const PAUSE = 'PAUSE';
 export const PROGRESS = 'PROGRESS';
 export const SET_DEFAULT_USER = 'SET_DEFAULT_USER';
 export const ADD_COMMENT = 'ADD_COMMENT';
-export const ADD_SEARCH_RESULT = 'ADD_SEARCH_RESULT';
+export const SET_SEARCH_RESULT = 'SET_SEARCH_RESULT';
 export const FETCH_SYNC_STATE = 'FETCH_SYNC_STATE';

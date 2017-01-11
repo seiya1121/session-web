@@ -33,7 +33,7 @@ class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.state = this.props.app;
-    this.bind('videoSearch', 'notification', 'setGifUrl');
+    this.bind('notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue');
     this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
@@ -123,7 +123,12 @@ class App extends ReactBaseComponent {
   onKeyPressForSearch(e) {
     if (e.which !== 13) return false;
     e.preventDefault();
-    this.videoSearch();
+    const searchFunc = (error, result) => {
+      (error) ?  Reactotron.log(error) : this.props.appActions.setSearchResult(result)
+    }
+    const youTubeNode = new YouTubeNode();
+    youTubeNode.setKey(YOUTUBE_API_KEY);
+    youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
     return true;
   }
 
@@ -159,15 +164,6 @@ class App extends ReactBaseComponent {
       const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif);
       this.props.appActions.addComment(comment);
     });
-  }
-
-  videoSearch() {
-    const searchFunc = (error, result) => {
-      (error) ?  Reactotron.log(error) : this.props.appActions.addSearchResult(result)
-    }
-    const youTubeNode = new YouTubeNode();
-    youTubeNode.setKey(YOUTUBE_API_KEY);
-    youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
   }
 
   onProgress(state) {
