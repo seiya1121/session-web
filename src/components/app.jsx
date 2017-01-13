@@ -290,7 +290,7 @@ class App extends ReactBaseComponent {
           <p>added by {video.userName}</p>
         </li>
         <div>
-          <span className="icon icon-cancel" onClick={() => appActions.deleteVideo(video)}>x</span>
+          <span className="icon icon-cancel" onClick={() => appActions.deleteVideo(video, i)}>x</span>
         </div>
       </div>
     ));
@@ -344,7 +344,7 @@ class App extends ReactBaseComponent {
             onReady={() => appActions.play()}
             onStart={() => Reactotron.log('onStart')}
             onPlay={() => appActions.play()}
-            onPause={() => appActions.pause()}
+            onPause={() => appActions.pause(app.played)}
             onBuffer={() => Reactotron.log('onBuffer')}
             onEnded={() => appActions.setPlayingVideo(app.que[0])}
             onError={(e) => Reactotron.log('onError', e)}
@@ -357,7 +357,7 @@ class App extends ReactBaseComponent {
             <th>Controls</th>
             <td>
               <button onClick={() => appActions.setPlayingVideo(app.que[0])}>Skip</button>
-              <button onClick={() => appActions.playPause}>{app.playing ? 'Pause' : 'Play'}</button>
+              <button onClick={() => appActions.playPause(app.playing)}>{app.playing ? 'Pause' : 'Play'}</button>
             </td>
           </tr>
           <tr>

@@ -1,10 +1,15 @@
 import * as App from '../constants/app';
 import { base } from '../config/firebaseApp.js';
 
-const push = (stateName, data) => base.push(stateName, { data });
+const push = (stateName, data, successFunc) => base.push(stateName, { data })
+const post = (stateName, data) => base.post(stateName, { data });
+const remove = (endPoint) => base.remove(endPoint);
 
 // sync系
-export const setPlayingVideo = (video) => ({ type: App.SET_PLAYING_VIDEO, video });
+export const setPlayingVideo = (video) => {
+  post('playingVideo', video)
+  return { type: App.SET_PLAYING_VIDEO, video };
+}
 export const fetchSyncState = (key, value) => ({ type: App.FETCH_SYNC_STATE, key, value });
 export const addVideo = (video) => {
   push('que', video);
@@ -14,10 +19,30 @@ export const addComment = (comment) => {
   push('comments', comment);
   return { type: App.ADD_COMMENT, comment };
 };
-export const deleteVideo = (video) => ({ type: App.DELETE_VIDEO, video });
-export const changePlayed = (played) => ({ type: App.CHANGE_PLAYED, played });
-export const play = () => ({ type: App.PLAY });
-export const pause = () => ({ type: App.PAUSE });
+export const deleteVideo = (video, index) => {
+  remove(`que/${index}`);
+  return { type: App.DELETE_VIDEO, video }
+};
+export const changePlayed = (played) => {
+  post('startTime', played);
+  return { type: App.CHANGE_PLAYED, played };
+}
+export const play = () => {
+  const playing = true;
+  post('playing', playing);
+  return { type: App.PLAY, playing };
+}
+export const pause = (startTime) => {
+  const playing = false;
+  post('playing', playing);
+  post('startTime', startTime);
+  return { type: App.PAUSE, playing, startTime };
+}
+export const playPause = (isPlaying) => {
+  const playing = !isPlaying;
+  post('playing', playing)
+  return { type: App.PLAY_PAUSE, playing };
+}
 export const progress = (state) => {
   const { played, loaded } = state;
   const playingStatus = (state.loaded) ? { played, loaded } : { played }
@@ -25,7 +50,6 @@ export const progress = (state) => {
 }
 export const seekDown = () => ({ type: App.SEEK_DOWN });
 export const seekUp = (played) => ({ type: App.SEEK_UP, played });
-export const playPause = () => ({ type: App.PLAY_PAUSE });
 
 // local系
 export const changeText = (textType, text) => ({ type: App.CHANGE_TEXT, textType, text });

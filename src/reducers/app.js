@@ -22,10 +22,10 @@ const app = (state = App.InitialState, action) => {
       return newState({ [action.key]: action.value })
     case App.ADD_VIDEO:
       return newState({ que: [...state.que, action.video] })
-    case App.DELETE_QUE:
+    case App.DELETE_VIDEO:
       return newState({ que: state.que.filter((q) => q.key !== action.video.key) })
     case App.PLAY_PAUSE:
-      return newState({ playing: !state.playing, startTime: state.played })
+      return newState({ playing: action.playing, startTime: state.played })
     case App.CHANGE_VOLUME:
       return newState({ volume: parseFloat(action.volume) })
     case App.SEEK_DOWN:
@@ -33,11 +33,11 @@ const app = (state = App.InitialState, action) => {
     case App.SEEK_UP:
       return newState({ seeking: false, startTime: action.played })
     case App.CHANGE_PLAYED:
-      return newState({ played: action.played, seekin: false })
+      return newState({ played: action.played, seeking: false })
     case App.PLAY:
-      return newState({ playing: true })
+      return newState({ playing: action.playing })
     case App.PAUSE:
-      return newState({ playing: false })
+      return newState({ playing: action.playing, played: action.startTime })
     case App.PROGRESS:
       return !state.seeking ? newState(action.playingStatus) : state
     case App.SET_COMMENT:
