@@ -32,7 +32,6 @@ const commandType = { giphy: '/ giphy ' };
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
-    this.state = this.props.app;
     this.bind('notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue');

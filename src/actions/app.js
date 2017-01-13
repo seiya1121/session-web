@@ -43,13 +43,6 @@ export const playPause = (isPlaying) => {
   post('playing', playing)
   return { type: App.PLAY_PAUSE, playing };
 }
-export const progress = (state) => {
-  const { played, loaded } = state;
-  const playingStatus = (state.loaded) ? { played, loaded } : { played }
-  return { type: App.PROGRESS, playingStatus };
-}
-export const seekDown = () => ({ type: App.SEEK_DOWN });
-export const seekUp = (played) => ({ type: App.SEEK_UP, played });
 
 // local系
 export const changeText = (textType, text) => ({ type: App.CHANGE_TEXT, textType, text });
@@ -62,3 +55,10 @@ export const setSearchResult = (result) => ({
       videoId: item.id.videoId, title: item.snippet.title, thumbnail: item.snippet.thumbnails.default
     })),
 });
+export const seekDown = () => ({ type: App.SEEK_DOWN });
+export const seekUp = (played) => ({ type: App.SEEK_UP, played });
+export const progress = (state) => {
+  const { played, loaded } = state;
+  const playingStatus = (state.loaded) ? { played, loaded } : { played }
+  return { type: App.PROGRESS, playingStatus };
+}
