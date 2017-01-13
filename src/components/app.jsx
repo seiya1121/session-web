@@ -1,11 +1,11 @@
 import React from 'react';
-import ReactBaseComponent from './reactBaseComponent';
+import ReactBaseComponent from './reactBaseComponent.jsx';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import * as AppActions from './actions/app';
+import * as AppActions from '../actions/app';
 import Reactotron from 'reactotron-react-js'
-import { YOUTUBE_API_KEY } from './api_key.js';
-import { base, firebaseAuth } from './firebaseApp.js';
+import { YOUTUBE_API_KEY } from '../config/api_key.js';
+import { base, firebaseAuth } from '../config/firebaseApp.js';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import giphy from 'giphy-api';
@@ -32,8 +32,7 @@ const commandType = { giphy: '/ giphy ' };
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
-    this.state = this.props.app;
-    this.bind('videoSearch', 'notification', 'setGifUrl');
+    this.bind('notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue');
     this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
@@ -42,20 +41,19 @@ class App extends ReactBaseComponent {
   }
 
   componentWillMount() {
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.bindToState(state, { context: this, state, asArray });
-    });
     firebaseAuth.onAuthStateChanged((user) => {
       user && this.props.appActions.setUser(user, true)
     });
+    SyncStates.forEach((obj) => {
+      const { state, asArray } = obj;
+      base.fetch(state, {
+        context: this, asArray,
+        then(data) { this.props.appActions.fetchSyncState(state, data) },
+      });
+    })
   }
 
   componentDidMount() {
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.syncState(state, { context: this, state, asArray });
-    });
     base.listenTo('startTime',{
       context: this,
       asArray: false,
@@ -124,7 +122,12 @@ class App extends ReactBaseComponent {
   onKeyPressForSearch(e) {
     if (e.which !== 13) return false;
     e.preventDefault();
-    this.videoSearch();
+    const searchFunc = (error, result) => {
+      (error) ?  Reactotron.log(error) : this.props.appActions.setSearchResult(result)
+    }
+    const youTubeNode = new YouTubeNode();
+    youTubeNode.setKey(YOUTUBE_API_KEY);
+    youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
     return true;
   }
 
@@ -137,7 +140,7 @@ class App extends ReactBaseComponent {
       this.setGifUrl(e.target.value);
     } else {
       const comment = commentObj(e.target.value, this.props.app.currentUser.name, CommentType.text);
-      this.props.appActions.setComment(comment);
+      this.props.appActions.addComment(comment);
     }
     return true;
   }
@@ -148,7 +151,7 @@ class App extends ReactBaseComponent {
     if (que.length === 0 && playingVideo === '') {
       this.props.appActions.setPlayingVideo(targetVideo);
     } else {
-      this.props.appActions.setQue(targetVideo);
+      this.props.appActions.addVideo(targetVideo);
     }
   }
 
@@ -158,17 +161,8 @@ class App extends ReactBaseComponent {
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
       const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif);
-      this.props.appActions.setComment(comment);
+      this.props.appActions.addComment(comment);
     });
-  }
-
-  videoSearch() {
-    const searchFunc = (error, result) => {
-      (error) ?  Reactotron.log(error) : this.props.appActions.setSearchResult(result)
-    }
-    const youTubeNode = new YouTubeNode();
-    youTubeNode.setKey(YOUTUBE_API_KEY);
-    youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
   }
 
   onProgress(state) {
@@ -177,7 +171,6 @@ class App extends ReactBaseComponent {
 
   render() {
     const { app, appActions } = this.props;
-    console.log(app);
     const { isLogin, name, photoURL } = app.currentUser;
     const isSetPlayingVideo = app.playingVideo !== '';
 
@@ -296,7 +289,7 @@ class App extends ReactBaseComponent {
           <p>added by {video.userName}</p>
         </li>
         <div>
-          <span className="icon icon-cancel" onClick={() => appActions.deleteQue(video)}>x</span>
+          <span className="icon icon-cancel" onClick={() => appActions.deleteVideo(video, i)}>x</span>
         </div>
       </div>
     ));
@@ -350,7 +343,7 @@ class App extends ReactBaseComponent {
             onReady={() => appActions.play()}
             onStart={() => Reactotron.log('onStart')}
             onPlay={() => appActions.play()}
-            onPause={() => appActions.pause()}
+            onPause={() => appActions.pause(app.played)}
             onBuffer={() => Reactotron.log('onBuffer')}
             onEnded={() => appActions.setPlayingVideo(app.que[0])}
             onError={(e) => Reactotron.log('onError', e)}
@@ -363,7 +356,7 @@ class App extends ReactBaseComponent {
             <th>Controls</th>
             <td>
               <button onClick={() => appActions.setPlayingVideo(app.que[0])}>Skip</button>
-              <button onClick={() => appActions.layPause}>{app.playing ? 'Pause' : 'Play'}</button>
+              <button onClick={() => appActions.playPause(app.playing)}>{app.playing ? 'Pause' : 'Play'}</button>
             </td>
           </tr>
           <tr>
@@ -386,7 +379,7 @@ class App extends ReactBaseComponent {
                 min={0}
                 max={1}
                 step="any"
-                value={app.volume} onChange={(e) => appActions.setVolume(e.target.value)}
+                value={app.volume} onChange={(e) => appActions.changeVolume(e.target.value)}
               />
             </td>
           </tr>
