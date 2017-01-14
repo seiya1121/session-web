@@ -26,7 +26,9 @@ const PlayingVideoStatusText = {
   noVideos: "There're no videos to play.",
 };
 const CommentType = { text: 'text', log: 'log', gif: 'gif' };
-const commentObj = (content, userName, type) => Object.assign({}, { content, userName, type });
+const commentObj = (content, userName, type, keyword) => (
+  Object.assign({}, { content, userName, type, keyword })
+);
 const commandType = { giphy: '/ giphy ' };
 
 class App extends ReactBaseComponent {
@@ -160,7 +162,7 @@ class App extends ReactBaseComponent {
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
-      const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif);
+      const comment = commentObj(imageUrl, this.state.currentUser.name, CommentType.gif, key);
       this.props.appActions.addComment(comment);
     });
   }
