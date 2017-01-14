@@ -28,15 +28,14 @@ const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, userName, type, keyword) => (
   Object.assign({}, { content, userName, type, keyword })
 );
-const commandType = { giphy: '/ giphy ' };
+const commandType = { giphy: '/giphy ' };
 
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.bind('notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
-    this.bind('onClickSetQue');
-    this.bind('onClickSignUp', 'onClickSignOut', 'onClickSignIn');
+    this.bind('onClickSetQue', 'onClickSignUp', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
     this.bind('onSeekMouseUp', 'onProgress')
   }
@@ -161,7 +160,7 @@ class App extends ReactBaseComponent {
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
-      const comment = commentObj(imageUrl, this.state.currentUser.name, CommentType.gif, key);
+      const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif, key);
       this.props.appActions.addComment(comment);
     });
   }
@@ -314,6 +313,7 @@ class App extends ReactBaseComponent {
         case CommentType.gif:
           return (
             <li key={i}>
+              <p>{comment.keyword}</p>
               <img src={comment.content} alt=""></img>
               <p>{comment.userName}</p>
             </li>
