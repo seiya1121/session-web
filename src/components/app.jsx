@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import Reactotron from 'reactotron-react-js'
-import { YOUTUBE_API_KEY } from '../config/api_key.js';
+import { YOUTUBE_API_KEY } from '../config/apiKey.js';
 import { base, firebaseAuth } from '../config/firebaseApp.js';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
@@ -141,7 +141,7 @@ class App extends ReactBaseComponent {
     if (isGif) {
       this.setGifUrl(e.target.value);
     } else {
-      const comment = commentObj(e.target.value, this.props.app.currentUser.name, CommentType.text);
+      const comment = commentObj(e.target.value, this.props.app.currentUser.name, CommentType.text, '');
       this.props.appActions.addComment(comment);
     }
     return true;

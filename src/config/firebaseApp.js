@@ -1,5 +1,5 @@
 import firebase from 'firebase';
-import { FIREBASE_CONFIG } from './api_key.js';
+import { FIREBASE_CONFIG } from './apiKey.js';
 import Rebase from 're-base';
 
 const ref = (process.env.NODE_ENV === 'production') ? 'session' : 'session';
