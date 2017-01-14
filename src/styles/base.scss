@@ -1,0 +1,542 @@
+
+
+// variables
+$header-height: 52px;
+$footer-height: 80px;
+$display-height: calc( 100% - 132px ); // 変数計算したいのにうまくいかないのなんで
+
+$color-bar-bg: #333333;
+
+$color-black: #000000;
+$color-white: #FFFFFF;
+$color-key: #26BFBA;
+
+%input-range-disable {
+  -webkit-appearance: none;
+  // -moz-appearance: none;
+  // appearance: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+
+  color: $color-white;
+
+  background: $color-black;
+}
+
+li {
+  list-style: none;
+}
+
+* {
+
+  &:focus {
+    outline: 0;
+  }
+}
+
+input {
+  color: #000000;
+}
+
+// 開発用：一旦消す
+.none {
+  display:none
+}
+
+/* mainlayout
+## レイアウト上の構成
+.contents
+  .header-bar : 画面上部のバー
+  .main-display : 画面中部のメインディスプレイ
+  .footer-bar : 画面下部の
+ */
+
+#root {
+  height: 100%;
+}
+
+.contents {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.header-bar {
+  box-sizing: border-box;
+  height: $header-height;
+  padding: 6px 0 6px 72px;
+
+  background: $color-bar-bg;
+
+  overflow: hidden;
+  font-size: 12px;
+
+  border-bottom:solid 1px #333333;
+
+  &__text {
+    margin: 0;
+
+    &--message {
+      color: #999999;
+      padding: 0 20px 0 0;
+    }
+  }
+}
+
+.main-display {
+  height: $display-height;
+  overflow: hidden;
+  position: relative;
+}
+
+.footer-bar {
+  box-sizing: border-box;
+  height: $footer-height;
+
+  background: $color-bar-bg;
+
+  overflow: hidden;
+
+  border-top:solid 1px #333333;
+}
+
+
+// search
+
+.form-search{
+  -webkit-app-region: no-drag;
+
+  color: $color-white;
+  position: absolute;
+  background: $color-black;
+  text-indent: 10px;
+  right: 20px;
+  top: 10px;
+  border-radius: 10px;
+  width: 10%;
+  border: none;
+  height: 30px;
+  box-sizing: border-box;
+  transition: .2s;
+
+  &:focus,
+  &.is-search-active {
+    color: $color-black;
+    background: $color-white;
+    width: calc( 30% - 40px );
+    transition: .5s;
+  }
+}
+
+/* main の要素
+
+*/
+
+// このサイズを変えればyoutube自体はそれに自動でアジャストされる
+// modeごとにサイズ変えればOKな感じ
+.display-youtube {
+  height: 100%;
+}
+
+.display-comments {
+  box-sizing: border-box;
+  position: absolute;
+  height: 100%;
+  width: 30%;
+  left: 20px;
+  bottom: 20px;
+  padding: 0;
+  overflow: auto;
+
+  .comments-stream {
+    position: absolute;
+    left: 0;
+    bottom: 40px;
+    font-size: 12px;
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+
+    &__item {
+      margin: 10px 0 0;
+      position: relative;
+      list-style: none;
+      border-radius: 10px;
+      padding: 10px;
+      background: transparentize($color-white, .4);
+      float: left;
+      clear: left;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    &__item--play {
+      @extend .comments-stream__item;
+      background: $color-key;
+    }
+
+    .comment-single {
+      color: $color-black;
+    }
+
+    .comment-author {
+      padding: 0;
+      color: #666666;
+    }
+  }
+
+  .comment-input {
+    -webkit-app-region: no-drag;
+
+    border: none;
+    box-sizing: border-box;
+    padding: 15px;
+    position: absolute;
+    bottom: 0;
+    border-radius: 10px;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 3em;
+    font-size: 12px;
+  }
+}
+
+// include .display-search and .display-list
+
+.display-control {
+  width: 60%;
+  height: 100%;
+  position: absolute;
+  right: -60%;
+  top: 0;
+
+  background: transparentize($color-black, .4);
+
+  transition: .5s;
+
+  &.is-list {
+    right: -30%;
+  }
+
+  &.is-search-active,
+  &.is-list.is-search-active {
+    right: 0;
+  }
+}
+
+%display-control__child {
+  box-sizing: border-box;
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  overflow: auto;
+  padding: 20px;
+}
+
+.display-list {
+  @extend %display-control__child;
+  right: 50%;
+  border-right: 1px solid transparentize($color-white, .5);
+}
+
+.display-search {
+  @extend %display-control__child;
+  right: 0;
+}
+
+.list-group {
+  padding: 0;
+}
+
+.list-group-title {
+  font-size: 12px;
+  color: $color-white;
+
+  &__number {
+    height: 2em;
+    padding: 2px 8px;
+    border-radius: 2em;
+    background: $color-key;
+    color: $color-white;
+    position: relative;
+    left: 10px;
+  }
+}
+
+.list-group-item {
+  clear: both;
+  padding: 15px 0;
+  border-top: 1px solid transparentize($color-white, .5);
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+
+  &:hover {
+    background: transparentize($color-white, .8);
+  }
+
+  &__thumbnail {
+    width: 30%;
+    height: auto;
+    float: left;
+    box-sizing: border-box;
+    border: 1px solid transparentize($color-white, .5);
+  }
+
+  &__body {
+    width: 70%;
+    float: left;
+    padding: 0 0 0 10px;
+    font-size: 12px;
+    box-sizing: border-box;
+  }
+
+  &__name {
+    color: #666666;
+  }
+
+  &__close {
+    float: right;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    line-height: 0;
+    font-size: 0;
+    border: 1px solid $color-white;
+    position: relative;
+    margin: 0 5px 0 0;
+
+    &:after,
+    &:before {
+      content: " ";
+      height: 10px;
+      border-left: 1px solid #FFFFFF;
+      display: block;
+      position: absolute;
+      left: 10px;
+      top: 5px;
+    }
+
+    &:after {
+      transform: rotate(45deg);
+    }
+
+    &:before {
+      transform: rotate(-45deg);
+    }
+  }
+}
+
+/* footer の要素
+
+*/
+
+%controll-default {
+  width: 25px;
+  height: 25px;
+  display: block;
+  float: left;
+
+  margin: 0 5px;
+
+  border-radius: 50%;
+  border: solid 1px $color-white;
+  background: $color-bar-bg;
+  cursor: pointer;
+
+  position: relative;
+}
+
+.play-controll {
+  float: left;
+  width: 150px;
+  box-sizing: border-box;
+  padding: 25px 40px;
+
+  &__play {
+    @extend %controll-default;
+
+    &:before {
+      font-size: 0;
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      content: "";
+      width: 10px;
+      height: 0;
+      border: 5px solid transparent;
+      border-left: 8px solid $color-key;
+      line-height: 0;
+    }
+  }
+
+  &__pause {
+    @extend %controll-default;
+
+    &:before,
+    &:after {
+      content: "";
+      font-size: 0;
+      line-height: 0;
+      position: absolute;
+      top: 7px;
+      width: 2px;
+      height: 8px;
+      background: $color-key;
+    }
+
+    &:before {
+      left: 13px;
+    }
+
+    &:after {
+      left: 8px;
+    }
+  }
+
+  &__stop {
+    @extend %controll-default;
+
+    &:before {
+      content: "";
+      font-size: 0;
+      line-height: 0;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 7px;
+      height: 7px;
+      background: $color-key;
+    }
+
+  }
+}
+
+%footer-ttl {
+  text-align: center;
+  font-size: 12px;
+  height: 1em;
+}
+
+.progress-box {
+  float: left;
+  width: calc( 100% - 300px );
+  box-sizing: border-box;
+
+  padding: 0 10px;
+
+  &__ttl {
+    @extend %footer-ttl;
+    color: $color-white;
+  }
+
+  &__status p {
+    text-align: center;
+    font-size: 12px;
+    color: #666666;
+    margin: 10px 0;
+  }
+}
+
+.volume-box {
+  float: left;
+  width: 150px;
+  box-sizing: border-box;
+  padding: 0 10px;
+
+  &__ttl {
+    @extend %footer-ttl;
+    color: #666666;
+  }
+
+  &__range-wrap {
+    height: 1px;
+    position: relative;
+  }
+
+  &__range {
+    @extend %input-range-disable;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 1px;
+    background: $color-black;
+
+    &::-webkit-slider-thumb {
+      @extend %input-range-disable;
+      -webkit-app-region: no-drag;
+
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border: solid 1px $color-white;
+      background: $color-bar-bg;
+    }
+  }
+}
+
+.progress-bar {
+  width: 100%;
+  height: 1px;
+  position: relative;
+  background: $color-black;
+
+  %progress-size-positioning {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    height: 1px;
+  }
+
+  // つまみのスタイル
+  &__seek {
+    @extend %input-range-disable;
+    @extend %progress-size-positioning;
+
+    width: 100%;
+    z-index: 100;
+
+    background: transparent;
+
+    &::-webkit-slider-thumb {
+      @extend %input-range-disable;
+      -webkit-app-region: no-drag;
+
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border: solid 1px $color-white;
+      background: $color-bar-bg;
+    }
+    &:hover::-webkit-slider-thumb {
+      width: 15px;
+      height: 15px;
+      transition: .2s;
+    }
+  }
+
+  &__played {
+    @extend %progress-size-positioning;
+    z-index: 10;
+
+    background: $color-key;
+  }
+
+  &__loaded {
+    @extend %progress-size-positioning;
+    z-index: 5;
+
+    background: #CCCCCC;
+  }
+}

@@ -23,10 +23,14 @@ export const InitialState = {
   volume: 0.8,
   played: 0,
   loaded: 0,
+  duration: 0,
   seeking: false,
+  isSearchActive: false,
 };
 
+export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
 export const CHANGE_TEXT = 'CHANGE_TEXT';
+export const CHANGE_SEARCH_TEXT = 'CHANGE_SEARCH_TEXT';
 export const SET_PLAYING_VIDEO = 'SET_PLAYING_VIDEO';
 export const SET_USER = 'SET_USER';
 export const ADD_VIDEO = 'ADD_VIDEO';

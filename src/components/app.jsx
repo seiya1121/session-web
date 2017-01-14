@@ -1,14 +1,16 @@
 import React from 'react';
-import ReactBaseComponent from './reactBaseComponent.jsx';
+import ReactBaseComponent from './reactBaseComponent';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
-import Reactotron from 'reactotron-react-js'
 import { YOUTUBE_API_KEY } from '../config/apiKey';
 import { base, firebaseAuth } from '../config/firebaseApp';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
+import classNames from 'classnames';
 import giphy from 'giphy-api';
+import '../styles/base.scss';
+import '../styles/normalize.scss';
 
 const SyncStates = [
   { state: 'que', asArray: true },
@@ -16,14 +18,11 @@ const SyncStates = [
   { state: 'comments', asArray: true },
   { state: 'playingVideo', asArray: false },
   { state: 'playing', asArray: false },
-  { state: 'startTime', asArray: false},
+  { state: 'startTime', asArray: false },
 ];
+
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 const videoObject = (video, userName) => Object.assign({}, video, { userName });
-const PlayingVideoStatusText = {
-  playing: 'Now Playing',
-  noVideos: "There're no videos to play.",
-};
 const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, userName, type, keyword) => (
   Object.assign({}, { content, userName, type, keyword })
@@ -37,29 +36,30 @@ class App extends ReactBaseComponent {
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue', 'onClickSignUp', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
-    this.bind('onSeekMouseUp', 'onProgress')
+    this.bind('onSeekMouseUp', 'onProgress');
   }
 
   componentWillMount() {
     firebaseAuth.onAuthStateChanged((user) => {
-      user && this.props.appActions.setUser(user, true)
+      // if (user) { this.props.appActions.setUser(user, true); }
+      if (user) { this.props.appActions.setDefaultUser(); }
     });
     SyncStates.forEach((obj) => {
       const { state, asArray } = obj;
       base.fetch(state, {
         context: this, asArray,
-        then(data) { this.props.appActions.fetchSyncState(state, data) },
+        then(data) { this.props.appActions.fetchSyncState(state, data); },
       });
-    })
+    });
   }
 
   componentDidMount() {
-    base.listenTo('startTime',{
+    base.listenTo('startTime', {
       context: this,
       asArray: false,
       then(startTime) {
         this.props.appActions.changePlayed(startTime);
-        this.player.seekTo(startTime)
+        this.player.seekTo(startTime);
       },
     });
     base.listenTo('que', {
@@ -81,11 +81,13 @@ class App extends ReactBaseComponent {
         user.updateProfile({ displayName });
       })
       .catch((error) => {
-        Reactotron.log(error.code);
-        Reactotron.log(error.message);
+        console.log(error.code);
+        console.log(error.message);
       });
     firebaseAuth.onAuthStateChanged((user) => {
-      user && this.props.appActions.setUser({ name: displayName, photoURL: user.photoURL }, true)
+      if (user) {
+        this.props.appActions.setUser({ name: displayName, photoURL: user.photoURL }, true);
+      }
     });
   }
 
@@ -93,11 +95,11 @@ class App extends ReactBaseComponent {
     const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
     firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
       .then((user) => {
-        this.props.appActions.setUser({ name: user.displayName, photoURL: user.photoURL }, true)
+        this.props.appActions.setUser({ name: user.displayName, photoURL: user.photoURL }, true);
       })
       .catch((error) => {
-        Reactotron.log(error.code);
-        Reactotron.log(error.message);
+        console.log(error.code);
+        console.log(error.message);
       });
   }
 
@@ -106,7 +108,7 @@ class App extends ReactBaseComponent {
   }
 
   onSeekMouseUp(e) {
-    const played = parseFloat(e.target.value)
+    const played = parseFloat(e.target.value);
     this.props.appActions.seekUp(played);
     this.player.seekTo(played);
   }
@@ -123,8 +125,12 @@ class App extends ReactBaseComponent {
     if (e.which !== 13) return false;
     e.preventDefault();
     const searchFunc = (error, result) => {
-      (error) ?  Reactotron.log(error) : this.props.appActions.setSearchResult(result)
-    }
+      if (error) {
+        console.log(error);
+      } else {
+        this.props.appActions.setSearchResult(result);
+      }
+    };
     const youTubeNode = new YouTubeNode();
     youTubeNode.setKey(YOUTUBE_API_KEY);
     youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
@@ -135,11 +141,17 @@ class App extends ReactBaseComponent {
     if (e.which !== 13) return false;
     if (e.target.value === '') return false;
     e.preventDefault();
-    const isGif = e.target.value.includes(commandType.giphy);
+    const commentText = e.target.value;
+    const isGif = commentText.includes(commandType.giphy);
     if (isGif) {
-      this.setGifUrl(e.target.value);
+      this.setGifUrl(commentText);
     } else {
-      const comment = commentObj(e.target.value, this.props.app.currentUser.name, CommentType.text, '');
+      const comment = commentObj(
+        commentText,
+        this.props.app.currentUser.name,
+        CommentType.text,
+        ''
+      );
       this.props.appActions.addComment(comment);
     }
     return true;
@@ -175,7 +187,7 @@ class App extends ReactBaseComponent {
     const isSetPlayingVideo = app.playingVideo !== '';
 
     const headerForNotLogin = (
-      <div>
+      <div className="none">
         <div>
           <input
             className="comment-input"
@@ -226,7 +238,7 @@ class App extends ReactBaseComponent {
     );
 
     const headerForLogedin = (
-      <div>
+      <div className="none">
         <div>
           <p>{name}</p>
           <p>{photoURL}</p>
@@ -236,86 +248,95 @@ class App extends ReactBaseComponent {
     );
 
     const headerNode = (
-      <header className="sss-header">
+      <header className="header-bar">
+        {/* ログイン機能、レイアウト考える上でめんどいから一旦非表示 */}
         {(isLogin) ? headerForLogedin : headerForNotLogin}
-        {
-          isSetPlayingVideo &&
-            <p>
-              <span className="text-small">{PlayingVideoStatusText.playing}</span>
-              {app.playingVideo.title} {app.playingVideo.displayName}
-            </p>
-        }
-        {
-          !isSetPlayingVideo &&
-            <p>
-              <span className="text-small">{PlayingVideoStatusText.noVideos}</span>
-            </p>
-        }
+
+        <input
+          className={classNames(
+            'form-search',
+            { 'is-search-active': app.isSearchActive },
+          )}
+          type="text"
+          placeholder="Search videos"
+          onChange={(e) => appActions.changeSearchText(e.target.value)}
+          onKeyPress={this.onKeyPressForSearch}
+          value={app.searchText}
+        >
+        </input>
       </header>
     );
 
     const searchResultNode = app.searchResult.map((result, i) => (
-      <ul key={i} className="list-group" onClick={() => this.onClickSetQue(result)}>
-        <li className="list-group-item">
+      <li
+        key={i}
+        className="list-group-item"
+        onClick={() => this.onClickSetQue(result)}
+      >
+        <div
+          className="list-group-item__click"
+        >
           <img
-            className="img-circle"
+            className="list-group-item__thumbnail"
             src={result.thumbnail.url}
-            width="32"
-            height="32"
             alt=""
-          ></img>
-          <div className="media-body">
+          />
+          <div className="list-group-item__body">
             <strong>{result.title}</strong>
           </div>
-        </li>
-      </ul>
+        </div>
+      </li>
     ));
+
     const queNode = app.que.map((video, i) => (
-      <div key={i}>
-        <li
-          className="slist-group-item"
+      <li key={i} className="list-group-item">
+        <div
+          className="list-group-item__click"
           onClick={() => appActions.setPlayingVideo(video)}
         >
           <img
-            className="img-circle media-object pull-left"
+            className="list-group-item__thumbnail"
             src={video.thumbnail.url}
-            width="32"
-            height="32"
             alt=""
-          ></img>
-          <div className="media-body">
+          />
+          <div className="list-group-item__body">
             <strong>{video.title}</strong>
+            <p className="list-group-item__name">added by {video.userName}</p>
           </div>
-          <p>added by {video.userName}</p>
-        </li>
-        <div>
-          <span className="icon icon-cancel" onClick={() => appActions.deleteVideo(video, i)}>x</span>
         </div>
-      </div>
+        <div className="list-group-item__close" onClick={() => appActions.deleteVideo(video, i)}>
+        </div>
+      </li>
     ));
 
     const commentsNode = app.comments.map((comment, i) => {
       switch (comment.type) {
         case CommentType.text:
           return (
-            <li key={i}>
-              <p>{comment.content}</p>
-              <p>{comment.userName}</p>
+            <li key={i} className="comments-stream__item">
+              <div className="comment-single">
+                {comment.content}
+              </div>
+              <div className="comment-author">
+                {comment.userName}
+              </div>
             </li>
           );
         case CommentType.log:
           return (
-            <li key={i}>
-              <p>{comment.content}</p>
-              <p>{comment.userName}</p>
+            <li key={i} className="comments-stream__item--play">
+              {comment.content}
+              {comment.userName}
             </li>
           );
         case CommentType.gif:
           return (
-            <li key={i}>
+            <li key={i} className="comments-stream__item">
               <p>{comment.keyword}</p>
               <img src={comment.content} alt=""></img>
-              <p>{comment.userName}</p>
+              <div className="comment-author">
+                {comment.userName}
+              </div>
             </li>
           );
         default:
@@ -324,78 +345,39 @@ class App extends ReactBaseComponent {
     });
 
     return (
-      <div>
-        <br />
-        <br />
+      <div className="contents">
         {headerNode}
-        <div className="sss-youtube-wrapper is-covered">
-          <ReactPlayer
-            ref={(player) => { this.player = player; }}
-            className="react-player"
-            width={480}
-            height={270}
-            url={youtubeUrl(app.playingVideo.videoId)}
-            playing={app.playing}
-            volume={app.volume}
-            soundcloudConfig={app.soundcloudConfig}
-            vimeoConfig={app.vimeoConfig}
-            youtubeConfig={app.youtubeConfig}
-            fileConfig={app.fileConfig}
-            onReady={() => appActions.play()}
-            onStart={() => Reactotron.log('onStart')}
-            onPlay={() => appActions.play()}
-            onPause={() => appActions.pause(app.played)}
-            onBuffer={() => Reactotron.log('onBuffer')}
-            onEnded={() => appActions.setPlayingVideo(app.que[0])}
-            onError={(e) => Reactotron.log('onError', e)}
-            onProgress={this.onProgress}
-            onDuration={(duration) => this.setState({ duration })}
-          />
-        </div>
-        <table><tbody>
-          <tr>
-            <th>Controls</th>
-            <td>
-              <button onClick={() => appActions.setPlayingVideo(app.que[0])}>Skip</button>
-              <button onClick={() => appActions.playPause(app.playing)}>{app.playing ? 'Pause' : 'Play'}</button>
-            </td>
-          </tr>
-          <tr>
-            <th>Seek</th>
-            <td>
-              <input
-                type="range" min={0} max={1} step="any"
-                value={app.played}
-                onMouseDown={appActions.seekDown}
-                onChange={(e) => appActions.changePlayed(parseFloat(e.target.value))}
-                onMouseUp={this.onSeekMouseUp}
-              />
-            </td>
-          </tr>
-          <tr>
-            <th>Volume</th>
-            <td>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step="any"
-                value={app.volume} onChange={(e) => appActions.changeVolume(e.target.value)}
-              />
-            </td>
-          </tr>
-          <tr>
-            <th>Played</th>
-            <td><progress max={1} value={app.played} /></td>
-          </tr>
-          <tr>
-            <th>Loaded</th>
-            <td><progress max={1} value={app.loaded} /></td>
-          </tr>
-        </tbody></table>
-        <div className="controlls">
-          <div className="pane comment-box">
-            <ul className="comment-list-group">
+
+        <div className="main-display">
+          {/* youotube */}
+          <div className="display-youtube">
+            <ReactPlayer
+              ref={(player) => { this.player = player; }}
+              className="react-player"
+              width={"100%"}
+              height={"100%"}
+              url={youtubeUrl(app.playingVideo.videoId)}
+              playing={app.playing}
+              volume={app.volume}
+              soundcloudConfig={app.soundcloudConfig}
+              vimeoConfig={app.vimeoConfig}
+              youtubeConfig={app.youtubeConfig}
+              fileConfig={app.fileConfig}
+              onReady={() => appActions.play()}
+              onStart={() => console.log('onStart')}
+              onPlay={() => appActions.play()}
+              onPause={() => appActions.pause(app.played)}
+              onBuffer={() => console.log('onBuffer')}
+              onEnded={() => appActions.setPlayingVideo(app.que[0])}
+              onError={(e) => console.log('onError', e)}
+              onProgress={this.onProgress}
+              onDuration={(duration) => appActions.changeValueWithKey('duration', duration)}
+            />
+          </div>
+
+          {/* comment */}
+          <div className="display-comments">
+            <ul className="comments-stream">
               {commentsNode}
             </ul>
             <input
@@ -408,35 +390,108 @@ class App extends ReactBaseComponent {
             >
             </input>
           </div>
-          <div className="pane list-box">
-            <h5 className="nav-group-title">
-              <span className="icon icon-music"></span>
-              Up Coming({app.que.length} videos}
-            </h5>
-            <ul className="list-group">
-              {queNode}
-            </ul>
+
+          <div
+            className={classNames(
+              'display-control',
+              { 'is-search-active': app.isSearchActive },
+            )}
+          >
+            {/* Play list */}
+            <div className="display-list">
+              <p className="list-group-title">
+                Up Coming <span className="list-group-title__number">{app.que.length}</span>
+              </p>
+              <ul className="list-group">
+                {queNode}
+              </ul>
+            </div>
+
+            {/* Search */}
+            <div className="display-search">
+              <p className="list-group-title">
+                search for
+                <span className="list-group-title__number">{app.searchText}</span>
+              </p>
+              <ul className="list-group">
+                {searchResultNode}
+              </ul>
+            </div>
           </div>
 
-          <div className="pane">
-            <ul className="list-group">
-              <li className="list-group-header">
-                <span className="icon icon-search"></span>
-                <input
-                  className="form-control"
-                  type="text"
-                  placeholder="Search for something you want"
-                  onChange={(e) => appActions.changeText('searchText', e.target.value)}
-                  onKeyPress={this.onKeyPressForSearch}
-                  value={app.searchText}
-                >
-                </input>
-              </li>
-            </ul>
-            <h5 className="nav-group-title">Search Result</h5>
-            {searchResultNode}
+        </div>
+
+        <div className="footer-bar">
+          {/* progress */}
+
+          <div className="play-controll">
+            <button
+              className={classNames(
+                { 'play-controll__pause': app.playing },
+                { 'play-controll__play': !app.playing },
+              )}
+              onClick={() => appActions.playPause(app.playing)}
+            >
+              &nbsp;
+            </button>
+            <button
+              className="play-controll__stop"
+              onClick={() => appActions.setPlayingVideo(app.que[0])}
+            >&nbsp;</button>
           </div>
 
+          <div className="progress-box">
+            {
+              isSetPlayingVideo &&
+                <p className="progress-box__ttl">
+                  {app.playingVideo.title} {app.playingVideo.displayName}
+                </p>
+            }
+            {
+              !isSetPlayingVideo &&
+                <p className="progress-box__ttl">
+                  <span className="header-bar__text--message">There're no videos to play.</span>
+                </p>
+            }
+            <div className="progress-bar">
+              <input
+                className="progress-bar__seek"
+                type="range" min={0} max={1} step="any"
+                value={app.played}
+                onMouseDown={appActions.seekDown}
+                onChange={(e) => appActions.changePlayed(parseFloat(e.target.value))}
+                onMouseUp={this.onSeekMouseUp}
+              />
+              <div
+                className="progress-bar__played"
+                style={{ width: `${100 * app.played}%` }}
+              ></div>
+              <div
+                className="progress-bar__loaded"
+                style={{ width: `${100 * app.loaded}%` }}
+              ></div>
+            </div>
+            <div className="progress-box__status">
+              <p>played {app.played.toFixed(3)} / loaded {app.loaded.toFixed(3)}</p>
+            </div>
+          </div>
+
+          <div className="volume-box">
+            <p className="volume-box__ttl">
+              Volume
+            </p>
+            <div className="volume-box__range-wrap">
+              <input
+                className="volume-box__range"
+                type="range"
+                min={0}
+                max={1}
+                step="any"
+                value={app.volume}
+                onChange={(e) => appActions.changeVolume(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
       </div>
     );
