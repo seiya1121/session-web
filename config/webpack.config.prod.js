@@ -98,7 +98,9 @@ module.exports = {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract('style', 'css?importLoaders=1!postcss')
       },
-      { test: /\.json$/, loader: 'json' },
+      {
+        test: /\.json$/, loader: 'json'
+      },
       {
         test: /\.svg$/,
         loader: 'file',
