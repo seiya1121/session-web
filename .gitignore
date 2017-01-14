@@ -11,6 +11,5 @@ build
 .DS_Store
 .env
 npm-debug.log
-src/config/apiKey.js
 firebase-debug.log
 app/dist
