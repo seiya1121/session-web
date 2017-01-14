@@ -4,12 +4,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import Reactotron from 'reactotron-react-js'
-import { YOUTUBE_API_KEY } from '../config/apiKey.js';
-import { base, firebaseAuth } from '../config/firebaseApp.js';
+import { YOUTUBE_API_KEY } from '../config/apiKey';
+import { base, firebaseAuth } from '../config/firebaseApp';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import giphy from 'giphy-api';
-// import '../styles/test.scss';
 
 const SyncStates = [
   { state: 'que', asArray: true },
