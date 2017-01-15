@@ -28,8 +28,6 @@ const app = (state = App.InitialState, action) => {
       return newState({ que: [...state.que, action.video] });
     case App.PUSH_VIDEO:
       return newState({ que: [...state.que, action.video] });
-    case App.PUSH_VIDEO:
-      return newState({ que: [...state.que, action.video] });
     case App.DELETE_VIDEO:
       return newState({ que: state.que.filter((q) => q.key !== action.video.key) });
     case App.PLAY_PAUSE:
