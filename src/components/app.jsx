@@ -72,6 +72,13 @@ class App extends ReactBaseComponent {
         }
       },
     });
+    base.listenTo('playingVideo', {
+      context: this,
+      asArray: false,
+      then(video) {
+        this.props.appActions.setPlayingVideo(video);
+      },
+    });
   }
 
   onClickSignUp() {
