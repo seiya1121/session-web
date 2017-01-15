@@ -68,3 +68,5 @@ export const progress = (state) => {
   const playingStatus = (state.loaded) ? { played, loaded } : { played };
   return { type: App.PROGRESS, playingStatus };
 };
+export const pushComment = (comment) => ({ type: App.PUSH_COMMENT, comment });
+export const pushVideo = (video) => ({ type: App.PUSH_VIDEO, video });

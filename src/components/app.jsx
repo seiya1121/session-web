@@ -64,12 +64,16 @@ class App extends ReactBaseComponent {
     });
     base.listenTo('que', {
       context: this,
-      asArray: false,
+      asArray: true,
       then(que) {
-        if (typeof que !== 'object') {
-          const addedVideo = que.pop();
-          this.notification('Added♪', { body: addedVideo.title, icon: addedVideo.thumbnail.url });
-        }
+        this.props.appActions.pushVideo(que[que.length - 1]);
+      },
+    });
+    base.listenTo('comments', {
+      context: this,
+      asArray: true,
+      then(comments) {
+        this.props.appActions.pushComment(comments[comments.length - 1]);
       },
     });
     base.listenTo('playingVideo', {
