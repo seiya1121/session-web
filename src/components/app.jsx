@@ -58,8 +58,15 @@ class App extends ReactBaseComponent {
       context: this,
       asArray: false,
       then(startTime) {
-        this.props.appActions.changePlayed(startTime);
+        this.props.appActions.updatePlayed(startTime);
         this.player.seekTo(startTime);
+      },
+    });
+    base.listenTo('playing', {
+      context: this,
+      asArray: false,
+      then(playing) {
+        this.props.appActions.updatePlaying(playing);
       },
     });
     base.listenTo('que', {

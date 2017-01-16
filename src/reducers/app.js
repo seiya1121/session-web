@@ -50,6 +50,10 @@ const app = (state = App.InitialState, action) => {
       return newState({ que: action.que });
     case App.UPDATE_COMMENTS:
       return newState({ comments: action.comments });
+    case App.UPDATE_PLAYED:
+      return newState({ played: action.played });
+    case App.UPDATE_PLAYING:
+      return newState({ playing: action.playing });
     default:
       return state;
   }
