@@ -47,7 +47,6 @@ export const playPause = (isPlaying) => {
 export const changeValueWithKey = (key, value) => ({
   type: App.CHANGE_VALUE_WITH_KEY, key, value,
 });
-export const changeText = (textType, text) => ({ type: App.CHANGE_TEXT, textType, text });
 export const changeSearchText = (text) => ({
   type: App.CHANGE_SEARCH_TEXT, text, isSearchActive: text.length >= 1,
 });
