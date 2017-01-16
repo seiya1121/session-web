@@ -19,13 +19,13 @@ const app = (state = App.InitialState, action) => {
     case App.SET_USER:
       return newState({ currentUser: action.user });
     case App.ADD_COMMENT:
-      return newState({ comments: [...state.comments, action.comment], commentText: '' });
+      return newState({ commentText: '' });
     case App.SET_DEFAULT_USER:
       return newState({ currentUser: App.DefaultUser });
     case App.FETCH_SYNC_STATE:
       return newState({ [action.key]: action.value });
     case App.ADD_VIDEO:
-      return newState({ que: [...state.que, action.video] });
+      return newState({ que: state.que });
     case App.DELETE_VIDEO:
       return newState({ que: state.que.filter((q) => q.key !== action.video.key) });
     case App.PLAY_PAUSE:

@@ -13,11 +13,11 @@ export const setPlayingVideo = (video) => {
 export const fetchSyncState = (key, value) => ({ type: App.FETCH_SYNC_STATE, key, value });
 export const addVideo = (video) => {
   push('que', video);
-  return { type: App.ADD_VIDEO, video };
+  return { type: App.ADD_VIDEO };
 };
 export const addComment = (comment) => {
   push('comments', comment);
-  return { type: App.ADD_COMMENT, comment };
+  return { type: App.ADD_COMMENT };
 };
 export const deleteVideo = (video, index) => {
   remove(`que/${index}`);
