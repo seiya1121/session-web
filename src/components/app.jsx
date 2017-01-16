@@ -65,16 +65,12 @@ class App extends ReactBaseComponent {
     base.listenTo('que', {
       context: this,
       asArray: true,
-      then(que) {
-        this.props.appActions.pushVideo(que[que.length - 1]);
-      },
+      then(que) { this.props.appActions.updateQue(que); },
     });
     base.listenTo('comments', {
       context: this,
       asArray: true,
-      then(comments) {
-        this.props.appActions.pushComment(comments[comments.length - 1]);
-      },
+      then(comments) { this.props.appActions.updateComments(comments); },
     });
     base.listenTo('playingVideo', {
       context: this,

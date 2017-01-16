@@ -26,8 +26,6 @@ const app = (state = App.InitialState, action) => {
       return newState({ [action.key]: action.value });
     case App.ADD_VIDEO:
       return newState({ que: [...state.que, action.video] });
-    case App.PUSH_VIDEO:
-      return newState({ que: [...state.que, action.video] });
     case App.DELETE_VIDEO:
       return newState({ que: state.que.filter((q) => q.key !== action.video.key) });
     case App.PLAY_PAUSE:
@@ -46,10 +44,12 @@ const app = (state = App.InitialState, action) => {
       return newState({ playing: action.playing, played: action.startTime });
     case App.PROGRESS:
       return !state.seeking ? newState(action.playingStatus) : state;
-    case App.PUSH_COMMENT:
-      return newState({ comments: [...state.comments, action.comment] });
     case App.SET_SEARCH_RESULT:
       return newState({ searchResult: action.result });
+    case App.UPDATE_QUE:
+      return newState({ que: action.que });
+    case App.UPDATE_COMMENTS:
+      return newState({ comments: action.comments });
     default:
       return state;
   }

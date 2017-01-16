@@ -47,5 +47,5 @@ export const SET_DEFAULT_USER = 'SET_DEFAULT_USER';
 export const ADD_COMMENT = 'ADD_COMMENT';
 export const SET_SEARCH_RESULT = 'SET_SEARCH_RESULT';
 export const FETCH_SYNC_STATE = 'FETCH_SYNC_STATE';
-export const PUSH_COMMENT = 'PUSH_COMMENT';
-export const PUSH_VIDEO = 'PUSH_VIDEO';
+export const UPDATE_QUE = 'UPDATE_QUE';
+export const UPDATE_COMMENTS = 'UPDATE_COMMENTS';
