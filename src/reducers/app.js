@@ -22,8 +22,6 @@ const app = (state = App.InitialState, action) => {
       return newState({ commentText: '' });
     case App.SET_DEFAULT_USER:
       return newState({ currentUser: App.DefaultUser });
-    case App.FETCH_SYNC_STATE:
-      return newState({ [action.key]: action.value });
     case App.ADD_VIDEO:
       return newState({ que: state.que });
     case App.DELETE_VIDEO:
@@ -46,6 +44,8 @@ const app = (state = App.InitialState, action) => {
       return !state.seeking ? newState(action.playingStatus) : state;
     case App.SET_SEARCH_RESULT:
       return newState({ searchResult: action.result });
+    case App.UPDATE_SYNC_STATE:
+      return newState({ [action.key]: action.value });
     case App.UPDATE_QUE:
       return newState({ que: action.que });
     case App.UPDATE_COMMENTS:
@@ -54,6 +54,13 @@ const app = (state = App.InitialState, action) => {
       return newState({ played: action.played });
     case App.UPDATE_PLAYING:
       return newState({ playing: action.playing });
+    case App.UPDATE_PLAYING_VIDEO:
+      return newState({
+        playing: true,
+        startTime: 0,
+        playingVideo: action.video,
+        que: state.que.filter((item) => item.key !== action.video.key),
+      });
     default:
       return state;
   }

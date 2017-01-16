@@ -48,7 +48,7 @@ class App extends ReactBaseComponent {
       const { state, asArray } = obj;
       base.fetch(state, {
         context: this, asArray,
-        then(data) { this.props.appActions.fetchSyncState(state, data); },
+        then(data) { this.props.appActions.updateSyncState(state, data); },
       });
     });
   }
@@ -65,9 +65,7 @@ class App extends ReactBaseComponent {
     base.listenTo('playing', {
       context: this,
       asArray: false,
-      then(playing) {
-        this.props.appActions.updatePlaying(playing);
-      },
+      then(playing) { this.props.appActions.updatePlaying(playing); },
     });
     base.listenTo('que', {
       context: this,
@@ -82,9 +80,7 @@ class App extends ReactBaseComponent {
     base.listenTo('playingVideo', {
       context: this,
       asArray: false,
-      then(video) {
-        this.props.appActions.setPlayingVideo(video);
-      },
+      then(video) { this.props.appActions.updatePlayingVideo(video); },
     });
   }
 

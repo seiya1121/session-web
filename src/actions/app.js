@@ -10,7 +10,6 @@ export const setPlayingVideo = (video) => {
   post('playingVideo', video);
   return { type: App.SET_PLAYING_VIDEO, video };
 };
-export const fetchSyncState = (key, value) => ({ type: App.FETCH_SYNC_STATE, key, value });
 export const addVideo = (video) => {
   push('que', video);
   return { type: App.ADD_VIDEO };
@@ -68,7 +67,9 @@ export const progress = (state) => {
   const playingStatus = (state.loaded) ? { played, loaded } : { played };
   return { type: App.PROGRESS, playingStatus };
 };
+export const updateSyncState = (key, value) => ({ type: App.UPDATE_SYNC_STATE, key, value });
 export const updateQue = (que) => ({ type: App.UPDATE_QUE, que });
 export const updateComments = (comments) => ({ type: App.UPDATE_COMMENTS, comments });
 export const updatePlayed = (played) => ({ type: App.UPDATE_PLAYED, played });
 export const updatePlaying = (playing) => ({ type: App.UPDATE_PLAYING, playing });
+export const updatePlayingVideo = (video) => ({ type: App.UPDATE_PLAYING_VIDEO, video });
