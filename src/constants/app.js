@@ -4,13 +4,29 @@ export const DefaultUser = Object.assign(
   {},
   { name: getAnimalName(), photoURL: '', isLogin: false }
 );
+export const DefaultVideo = Object.assign(
+  {},
+  { videoId: '', title: '', thumbnail: { url: '' }, displayName: '' }
+);
+
+export const SyncStates = [
+  { state: 'que', asArray: true },
+  { state: 'users', asArray: true },
+  { state: 'comments', asArray: true },
+  { state: 'playingVideo', asArray: false },
+  { state: 'playing', asArray: false },
+  { state: 'startTime', asArray: false },
+];
+
+export const CommandType = { giphy: '/giphy ' };
+export const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 
 export const InitialState = {
   currentUser: DefaultUser,
   searchResult: [],
   comments: [],
   que: [],
-  playingVideo: {},
+  playingVideo: DefaultVideo,
   playing: true,
   startTime: 0,
   commentText: '',
@@ -20,21 +36,21 @@ export const InitialState = {
   mailAddressForSignIn: '',
   passwordForSignIn: '',
   searchText: '',
+  searchedText: '',
   volume: 0.8,
   played: 0,
   loaded: 0,
   duration: 0,
   seeking: false,
   isSearchActive: false,
+  isCommentActive: false,
 };
 
 export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
-export const CHANGE_TEXT = 'CHANGE_TEXT';
-export const CHANGE_SEARCH_TEXT = 'CHANGE_SEARCH_TEXT';
-export const SET_PLAYING_VIDEO = 'SET_PLAYING_VIDEO';
+export const POST_PLAYING_VIDEO = 'POST_PLAYING_VIDEO';
 export const SET_USER = 'SET_USER';
-export const ADD_VIDEO = 'ADD_VIDEO';
-export const DELETE_VIDEO = 'DELETE_VIDEO';
+export const PUSH_VIDEO = 'PUSH_VIDEO';
+export const REMOVE_VIDEO = 'REMOVE_VIDEO';
 export const PLAY_PAUSE = 'PLAY_PAUSE';
 export const CHANGE_VOLUME = 'CHANGE_VOLUME';
 export const SEEK_DOWN = 'SEEK_DOWN';
@@ -46,6 +62,10 @@ export const PROGRESS = 'PROGRESS';
 export const SET_DEFAULT_USER = 'SET_DEFAULT_USER';
 export const ADD_COMMENT = 'ADD_COMMENT';
 export const SET_SEARCH_RESULT = 'SET_SEARCH_RESULT';
-export const FETCH_SYNC_STATE = 'FETCH_SYNC_STATE';
-export const PUSH_COMMENT = 'PUSH_COMMENT';
-export const PUSH_VIDEO = 'PUSH_VIDEO';
+
+export const UPDATE_SYNC_STATE = 'FETCH_SYNC_STATE';
+export const UPDATE_QUE = 'UPDATE_QUE';
+export const UPDATE_COMMENTS = 'UPDATE_COMMENTS';
+export const UPDATE_PLAYED = 'UPDATE_PLAYED';
+export const UPDATE_PLAYING = 'UPDATE_PLAYING';
+export const UPDATE_PLAYING_VIDEO = 'UPDATE_PLAYING_VIDEO';

@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import { YOUTUBE_API_KEY } from '../config/apiKey';
+import { SyncStates, CommandType, CommentType, DefaultVideo } from '../constants/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
@@ -12,22 +13,11 @@ import giphy from 'giphy-api';
 import '../styles/base.scss';
 import '../styles/normalize.scss';
 
-const SyncStates = [
-  { state: 'que', asArray: true },
-  { state: 'users', asArray: true },
-  { state: 'comments', asArray: true },
-  { state: 'playingVideo', asArray: false },
-  { state: 'playing', asArray: false },
-  { state: 'startTime', asArray: false },
-];
-
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 const videoObject = (video, userName) => Object.assign({}, video, { userName });
-const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, userName, type, keyword) => (
   Object.assign({}, { content, userName, type, keyword })
 );
-const commandType = { giphy: '/giphy ' };
 
 class App extends ReactBaseComponent {
   constructor(props) {
@@ -41,14 +31,19 @@ class App extends ReactBaseComponent {
 
   componentWillMount() {
     firebaseAuth.onAuthStateChanged((user) => {
-      // if (user) { this.props.appActions.setUser(user, true); }
-      if (user) { this.props.appActions.setDefaultUser(); }
+      if (user) {
+        this.props.appActions.setUser({
+          name: user.displayName, photoURL: user.photoURL, isLogin: true,
+        });
+      } else {
+        this.props.appActions.setDefaultUser();
+      }
     });
     SyncStates.forEach((obj) => {
       const { state, asArray } = obj;
       base.fetch(state, {
         context: this, asArray,
-        then(data) { this.props.appActions.fetchSyncState(state, data); },
+        then(data) { this.props.appActions.updateSyncState(state, data); },
       });
     });
   }
@@ -58,30 +53,31 @@ class App extends ReactBaseComponent {
       context: this,
       asArray: false,
       then(startTime) {
-        this.props.appActions.changePlayed(startTime);
+        this.props.appActions.updatePlayed(startTime);
         this.player.seekTo(startTime);
+      },
+    });
+    base.listenTo('playing', {
+      context: this,
+      asArray: false,
+      then(playing) {
+        this.props.appActions.updatePlaying(playing);
       },
     });
     base.listenTo('que', {
       context: this,
       asArray: true,
-      then(que) {
-        this.props.appActions.pushVideo(que[que.length - 1]);
-      },
+      then(que) { this.props.appActions.updateQue(que); },
     });
     base.listenTo('comments', {
       context: this,
       asArray: true,
-      then(comments) {
-        this.props.appActions.pushComment(comments[comments.length - 1]);
-      },
+      then(comments) { this.props.appActions.updateComments(comments); },
     });
     base.listenTo('playingVideo', {
       context: this,
       asArray: false,
-      then(video) {
-        this.props.appActions.setPlayingVideo(video);
-      },
+      then(video) { this.props.appActions.updatePlayingVideo(video); },
     });
   }
 
@@ -97,7 +93,9 @@ class App extends ReactBaseComponent {
       });
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
-        this.props.appActions.setUser({ name: displayName, photoURL: user.photoURL }, true);
+        this.props.appActions.setUser({
+          name: displayName, photoURL: user.photoURL, isLogin: true,
+        });
       }
     });
   }
@@ -106,7 +104,9 @@ class App extends ReactBaseComponent {
     const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
     firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
       .then((user) => {
-        this.props.appActions.setUser({ name: user.displayName, photoURL: user.photoURL }, true);
+        this.props.appActions.setUser({
+          name: user.displayName, photoURL: user.photoURL, isLogin: true,
+        });
       })
       .catch((error) => {
         console.log(error.code);
@@ -142,8 +142,10 @@ class App extends ReactBaseComponent {
         this.props.appActions.setSearchResult(result);
       }
     };
+    this.props.appActions.changeValueWithKey('searchedText', this.props.app.searchText);
     const youTubeNode = new YouTubeNode();
     youTubeNode.setKey(YOUTUBE_API_KEY);
+    youTubeNode.addParam('type', 'video');
     youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
     return true;
   }
@@ -153,7 +155,7 @@ class App extends ReactBaseComponent {
     if (e.target.value === '') return false;
     e.preventDefault();
     const commentText = e.target.value;
-    const isGif = commentText.includes(commandType.giphy);
+    const isGif = commentText.includes(CommandType.giphy);
     if (isGif) {
       this.setGifUrl(commentText);
     } else {
@@ -172,14 +174,14 @@ class App extends ReactBaseComponent {
     const { que, currentUser, playingVideo } = this.props.app;
     const targetVideo = videoObject(video, currentUser.name);
     if (que.length === 0 && playingVideo === '') {
-      this.props.appActions.setPlayingVideo(targetVideo);
+      this.props.appActions.postPlayingVideo(targetVideo);
     } else {
-      this.props.appActions.addVideo(targetVideo);
+      this.props.appActions.pushVideo(targetVideo);
     }
   }
 
   setGifUrl(keyword) {
-    const key = keyword.replace(commandType.giphy, '');
+    const key = keyword.replace(CommandType.giphy, '');
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
@@ -195,16 +197,19 @@ class App extends ReactBaseComponent {
   render() {
     const { app, appActions } = this.props;
     const { isLogin, name, photoURL } = app.currentUser;
-    const isSetPlayingVideo = app.playingVideo !== '';
+    const isPostPlayingVideo = app.playingVideo !== '';
+    const comments = (app.isCommentActive) ?
+      app.comments : app.comments.slice(app.comments.length - 3, app.comments.length);
+    const playingVideo = app.playingVideo || DefaultVideo;
 
     const headerForNotLogin = (
-      <div className="none">
+      <div>
         <div>
           <input
             className="comment-input"
             type="text"
             placeholder="user name"
-            onChange={(e) => appActions.changeText('displayName', e.target.value)}
+            onChange={(e) => appActions.changeValueWithKey('displayName', e.target.value)}
             value={app.displayName}
           >
           </input>
@@ -212,7 +217,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => appActions.changeText('mailAddressForSignUp', e.target.value)}
+            onChange={(e) => appActions.changeValueWithKey('mailAddressForSignUp', e.target.value)}
             value={app.mailAddressForSignUp}
           >
           </input>
@@ -220,7 +225,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => appActions.changeText('passwordForSignUp', e.target.value)}
+            onChange={(e) => appActions.changeValueWithKey('passwordForSignUp', e.target.value)}
             value={app.passwordForSignUp}
           >
           </input>
@@ -231,7 +236,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="mail address"
-            onChange={(e) => appActions.changeText('mailAddressForSignIn', e.target.value)}
+            onChange={(e) => appActions.changeValueWithKey('mailAddressForSignIn', e.target.value)}
             value={app.mailAddressForSignIn}
           >
           </input>
@@ -239,7 +244,7 @@ class App extends ReactBaseComponent {
             className="comment-input"
             type="text"
             placeholder="password"
-            onChange={(e) => appActions.changeText('passwordForSignIn', e.target.value)}
+            onChange={(e) => appActions.changeValueWithKey('passwordForSignIn', e.target.value)}
             value={app.passwordForSignIn}
           >
           </input>
@@ -249,20 +254,16 @@ class App extends ReactBaseComponent {
     );
 
     const headerForLogedin = (
-      <div className="none">
-        <div>
-          <p>{name}</p>
-          <p>{photoURL}</p>
-        </div>
+      <div>
+        <p>{name}</p>
+        <p>{photoURL}</p>
         <button onClick={this.onClickSignOut}>Sign Out</button>
       </div>
     );
 
     const headerNode = (
       <header className="header-bar">
-        {/* ログイン機能、レイアウト考える上でめんどいから一旦非表示 */}
         {(isLogin) ? headerForLogedin : headerForNotLogin}
-
         <input
           className={classNames(
             'form-search',
@@ -270,7 +271,10 @@ class App extends ReactBaseComponent {
           )}
           type="text"
           placeholder="Search videos"
-          onChange={(e) => appActions.changeSearchText(e.target.value)}
+          onChange={(e) => {
+            appActions.changeValueWithKey('searchText', e.target.value);
+          }}
+          onFocus={() => { appActions.changeValueWithKey('isSearchActive', true); }}
           onKeyPress={this.onKeyPressForSearch}
           value={app.searchText}
         >
@@ -299,11 +303,11 @@ class App extends ReactBaseComponent {
       </li>
     ));
 
-    const queNode = app.que.map((video, i) => (
-      <li key={i} className="list-group-item">
+    const queNode = app.que.map((video) => (
+      <li key={video.key} className="list-group-item">
         <div
           className="list-group-item__click"
-          onClick={() => appActions.setPlayingVideo(video)}
+          onClick={() => appActions.postPlayingVideo(video)}
         >
           <img
             className="list-group-item__thumbnail"
@@ -315,16 +319,28 @@ class App extends ReactBaseComponent {
             <p className="list-group-item__name">added by {video.userName}</p>
           </div>
         </div>
-        <div className="list-group-item__close" onClick={() => appActions.deleteVideo(video, i)}>
+        <div className="list-group-item__close" onClick={() => appActions.removeVideo(video)}>
         </div>
       </li>
     ));
 
-    const commentsNode = app.comments.map((comment, i) => {
+    const commentClass = (type, index) => (
+      (type === CommentType.log) ?
+        classNames(
+          'comments-stream__item--play',
+          { [`comments-stream__item--play_${index}`]: !app.isCommentActive },
+        ) :
+        classNames(
+          'comments-stream__item',
+          { [`comments-stream__item_${index}`]: !app.isCommentActive },
+        )
+    );
+
+    const commentsNode = comments.map((comment, i) => {
       switch (comment.type) {
         case CommentType.text:
           return (
-            <li key={i} className="comments-stream__item">
+            <li key={i} className={commentClass(comment.type, i)}>
               <div className="comment-single">
                 {comment.content}
               </div>
@@ -335,14 +351,13 @@ class App extends ReactBaseComponent {
           );
         case CommentType.log:
           return (
-            <li key={i} className="comments-stream__item--play">
-              {comment.content}
-              {comment.userName}
+            <li key={i} className={commentClass(comment.type, i)}>
+              {comment.content} by {comment.userName}
             </li>
           );
         case CommentType.gif:
           return (
-            <li key={i} className="comments-stream__item">
+            <li key={i} className={commentClass(comment.type, i)}>
               <p>{comment.keyword}</p>
               <img src={comment.content} alt=""></img>
               <div className="comment-author">
@@ -367,7 +382,7 @@ class App extends ReactBaseComponent {
               className="react-player"
               width={"100%"}
               height={"100%"}
-              url={youtubeUrl(app.playingVideo.videoId)}
+              url={youtubeUrl(playingVideo.videoId)}
               playing={app.playing}
               volume={app.volume}
               soundcloudConfig={app.soundcloudConfig}
@@ -375,12 +390,10 @@ class App extends ReactBaseComponent {
               youtubeConfig={app.youtubeConfig}
               fileConfig={app.fileConfig}
               onReady={() => appActions.play()}
-              onStart={() => console.log('onStart')}
               onPlay={() => appActions.play()}
               onPause={() => appActions.pause(app.played)}
-              onBuffer={() => console.log('onBuffer')}
-              onEnded={() => appActions.setPlayingVideo(app.que[0])}
-              onError={(e) => console.log('onError', e)}
+              onEnded={() => appActions.postPlayingVideo(app.que[0])}
+              onError={() => appActions.postPlayingVideo(app.que[0])}
               onProgress={this.onProgress}
               onDuration={(duration) => appActions.changeValueWithKey('duration', duration)}
             />
@@ -392,10 +405,12 @@ class App extends ReactBaseComponent {
               {commentsNode}
             </ul>
             <input
-              className="comment-input"
+              className={classNames('comment-input', { 'is-active': !app.isCommentActive })}
               type="text"
               placeholder="type comment"
-              onChange={(e) => appActions.changeText('commentText', e.target.value)}
+              onChange={(e) => { appActions.changeValueWithKey('commentText', e.target.value); }}
+              onFocus={() => { appActions.changeValueWithKey('isCommentActive', true); }}
+              onBlur={() => { appActions.changeValueWithKey('isCommentActive', false); }}
               onKeyPress={this.onKeyPressForComment}
               value={app.commentText}
             >
@@ -422,7 +437,7 @@ class App extends ReactBaseComponent {
             <div className="display-search">
               <p className="list-group-title">
                 search for
-                <span className="list-group-title__number">{app.searchText}</span>
+                <span className="list-group-title__number">{app.searchedText}</span>
               </p>
               <ul className="list-group">
                 {searchResultNode}
@@ -447,19 +462,19 @@ class App extends ReactBaseComponent {
             </button>
             <button
               className="play-controll__stop"
-              onClick={() => appActions.setPlayingVideo(app.que[0])}
+              onClick={() => appActions.postPlayingVideo(app.que[0])}
             >&nbsp;</button>
           </div>
 
           <div className="progress-box">
             {
-              isSetPlayingVideo &&
+              isPostPlayingVideo &&
                 <p className="progress-box__ttl">
-                  {app.playingVideo.title} {app.playingVideo.displayName}
+                  {playingVideo.title} {playingVideo.displayName}
                 </p>
             }
             {
-              !isSetPlayingVideo &&
+              !isPostPlayingVideo &&
                 <p className="progress-box__ttl">
                   <span className="header-bar__text--message">There're no videos to play.</span>
                 </p>
@@ -512,16 +527,12 @@ class App extends ReactBaseComponent {
 App.propTypes = {
   app: React.PropTypes.object,
   appActions: React.PropTypes.object,
-}
+};
 
-const mapStateToProps = (state) => {
-  return { app: state.app };
-}
+const mapStateToProps = (state) => ({ app: state.app });
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    appActions: bindActionCreators(AppActions, dispatch),
-  };
-}
+const mapDispatchToProps = (dispatch) => ({
+  appActions: bindActionCreators(AppActions, dispatch),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
