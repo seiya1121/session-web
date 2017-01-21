@@ -264,6 +264,9 @@ class App extends ReactBaseComponent {
     const headerNode = (
       <header className="header-bar">
         {(isLogin) ? headerForLogedin : headerForNotLogin}
+        <button onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}>
+          QueToggle
+        </button>
         <input
           className={classNames(
             'form-search',
@@ -421,6 +424,7 @@ class App extends ReactBaseComponent {
             className={classNames(
               'display-control',
               { 'is-search-active': app.isSearchActive },
+              { 'is-list': app.isQueListActive },
             )}
           >
             {/* Play list */}
@@ -440,6 +444,9 @@ class App extends ReactBaseComponent {
                 <span className="list-group-title__number">{app.searchedText}</span>
               </p>
               <ul className="list-group">
+                <button onClick={() => appActions.changeValueWithKey('isSearchActive', false)}>
+                  ×
+                </button>
                 {searchResultNode}
               </ul>
             </div>

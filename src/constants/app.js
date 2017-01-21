@@ -44,6 +44,7 @@ export const InitialState = {
   seeking: false,
   isSearchActive: false,
   isCommentActive: false,
+  isQueListActive: false,
 };
 
 export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
