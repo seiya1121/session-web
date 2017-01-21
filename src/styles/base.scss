@@ -67,7 +67,7 @@ input {
 .header-bar {
   box-sizing: border-box;
   height: $header-height;
-  padding: 6px 0 6px 72px;
+  padding: 6px 0;
 
   background: $color-bar-bg;
 
@@ -76,13 +76,9 @@ input {
 
   border-bottom:solid 1px #333333;
 
-  &__text {
-    margin: 0;
-
-    &--message {
-      color: #999999;
-      padding: 0 20px 0 0;
-    }
+  &__left {
+    float: left;
+    max-width: 50%;
   }
 }
 
@@ -95,11 +91,8 @@ input {
 .footer-bar {
   box-sizing: border-box;
   height: $footer-height;
-
   background: $color-bar-bg;
-
   overflow: hidden;
-
   border-top:solid 1px #333333;
 }
 
@@ -123,7 +116,8 @@ input {
   &.is-search-active {
     color: $color-black;
     background: $color-white;
-    width: 30%;
+    margin: 5px 20px 0 20px;
+    width: calc( 30% - 40px );
     transition: .5s;
   }
 }
@@ -288,6 +282,7 @@ input {
 }
 
 %display-control__child {
+  border-left: 1px solid transparentize($color-white, .5);
   box-sizing: border-box;
   position: absolute;
   width: 50%;
@@ -299,12 +294,43 @@ input {
 .display-list {
   @extend %display-control__child;
   right: 50%;
-  border-right: 1px solid transparentize($color-white, .5);
 }
 
 .display-search {
   @extend %display-control__child;
   right: 0;
+
+  &__close {
+    float: right;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    line-height: 0;
+    font-size: 0;
+    border: 1px solid $color-white;
+    position: relative;
+    margin: 0 5px 0 0;
+    cursor: pointer;
+
+    &:after,
+    &:before {
+      content: " ";
+      height: 10px;
+      border-left: 1px solid #FFFFFF;
+      display: block;
+      position: absolute;
+      left: 10px;
+      top: 5px;
+    }
+
+    &:after {
+      transform: rotate(45deg);
+    }
+
+    &:before {
+      transform: rotate(-45deg);
+    }
+  }
 }
 
 .list-group {
