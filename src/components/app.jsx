@@ -468,7 +468,7 @@ class App extends ReactBaseComponent {
               &nbsp;
             </button>
             <button
-              className="play-controll__stop"
+              className="play-controll__skip"
               onClick={() => appActions.postPlayingVideo(app.que[0])}
             >&nbsp;</button>
           </div>
