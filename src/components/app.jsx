@@ -85,20 +85,16 @@ class App extends ReactBaseComponent {
     // const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
     provider.addScope('https://www.googleapis.com/auth/plus.login');
     firebaseAuth.signInWithPopup(provider).then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const token = result.credential.accessToken;
-      // The signed-in user info.
+      // const token = result.credential.accessToken;
       const user = result.user;
-      console.log(token)
-      console.log(user)
-      // ...
+      console.log(user.displayName, user.photoURL)
+      this.props.appActions.setUser({
+        name: user.displayName, photoURL: user.photoURL, isLogin: true,
+      })
     }).catch((error) => {
-      // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
-      // The email of the user's account used.
       const email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
       const credential = error.credential;
       console.log(errorCode)
       console.log(errorMessage)
@@ -195,21 +191,15 @@ class App extends ReactBaseComponent {
       app.comments : app.comments.slice(app.comments.length - 3, app.comments.length);
     const playingVideo = app.playingVideo || DefaultVideo;
 
-    const headerForNotLogin = (
-      <button onClick={this.onClickSignIn}>Sign In</button>
-    );
-
-    const headerForLogedin = (
-      <div>
-        <p>{name}</p>
-        <img src={photoURL} alt=""></img>
-        <button onClick={this.onClickSignOut}>Sign Out</button>
-      </div>
-    );
-
     const headerNode = (
       <header className="header-bar">
-        {(isLogin) ? headerForLogedin : headerForNotLogin}
+        <p>{name}</p>
+        <img src={photoURL} alt=""></img>
+        {
+          (isLogin) ?
+            <button onClick={this.onClickSignOut}>Sign Out</button> :
+            <button onClick={this.onClickSignIn}>Sign In</button>
+        }
         <button onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}>
           QueToggle
         </button>
