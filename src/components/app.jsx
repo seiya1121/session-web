@@ -84,7 +84,7 @@ class App extends ReactBaseComponent {
   onClickSignIn() {
     // const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
     provider.addScope('https://www.googleapis.com/auth/plus.login');
-    firebaseAuth.signInWithPopup(provider).then((result) => {
+    firebaseAuth.signInWithRedirect(provider).then((result) => {
       // const token = result.credential.accessToken;
       const user = result.user;
       console.log(user.displayName, user.photoURL)
