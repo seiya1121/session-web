@@ -15,8 +15,8 @@ import '../styles/normalize.scss';
 
 const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
 const videoObject = (video, userName) => Object.assign({}, video, { userName });
-const commentObj = (content, userName, type, keyword) => (
-  Object.assign({}, { content, userName, type, keyword })
+const commentObj = (content, user, type, keyword) => (
+  Object.assign({}, { content, user, type, keyword })
 );
 
 class App extends ReactBaseComponent {
@@ -150,7 +150,7 @@ class App extends ReactBaseComponent {
     } else {
       const comment = commentObj(
         commentText,
-        this.props.app.currentUser.name,
+        this.props.app.currentUser,
         CommentType.text,
         ''
       );
@@ -174,7 +174,7 @@ class App extends ReactBaseComponent {
     const giphyApp = giphy({ apiKey: 'dc6zaTOxFJmzC' });
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
-      const comment = commentObj(imageUrl, this.props.app.currentUser.name, CommentType.gif, key);
+      const comment = commentObj(imageUrl, this.props.app.currentUser, CommentType.gif, key);
       this.props.appActions.addComment(comment);
     });
   }
@@ -291,11 +291,12 @@ class App extends ReactBaseComponent {
         case CommentType.text:
           return (
             <li key={i} className={commentClass(comment.type, i)}>
+              <img src={comment.user.photoURL} alt={comment.user.name}></img>
               <div className="comment-single">
                 {comment.content}
               </div>
               <div className="comment-author">
-                {comment.userName}
+                {comment.user.name}
               </div>
             </li>
           );
