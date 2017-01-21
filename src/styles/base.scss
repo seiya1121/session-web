@@ -122,7 +122,34 @@ input {
   }
 }
 
+// profile
+.header-bar-prof  {
+  position: relative;
 
+  &__icon {
+    position: absolute;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    left: 15px;
+    top: 5px;
+  }
+
+  &__name {
+    margin: 0px 0px 0 55px;
+    padding: 12px 10px;
+  }
+
+  &__sign {
+    padding-left: 15px;
+    color: $color-key;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
 
 // button-que-list
 .button-que-list {

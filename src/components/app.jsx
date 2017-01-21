@@ -196,13 +196,25 @@ class App extends ReactBaseComponent {
         <div className="header-bar__left">
           <div className="header-bar-prof">
             <img className="header-bar-prof__icon" src={photoURL} alt="" />
-            <p className="header-bar-prof__name">{name}</p>
+            <p className="header-bar-prof__name">
+              {name}
+              {
+                (isLogin) ?
+                  <a
+                    className="header-bar-prof__sign"
+                    onClick={this.onClickSignOut}
+                  >
+                    Sign Out
+                  </a> :
+                  <a
+                    className="header-bar-prof__sign"
+                    onClick={this.onClickSignIn}
+                  >
+                    Sign In
+                  </a>
+              }
+            </p>
           </div>
-          {
-            (isLogin) ?
-              <button onClick={this.onClickSignOut}>Sign Out</button> :
-              <button onClick={this.onClickSignIn}>Sign In</button>
-          }
         </div>
         <input
           className={classNames(
