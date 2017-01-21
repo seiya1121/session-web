@@ -439,8 +439,6 @@ input {
 
     &:before,&:after {
       content: "";
-      border: 4px solid transparent;
-      border-left: 5px solid $color-key;
       font-size: 0;
       line-height: 0;
       position: absolute;
@@ -450,11 +448,15 @@ input {
     }
 
     &:before {
+      border: 4px solid transparent;
+      border-left: 5px solid $color-key;
       left: 7px;
     }
 
     &:after {
-      left: 12px;
+      left: 14px;
+      border-right: 2px solid $color-key;
+      height: 8px;
     }
 
   }
