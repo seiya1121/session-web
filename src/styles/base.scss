@@ -103,18 +103,15 @@ input {
   border-top:solid 1px #333333;
 }
 
-
 // search
-
 .form-search{
   -webkit-app-region: no-drag;
 
   color: $color-white;
-  position: absolute;
+  float: right;
   background: $color-black;
   text-indent: 10px;
-  right: 20px;
-  top: 10px;
+  margin: 5px 20px 0 0;
   border-radius: 10px;
   width: 10%;
   border: none;
@@ -126,8 +123,34 @@ input {
   &.is-search-active {
     color: $color-black;
     background: $color-white;
-    width: calc( 30% - 40px );
+    width: 30%;
     transition: .5s;
+  }
+}
+
+
+
+// button-que-list
+.button-que-list {
+  float: right;
+  width: 17px;
+  height: 30px;
+  margin: 13px 15px 0 0;
+  position: relative;
+  cursor: pointer;
+
+  span {
+    display: block;
+    height: 1px;
+    background: $color-white;
+  }
+
+  &.is-quelist-list span {
+    background: $color-key;
+  }
+
+  span + span {
+    margin-top: 5px;
   }
 }
 
@@ -254,12 +277,12 @@ input {
 
   transition: .5s;
 
-  &.is-list {
+  &.is-quelist-list {
     right: -30%;
   }
 
   &.is-search-active,
-  &.is-list.is-search-active {
+  &.is-quelist-list.is-search-active {
     right: 0;
   }
 }
