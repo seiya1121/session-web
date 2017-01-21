@@ -200,9 +200,6 @@ class App extends ReactBaseComponent {
             <button onClick={this.onClickSignOut}>Sign Out</button> :
             <button onClick={this.onClickSignIn}>Sign In</button>
         }
-        <button onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}>
-          QueToggle
-        </button>
         <input
           className={classNames(
             'form-search',
@@ -218,6 +215,16 @@ class App extends ReactBaseComponent {
           value={app.searchText}
         >
         </input>
+        <div
+          className={classNames(
+            'button-que-list',
+            { 'is-quelist-list': app.isQueListActive },
+          )}
+          onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}>
+          <span />
+          <span />
+          <span />
+        </div>
       </header>
     );
 
@@ -360,7 +367,7 @@ class App extends ReactBaseComponent {
             className={classNames(
               'display-control',
               { 'is-search-active': app.isSearchActive },
-              { 'is-list': app.isQueListActive },
+              { 'is-quelist-list': app.isQueListActive },
             )}
           >
             {/* Play list */}
