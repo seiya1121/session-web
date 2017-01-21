@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import { YOUTUBE_API_KEY } from '../config/apiKey';
 import { SyncStates, CommandType, CommentType, DefaultVideo } from '../constants/app';
-import { base, firebaseAuth } from '../config/firebaseApp';
+import { base, firebaseAuth, provider } from '../config/firebaseApp';
 import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import classNames from 'classnames';
@@ -24,7 +24,7 @@ class App extends ReactBaseComponent {
     super(props);
     this.bind('notification', 'setGifUrl');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
-    this.bind('onClickSetQue', 'onClickSignUp', 'onClickSignOut', 'onClickSignIn');
+    this.bind('onClickSetQue', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
     this.bind('onSeekMouseUp', 'onProgress');
   }
@@ -81,37 +81,26 @@ class App extends ReactBaseComponent {
     });
   }
 
-  onClickSignUp() {
-    const { mailAddressForSignUp, passwordForSignUp, displayName } = this.props.app;
-    firebaseAuth.createUserWithEmailAndPassword(mailAddressForSignUp, passwordForSignUp)
-      .then((user) => {
-        user.updateProfile({ displayName });
-      })
-      .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
-      });
-    firebaseAuth.onAuthStateChanged((user) => {
-      if (user) {
-        this.props.appActions.setUser({
-          name: displayName, photoURL: user.photoURL, isLogin: true,
-        });
-      }
-    });
-  }
-
   onClickSignIn() {
-    const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
-    firebaseAuth.signInWithEmailAndPassword(mailAddressForSignIn, passwordForSignIn)
-      .then((user) => {
-        this.props.appActions.setUser({
-          name: user.displayName, photoURL: user.photoURL, isLogin: true,
-        });
+    // const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
+    provider.addScope('https://www.googleapis.com/auth/plus.login');
+    firebaseAuth.signInWithPopup(provider).then((result) => {
+      // const token = result.credential.accessToken;
+      const user = result.user;
+      console.log(user.displayName, user.photoURL)
+      this.props.appActions.setUser({
+        name: user.displayName, photoURL: user.photoURL, isLogin: true,
       })
-      .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
-      });
+    }).catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.email;
+      const credential = error.credential;
+      console.log(errorCode)
+      console.log(errorMessage)
+      console.log(email)
+      console.log(credential)
+    });
   }
 
   onClickSignOut() {
@@ -202,68 +191,15 @@ class App extends ReactBaseComponent {
       app.comments : app.comments.slice(app.comments.length - 3, app.comments.length);
     const playingVideo = app.playingVideo || DefaultVideo;
 
-    const headerForNotLogin = (
-      <div>
-        <div>
-          <input
-            className="comment-input"
-            type="text"
-            placeholder="user name"
-            onChange={(e) => appActions.changeValueWithKey('displayName', e.target.value)}
-            value={app.displayName}
-          >
-          </input>
-          <input
-            className="comment-input"
-            type="text"
-            placeholder="mail address"
-            onChange={(e) => appActions.changeValueWithKey('mailAddressForSignUp', e.target.value)}
-            value={app.mailAddressForSignUp}
-          >
-          </input>
-          <input
-            className="comment-input"
-            type="text"
-            placeholder="password"
-            onChange={(e) => appActions.changeValueWithKey('passwordForSignUp', e.target.value)}
-            value={app.passwordForSignUp}
-          >
-          </input>
-          <button onClick={this.onClickSignUp}>Sign Up</button>
-        </div>
-        <div>
-          <input
-            className="comment-input"
-            type="text"
-            placeholder="mail address"
-            onChange={(e) => appActions.changeValueWithKey('mailAddressForSignIn', e.target.value)}
-            value={app.mailAddressForSignIn}
-          >
-          </input>
-          <input
-            className="comment-input"
-            type="text"
-            placeholder="password"
-            onChange={(e) => appActions.changeValueWithKey('passwordForSignIn', e.target.value)}
-            value={app.passwordForSignIn}
-          >
-          </input>
-          <button onClick={this.onClickSignIn}>Sign In</button>
-        </div>
-      </div>
-    );
-
-    const headerForLogedin = (
-      <div>
-        <p>{name}</p>
-        <p>{photoURL}</p>
-        <button onClick={this.onClickSignOut}>Sign Out</button>
-      </div>
-    );
-
     const headerNode = (
       <header className="header-bar">
-        {(isLogin) ? headerForLogedin : headerForNotLogin}
+        <p>{name}</p>
+        <img src={photoURL} alt=""></img>
+        {
+          (isLogin) ?
+            <button onClick={this.onClickSignOut}>Sign Out</button> :
+            <button onClick={this.onClickSignIn}>Sign In</button>
+        }
         <button onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}>
           QueToggle
         </button>
