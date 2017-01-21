@@ -303,12 +303,18 @@ class App extends ReactBaseComponent {
         case CommentType.text:
           return (
             <li key={i} className={commentClass(comment.type, i)}>
-              <img src={comment.user.photoURL} alt={comment.user.name}></img>
-              <div className="comment-single">
-                {comment.content}
-              </div>
-              <div className="comment-author">
-                {comment.user.name}
+              <img
+                className="comments-stream__img-prof"
+                src={comment.user.photoURL}
+                alt={comment.user.name}
+              />
+              <div className="commemt-comment">
+                <div className="comment-single">
+                  {comment.content}
+                </div>
+                <div className="comment-author">
+                  {comment.user.name}
+                </div>
               </div>
             </li>
           );
@@ -322,7 +328,7 @@ class App extends ReactBaseComponent {
           return (
             <li key={i} className={commentClass(comment.type, i)}>
               <p>{comment.keyword}</p>
-              <img src={comment.content} alt=""></img>
+              <img className="comments-stream__img-giphy" src={comment.content} alt=""></img>
               <div className="comment-author">
                 {comment.userName}
               </div>
