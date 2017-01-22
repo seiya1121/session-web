@@ -113,14 +113,9 @@ class App extends ReactBaseComponent {
 
   getPlaylistVideos(playlistId) {
     const {accessToken} = this.props.app.currentUser;
-    fetch(
-      `${YoutubeUrl}/playlistItems?${playlistItemsParams(accessToken, playlistId)}`
-    )
-      .then((response) => { return response.json(); })
-      .then((result) => {
-        console.log(result)
-        this.props.appActions.setSearchResultForPlaylist(result)
-      })
+    fetch(`${YoutubeUrl}/playlistItems?${playlistItemsParams(accessToken, playlistId)}`)
+      .then((response) => response.json())
+      .then((result) => this.props.appActions.setSearchResultForPlaylist(result))
   }
 
   onClickSignIn() {
