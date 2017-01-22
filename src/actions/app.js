@@ -26,6 +26,10 @@ export const postUser = (uid, user) => {
   push(`users/${uid}`, user);
   return { type: App.POST_USER };
 };
+export const removeUser = (uid) => {
+  remove(`users/${uid}`);
+  return { type: App.REMOVE_USER };
+}
 export const pushVideo = (video) => {
   push('que', video);
   return { type: App.PUSH_VIDEO };
@@ -80,4 +84,10 @@ export const updatePlaying = (playing) => ({ type: App.UPDATE_PLAYING, playing }
 export const updatePlayingVideo = (video) => {
   const playingVideo = Object.keys(video).length === 0 ? App.DefaultVideo : video;
   return { type: App.UPDATE_PLAYING_VIDEO, playingVideo };
+};
+export const updateUsers = (users) => {
+  const tempUsers = users.map((user) => (
+    Object.assign({}, {name: user.name, photoURL: user.photoURL})
+  ));
+  return { type: App.UPDATE_USERS, users: tempUsers }
 };

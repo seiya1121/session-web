@@ -34,7 +34,7 @@ class App extends ReactBaseComponent {
       if (result.credential) {
         const { accessToken } = result.credential;
         const { uid, displayName, photoURL } = result.user;
-        this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken });
+        this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken, uid });
       }
     })
     firebaseAuth.onAuthStateChanged((user) => {
@@ -85,6 +85,11 @@ class App extends ReactBaseComponent {
       asArray: true,
       then(comments) { this.props.appActions.updateComments(comments); },
     });
+    base.listenTo('users', {
+      context: this,
+      asArray: true,
+      then(users) { this.props.appActions.updateUsers(users); },
+    });
     base.listenTo('playingVideo', {
       context: this,
       asArray: false,
@@ -98,7 +103,11 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignOut() {
-    firebaseAuth.signOut().then(() => this.props.appActions.setDefaultUser());
+    const { uid } = this.props.app.currentUser;
+    firebaseAuth.signOut().then(() => {
+      this.props.appActions.removeUser(uid);
+      this.props.appActions.setDefaultUser();
+    });
   }
 
   onSeekMouseUp(e) {
@@ -186,6 +195,10 @@ class App extends ReactBaseComponent {
       app.comments : app.comments.slice(app.comments.length - 3, app.comments.length);
     const playingVideo = app.playingVideo || DefaultVideo;
 
+    const usersNode = app.users.map((user, i) => (
+      <img key={i} src={user.photoURL} alt={user.name} />
+    ));
+
     const headerNode = (
       <header className="header-bar">
         <div className="header-bar__left">
@@ -200,6 +213,7 @@ class App extends ReactBaseComponent {
               }
             </p>
           </div>
+          {usersNode}
         </div>
         <input
           className={classNames('form-search', { 'is-search-active': app.isSearchActive })}

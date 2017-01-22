@@ -2,7 +2,7 @@ import { getAnimalName } from '../scripts/animal.js';
 
 export const DefaultUser = Object.assign(
   {},
-  { name: getAnimalName(), photoURL: '', accessToken: '' }
+  { name: getAnimalName(), photoURL: '', accessToken: '', uid: '' }
 );
 export const DefaultVideo = Object.assign(
   {},
@@ -51,6 +51,7 @@ export const InitialState = {
 export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
 export const POST_PLAYING_VIDEO = 'POST_PLAYING_VIDEO';
 export const POST_USER = 'POST_USER';
+export const REMOVE_USER = 'REMOVE_USER';
 export const SET_USER = 'SET_USER';
 export const PUSH_VIDEO = 'PUSH_VIDEO';
 export const REMOVE_VIDEO = 'REMOVE_VIDEO';
@@ -72,3 +73,4 @@ export const UPDATE_COMMENTS = 'UPDATE_COMMENTS';
 export const UPDATE_PLAYED = 'UPDATE_PLAYED';
 export const UPDATE_PLAYING = 'UPDATE_PLAYING';
 export const UPDATE_PLAYING_VIDEO = 'UPDATE_PLAYING_VIDEO';
+export const UPDATE_USERS = 'UPDATE_USERS';

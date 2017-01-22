@@ -17,6 +17,8 @@ const app = (state = App.InitialState, action) => {
       return state;
     case App.POST_USER:
       return state;
+    case App.REMOVE_USER:
+      return state;
     case App.SET_USER:
       return newState({ currentUser: action.user });
     case App.ADD_COMMENT:
@@ -52,6 +54,8 @@ const app = (state = App.InitialState, action) => {
         playingVideo: action.playingVideo,
         que: state.que.filter((item) => item.key !== action.playingVideo.key),
       });
+    case App.UPDATE_USERS:
+      return newState({ users: action.users });
     default:
       return state;
   }
