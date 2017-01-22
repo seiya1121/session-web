@@ -32,6 +32,7 @@ class App extends ReactBaseComponent {
   componentWillMount() {
     firebaseAuth.getRedirectResult().then((result) => {
       if (result.credential) {
+        console.log(result.credential);
         const { accessToken } = result.credential;
         const { uid, displayName, photoURL } = result.user;
         this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken, uid });
@@ -98,7 +99,7 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignIn() {
-    provider.addScope('https://www.googleapis.com/auth/plus.login');
+    provider.addScope('https://www.googleapis.com/auth/youtube');
     firebaseAuth.signInWithRedirect(provider)
   }
 
