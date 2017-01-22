@@ -2,7 +2,7 @@ import { getAnimalName } from '../scripts/animal.js';
 
 export const DefaultUser = Object.assign(
   {},
-  { name: getAnimalName(), photoURL: '', isLogin: false }
+  { name: getAnimalName(), photoURL: '', accessToken: '' }
 );
 export const DefaultVideo = Object.assign(
   {},
@@ -26,6 +26,7 @@ export const InitialState = {
   searchResult: [],
   comments: [],
   que: [],
+  users: [],
   playingVideo: DefaultVideo,
   playing: true,
   startTime: 0,
@@ -49,6 +50,7 @@ export const InitialState = {
 
 export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
 export const POST_PLAYING_VIDEO = 'POST_PLAYING_VIDEO';
+export const POST_USER = 'POST_USER';
 export const SET_USER = 'SET_USER';
 export const PUSH_VIDEO = 'PUSH_VIDEO';
 export const REMOVE_VIDEO = 'REMOVE_VIDEO';

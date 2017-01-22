@@ -30,15 +30,26 @@ class App extends ReactBaseComponent {
   }
 
   componentWillMount() {
+    firebaseAuth.getRedirectResult().then((result) => {
+      if (result.credential) {
+        const { accessToken } = result.credential;
+        const { uid, displayName, photoURL } = result.user;
+        this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken });
+      }
+    })
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
-        this.props.appActions.setUser({
-          name: user.displayName, photoURL: user.photoURL, isLogin: true,
-        });
+        base.listenTo(`users/${user.uid}`, {
+          context: this,
+          asArray: true,
+          then(data) {
+            this.props.appActions.setUser(data[0]);
+          }
+        })
       } else {
         this.props.appActions.setDefaultUser();
       }
-    });
+    })
     SyncStates.forEach((obj) => {
       const { state, asArray } = obj;
       base.fetch(state, {
@@ -82,25 +93,8 @@ class App extends ReactBaseComponent {
   }
 
   onClickSignIn() {
-    // const { mailAddressForSignIn, passwordForSignIn } = this.props.app;
     provider.addScope('https://www.googleapis.com/auth/plus.login');
-    firebaseAuth.signInWithRedirect(provider).then((result) => {
-      // const token = result.credential.accessToken;
-      const user = result.user;
-      console.log(user.displayName, user.photoURL)
-      this.props.appActions.setUser({
-        name: user.displayName, photoURL: user.photoURL, isLogin: true,
-      })
-    }).catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      const email = error.email;
-      const credential = error.credential;
-      console.log(errorCode)
-      console.log(errorMessage)
-      console.log(email)
-      console.log(credential)
-    });
+    firebaseAuth.signInWithRedirect(provider)
   }
 
   onClickSignOut() {
@@ -185,7 +179,8 @@ class App extends ReactBaseComponent {
 
   render() {
     const { app, appActions } = this.props;
-    const { isLogin, name, photoURL } = app.currentUser;
+    const { accessToken, name, photoURL } = app.currentUser;
+    const isLogin = accessToken;
     const isPostPlayingVideo = app.playingVideo !== '';
     const comments = (app.isCommentActive) ?
       app.comments : app.comments.slice(app.comments.length - 3, app.comments.length);

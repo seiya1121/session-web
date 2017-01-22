@@ -22,6 +22,10 @@ export const postPlayingVideo = (video) => {
   }
   return { type: App.POST_PLAYING_VIDEO };
 };
+export const postUser = (uid, user) => {
+  push(`users/${uid}`, user);
+  return { type: App.POST_USER };
+};
 export const pushVideo = (video) => {
   push('que', video);
   return { type: App.PUSH_VIDEO };
@@ -52,7 +56,7 @@ export const playPause = (isPlaying) => {
 export const changeValueWithKey = (key, value) => ({
   type: App.CHANGE_VALUE_WITH_KEY, key, value,
 });
-export const setUser = (user, isLogin) => ({ type: App.SET_USER, user, isLogin });
+export const setUser = (user) => ({ type: App.SET_USER, user });
 export const setDefaultUser = () => ({ type: App.SET_DEFAULT_USER });
 export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (result) => ({
