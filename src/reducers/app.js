@@ -21,6 +21,8 @@ const app = (state = App.InitialState, action) => {
       return state;
     case App.SET_USER:
       return newState({ currentUser: action.user });
+    case App.SET_PLAYLIST:
+      return newState({ playList: action.playList });
     case App.ADD_COMMENT:
       return newState({ commentText: '', isCommentActive: false });
     case App.SET_DEFAULT_USER:

@@ -10,6 +10,7 @@ import YouTubeNode from 'youtube-node';
 import ReactPlayer from 'react-player';
 import classNames from 'classnames';
 import giphy from 'giphy-api';
+import 'whatwg-fetch';
 import '../styles/base.scss';
 import '../styles/normalize.scss';
 
@@ -19,6 +20,8 @@ const commentObj = (content, user, type, keyword) => (
   Object.assign({}, { content, user, type, keyword })
 );
 
+const YoutubeUrl = 'https://www.googleapis.com/youtube/v3';
+const channelsParams = (accessToken) => (`access_token=${accessToken}&part=contentDetails&mine=true`);
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
@@ -140,7 +143,13 @@ class App extends ReactBaseComponent {
     youTubeNode.setKey(YOUTUBE_API_KEY);
     youTubeNode.addParam('type', 'video');
     youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
+    fetch(`${YoutubeUrl}/channels?${channelsParams(this.props.app.currentUser.accessToken)}`)
+      .then((response) => { return response.json(); })
+      .then((json) => {
+        this.props.appActions.setPlaylist(json.items[0].contentDetails.relatedPlaylists)
+      })
     return true;
+
   }
 
   onKeyPressForComment(e) {

@@ -27,6 +27,7 @@ export const InitialState = {
   comments: [],
   que: [],
   users: [],
+  playlists: {},
   playingVideo: DefaultVideo,
   playing: true,
   startTime: 0,
@@ -66,6 +67,7 @@ export const PROGRESS = 'PROGRESS';
 export const SET_DEFAULT_USER = 'SET_DEFAULT_USER';
 export const ADD_COMMENT = 'ADD_COMMENT';
 export const SET_SEARCH_RESULT = 'SET_SEARCH_RESULT';
+export const SET_PLAYLIST = 'SET_PLAYLIST';
 
 export const UPDATE_SYNC_STATE = 'FETCH_SYNC_STATE';
 export const UPDATE_QUE = 'UPDATE_QUE';

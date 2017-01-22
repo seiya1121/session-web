@@ -61,6 +61,7 @@ export const changeValueWithKey = (key, value) => ({
   type: App.CHANGE_VALUE_WITH_KEY, key, value,
 });
 export const setUser = (user) => ({ type: App.SET_USER, user });
+export const setPlaylist = (playList) => ({ type: App.SET_PLAYLIST, playList });
 export const setDefaultUser = () => ({ type: App.SET_DEFAULT_USER });
 export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (result) => ({
