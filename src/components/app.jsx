@@ -195,43 +195,26 @@ class App extends ReactBaseComponent {
               {name}
               {
                 (isLogin) ?
-                  <a
-                    className="header-bar-prof__sign"
-                    onClick={this.onClickSignOut}
-                  >
-                    Sign Out
-                  </a> :
-                  <a
-                    className="header-bar-prof__sign"
-                    onClick={this.onClickSignIn}
-                  >
-                    Sign In
-                  </a>
+                  <a className="header-bar-prof__sign" onClick={this.onClickSignOut}>Sign Out</a> :
+                  <a className="header-bar-prof__sign" onClick={this.onClickSignIn}>Sign In</a>
               }
             </p>
           </div>
         </div>
         <input
-          className={classNames(
-            'form-search',
-            { 'is-search-active': app.isSearchActive },
-          )}
+          className={classNames('form-search', { 'is-search-active': app.isSearchActive })}
           type="text"
           placeholder="Search videos"
-          onChange={(e) => {
-            appActions.changeValueWithKey('searchText', e.target.value);
-          }}
+          onChange={(e) => { appActions.changeValueWithKey('searchText', e.target.value); }}
           onFocus={() => { appActions.changeValueWithKey('isSearchActive', true); }}
           onKeyPress={this.onKeyPressForSearch}
           value={app.searchText}
         >
         </input>
         <div
-          className={classNames(
-            'button-que-list',
-            { 'is-quelist-list': app.isQueListActive },
-          )}
-          onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}>
+          className={classNames('button-que-list', { 'is-quelist-list': app.isQueListActive })}
+          onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}
+        >
           <span />
           <span />
           <span />
