@@ -21,11 +21,16 @@ const commentObj = (content, user, type, keyword) => (
 );
 
 const YoutubeUrl = 'https://www.googleapis.com/youtube/v3';
-const channelsParams = (accessToken) => (`access_token=${accessToken}&part=contentDetails&mine=true`);
+const channelsParams = (user) => (
+  `access_token=${user.accessToken}&part=contentDetails&mine=true`
+);
+const playlistItemsParams = (accessToken, playlistId) => (
+  `access_token=${accessToken}&part=snippet&playlistId=${playlistId}&maxResults=50`
+)
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
-    this.bind('notification', 'setGifUrl');
+    this.bind('notification', 'setGifUrl', 'getPlaylistVideos');
     this.bind('onKeyPressForSearch', 'onKeyPressForComment');
     this.bind('onClickSetQue', 'onClickSignOut', 'onClickSignIn');
     // For YouTube Player
@@ -35,7 +40,7 @@ class App extends ReactBaseComponent {
   componentWillMount() {
     firebaseAuth.getRedirectResult().then((result) => {
       if (result.credential) {
-        console.log(result.credential);
+        console.log(result);
         const { accessToken } = result.credential;
         const { uid, displayName, photoURL } = result.user;
         this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken, uid });
@@ -48,6 +53,11 @@ class App extends ReactBaseComponent {
           asArray: true,
           then(data) {
             this.props.appActions.setUser(data[0]);
+            fetch(`${YoutubeUrl}/channels?${channelsParams(data[0])}`)
+              .then((response) => { return response.json(); })
+              .then((json) => {
+                this.props.appActions.setPlaylists(json.items[0].contentDetails.relatedPlaylists)
+              })
           }
         })
       } else {
@@ -101,6 +111,18 @@ class App extends ReactBaseComponent {
     });
   }
 
+  getPlaylistVideos(playlistId) {
+    const {accessToken} = this.props.app.currentUser;
+    fetch(
+      `${YoutubeUrl}/playlistItems?${playlistItemsParams(accessToken, playlistId)}`
+    )
+      .then((response) => { return response.json(); })
+      .then((result) => {
+        console.log(result)
+        this.props.appActions.setSearchResultForPlaylist(result)
+      })
+  }
+
   onClickSignIn() {
     provider.addScope('https://www.googleapis.com/auth/youtube');
     firebaseAuth.signInWithRedirect(provider)
@@ -135,6 +157,7 @@ class App extends ReactBaseComponent {
       if (error) {
         console.log(error);
       } else {
+        console.log(result)
         this.props.appActions.setSearchResult(result);
       }
     };
@@ -143,11 +166,6 @@ class App extends ReactBaseComponent {
     youTubeNode.setKey(YOUTUBE_API_KEY);
     youTubeNode.addParam('type', 'video');
     youTubeNode.search(this.props.app.searchText, 50, (error, result) => searchFunc(error, result));
-    fetch(`${YoutubeUrl}/channels?${channelsParams(this.props.app.currentUser.accessToken)}`)
-      .then((response) => { return response.json(); })
-      .then((json) => {
-        this.props.appActions.setPlaylist(json.items[0].contentDetails.relatedPlaylists)
-      })
     return true;
 
   }
@@ -288,6 +306,14 @@ class App extends ReactBaseComponent {
       </li>
     ));
 
+    const playlistNamesNode = Object.keys(app.playlists).map((list, i) => (
+      <li key={i}>
+        <button onClick={() => this.getPlaylistVideos(app.playlists[list])}>
+          {list}
+        </button>
+      </li>
+    ));
+
     const commentClass = (type, index) => (
       (type === CommentType.log) ?
         classNames(
@@ -414,6 +440,7 @@ class App extends ReactBaseComponent {
               <p className="list-group-title">
                 search for
                 <span className="list-group-title__number">{app.searchedText}</span>
+                {playlistNamesNode}
               </p>
               <ul className="list-group">
                 {searchResultNode}

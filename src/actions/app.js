@@ -61,7 +61,7 @@ export const changeValueWithKey = (key, value) => ({
   type: App.CHANGE_VALUE_WITH_KEY, key, value,
 });
 export const setUser = (user) => ({ type: App.SET_USER, user });
-export const setPlaylist = (playList) => ({ type: App.SET_PLAYLIST, playList });
+export const setPlaylists = (playlists) => ({ type: App.SET_PLAYLISTS, playlists });
 export const setDefaultUser = () => ({ type: App.SET_DEFAULT_USER });
 export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (result) => ({
@@ -70,6 +70,18 @@ export const setSearchResult = (result) => ({
     videoId: item.id.videoId, title: item.snippet.title, thumbnail: item.snippet.thumbnails.default,
   })),
 });
+export const setSearchResultForPlaylist = (result) => {
+  const filteredItems = result.items.filter((item) => item.snippet.title !== "Deleted video")
+  return {
+    type: App.SET_SEARCH_RESULT_FOR_PLAYLIST,
+    result: filteredItems.map((item) => {
+      const { resourceId, title, thumbnails } = item.snippet;
+      return {
+        videoId: resourceId.videoId, title, thumbnail: thumbnails.default,
+      }
+    }),
+  }
+};
 export const seekDown = () => ({ type: App.SEEK_DOWN });
 export const seekUp = (played) => ({ type: App.SEEK_UP, played });
 export const progress = (state) => {
