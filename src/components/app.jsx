@@ -40,7 +40,6 @@ class App extends ReactBaseComponent {
   componentWillMount() {
     firebaseAuth.getRedirectResult().then((result) => {
       if (result.credential) {
-        console.log(result);
         const { accessToken } = result.credential;
         const { uid, displayName, photoURL } = result.user;
         this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken, uid });
