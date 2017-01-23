@@ -39,8 +39,6 @@
     "postcss-loader": "1.0.0",
     "promise": "7.1.1",
     "react-dev-utils": "^0.4.2",
-    "reactotron-react-js": "^1.6.0",
-    "reactotron-redux": "^1.6.1",
     "recursive-readdir": "2.1.0",
     "redux-devtools": "^3.3.1",
     "sass-loader": "^4.1.1",
