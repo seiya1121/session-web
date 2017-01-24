@@ -247,6 +247,7 @@ class App extends ReactBaseComponent {
           value={app.searchText}
         >
         </input>
+        {(isLogin) && <button>play lists</button>}
         <div
           className={classNames('button-que-list', { 'is-quelist-list': app.isQueListActive })}
           onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}
