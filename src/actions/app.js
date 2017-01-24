@@ -76,9 +76,7 @@ export const setSearchResultForPlaylist = (result) => {
     type: App.SET_SEARCH_RESULT_FOR_PLAYLIST,
     result: filteredItems.map((item) => {
       const { resourceId, title, thumbnails } = item.snippet;
-      return {
-        videoId: resourceId.videoId, title, thumbnail: thumbnails.default,
-      }
+      return { videoId: resourceId.videoId, title, thumbnail: thumbnails.default }
     }),
   }
 };
@@ -103,4 +101,7 @@ export const updateUsers = (users) => {
     Object.assign({}, {name: user.name, photoURL: user.photoURL})
   ));
   return { type: App.UPDATE_USERS, users: tempUsers }
+};
+export const updateSearchResult = (listType, lists) => {
+  return { type: App.UPDATE_SEARCH_RESULT, listType, lists }
 };

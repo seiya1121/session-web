@@ -60,6 +60,8 @@ const app = (state = App.InitialState, action) => {
       });
     case App.UPDATE_USERS:
       return newState({ users: action.users });
+    case App.UPDATE_SEARCH_RESULT:
+      return newState({ searchResult: app.lists, isSearchActive: true });
     default:
       return state;
   }
