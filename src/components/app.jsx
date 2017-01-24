@@ -258,7 +258,7 @@ class App extends ReactBaseComponent {
       </header>
     );
 
-    const searchResultNode = app.searchResult.map((result, i) => (
+    const resultVideoNode = (result, i) => (
       <li
         key={i}
         className="list-group-item"
@@ -277,7 +277,9 @@ class App extends ReactBaseComponent {
           </div>
         </div>
       </li>
-    ));
+    )
+
+    const searchResultNode = app.searchResult.map((result, i) => resultVideoNode(result, i));
 
     const queNode = app.que.map((video) => (
       <li key={video.key} className="list-group-item">
