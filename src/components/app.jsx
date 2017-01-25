@@ -21,6 +21,8 @@ const channelsParams = (user) => (
   `access_token=${user.accessToken}&part=contentDetails&mine=true`
 );
 
+const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
+
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
@@ -44,70 +46,49 @@ class App extends ReactBaseComponent {
     })
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
-        base.listenTo(`users/${user.uid}`, {
-          context: this,
-          asArray: true,
-          then(data) {
-            this.props.appActions.setUser(data[0]);
-            fetch(`${YoutubeApiUrl}/channels?${channelsParams(data[0])}`)
-              .then((response) => { return response.json(); })
-              .then((json) => {
-                const base = json.items[0].contentDetails.relatedPlaylists;
-                const lists = Object.keys(base)
-                                    .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
-                this.props.appActions.setPlaylists(lists)
-              })
-          }
-        })
+        base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
+          this.props.appActions.setUser(data[0]);
+          fetch(`${YoutubeApiUrl}/channels?${channelsParams(data[0])}`)
+            .then((response) => { return response.json(); })
+            .then((json) => {
+              const base = json.items[0].contentDetails.relatedPlaylists;
+              const lists = Object.keys(base)
+                                  .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
+              this.props.appActions.setPlaylists(lists)
+            })
+        }})
       } else {
         this.props.appActions.setDefaultUser();
       }
     })
     SyncStates.forEach((obj) => {
       const { state, asArray } = obj;
-      base.fetch(state, {
-        context: this, asArray,
-        then(data) { this.props.appActions.updateSyncState(state, data); },
-      });
+      base.fetch(state, { context: this, asArray, then(data) {
+        this.props.appActions.updateSyncState(state, data);
+      }});
     });
   }
 
   componentDidMount() {
-    base.listenTo('startTime', {
-      context: this,
-      asArray: false,
-      then(startTime) {
-        this.props.appActions.updatePlayed(startTime);
-        this.player.seekTo(startTime);
-      },
-    });
-    base.listenTo('playing', {
-      context: this,
-      asArray: false,
-      then(playing) {
-        this.props.appActions.updatePlaying(playing);
-      },
-    });
-    base.listenTo('que', {
-      context: this,
-      asArray: true,
-      then(que) { this.props.appActions.updateQue(que); },
-    });
-    base.listenTo('comments', {
-      context: this,
-      asArray: true,
-      then(comments) { this.props.appActions.updateComments(comments); },
-    });
-    base.listenTo('users', {
-      context: this,
-      asArray: true,
-      then(users) { this.props.appActions.updateUsers(users); },
-    });
-    base.listenTo('playingVideo', {
-      context: this,
-      asArray: false,
-      then(video) { this.props.appActions.updatePlayingVideo(video); },
-    });
+    base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
+      this.props.appActions.updatePlayed(startTime);
+      this.player.seekTo(startTime);
+    }});
+    base.listenTo('playing', { context: this, asArray: false, then(playing) {
+      this.props.appActions.updatePlaying(playing);
+    }});
+    base.listenTo('que', { context: this, asArray: true, then(que) {
+      this.props.appActions.updateQue(que);
+    }});
+    base.listenTo('comments', { context: this, asArray: true, then(comments) {
+      this.props.appActions.updateComments(comments);
+    }});
+    base.listenTo('users', { context: this, asArray: true, then(users) {
+      this.props.appActions.updateUsers(users);
+    }});
+    base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
+      this.props.appActions.updatePlayingVideo(video);
+    }});
   }
 
   notification(title, option) {
@@ -122,7 +103,6 @@ class App extends ReactBaseComponent {
     const { app, appActions } = this.props;
     const isPostPlayingVideo = app.playingVideo !== '';
     const playingVideo = app.playingVideo || DefaultVideo;
-    const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 
     return (
       <div className="contents">
