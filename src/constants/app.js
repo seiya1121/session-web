@@ -39,6 +39,7 @@ export const InitialState = {
   passwordForSignIn: '',
   searchText: '',
   searchedText: '',
+  selectedPlaylist: '',
   volume: 0.8,
   played: 0,
   loaded: 0,

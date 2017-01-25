@@ -288,7 +288,13 @@ class App extends ReactBaseComponent {
     );
 
     const listResult = (result, i) => (
-      <li key={i} className="list-group-item" onClick={() => this.getPlaylistVideos(result.id)}>
+      <li
+        key={i}
+        className="list-group-item"
+        onClick={() => {
+          this.getPlaylistVideos(result.id);
+          appActions.changeValueWithKey('selectedPlaylist', result.title);
+        }}>
         <div className="list-group-item__click">
           <div className="list-group-item__body">
             <strong>{result.title}</strong>
@@ -375,6 +381,38 @@ class App extends ReactBaseComponent {
       }
     });
 
+    const searchCategory = () => {
+      if(!app.isPlaylistActive) {
+        return (
+          <p className="list-group-title">
+            search for
+            <span className="list-group-title__number">{app.searchedText}</span>
+          </p>
+        )
+      }
+      if(app.isPlaylistActive && app.selectedPlaylist) {
+        return (
+          <div>
+            <li
+              className="list-group-item"
+              onClick={() => {
+                appActions.setSearchResult('playlist', app.playlists);
+                appActions.setSearchResult('selectedPlaylist', '')
+              }}
+            >
+              <div className="list-group-item__click">
+                <div className="list-group-item__body">
+                  Back
+                </div>
+              </div>
+            </li>
+            <p className="list-group-title"><strong>{app.selectedPlaylist}</strong></p>
+          </div>
+        )
+      }
+       return ( <p className="list-group-title">Playlists</p> );
+    };
+
     return (
       <div className="contents">
         {headerNode}
@@ -444,15 +482,8 @@ class App extends ReactBaseComponent {
               <div
                 className="display-search__close"
                 onClick={() => appActions.changeValueWithKey('isSearchActive', false)}
-               />
-             {
-                (!app.isPlaylistActive) ?
-                 <p className="list-group-title">
-                   search for
-                   <span className="list-group-title__number">{app.searchedText}</span>
-                 </p> :
-                 <p className="list-group-title">play list</p>
-             }
+              />
+              {searchCategory()}
               <ul className="list-group">
                 {searchResultNode}
               </ul>
