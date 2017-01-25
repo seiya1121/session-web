@@ -27,7 +27,7 @@ export const InitialState = {
   comments: [],
   que: [],
   users: [],
-  playlists: {},
+  playlists: [],
   playingVideo: DefaultVideo,
   playing: true,
   startTime: 0,

@@ -13,14 +13,15 @@ const resultObj = (item, resultType) => {
       return {
         id: item.id.videoId,
         title: item.snippet.title,
-        thumbnailUrl: item.snippet.thumbnails.default.url
+        thumbnailUrl: item.snippet.thumbnails.default.url,
+        type: 'video',
       };
     case 'playlistVideo':
       const { resourceId, title, thumbnails } = item.snippet;
-      return { id: resourceId.videoId, title, thumbnailUrl: thumbnails.default.url };
+      return { id: resourceId.videoId, title, thumbnailUrl: thumbnails.default.url, type: 'video' };
     case 'playlist':
       const { id, thumbnailUrl } = item;
-      return { id, title: item.title, thumbnailUrl };
+      return { id, title: item.title, thumbnailUrl, type: 'list', };
     default:
       return {};
   }
@@ -85,9 +86,10 @@ export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (resultType, result) => {
   const tempResult = (resultType === 'playlistVideo') ?
     result.items.filter((item) => item.snippet.title !== "Deleted video") : result
+  console.log(result)
   return {
     type: App.SET_SEARCH_RESULT,
-    result: tempResult.items.map((item) =>  resultObj(item, resultType)),
+    result: tempResult.map((item) =>  resultObj(item, resultType)),
   }
 };
 export const seekDown = () => ({ type: App.SEEK_DOWN });
