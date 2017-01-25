@@ -14,7 +14,7 @@ import 'whatwg-fetch';
 import '../styles/base.scss';
 import '../styles/normalize.scss';
 
-const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
+const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 const videoObject = (video, userName) => Object.assign({}, video, { userName });
 const commentObj = (content, user, type, keyword) => (
   Object.assign({}, { content, user, type, keyword })
@@ -55,7 +55,10 @@ class App extends ReactBaseComponent {
             fetch(`${YoutubeUrl}/channels?${channelsParams(data[0])}`)
               .then((response) => { return response.json(); })
               .then((json) => {
-                this.props.appActions.setPlaylists(json.items[0].contentDetails.relatedPlaylists)
+                const base = json.items[0].contentDetails.relatedPlaylists;
+                const lists = Object.keys(base)
+                                    .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
+                this.props.appActions.setPlaylists(lists)
               })
           }
         })
@@ -114,7 +117,7 @@ class App extends ReactBaseComponent {
     const {accessToken} = this.props.app.currentUser;
     fetch(`${YoutubeUrl}/playlistItems?${playlistItemsParams(accessToken, playlistId)}`)
       .then((response) => response.json())
-      .then((result) => this.props.appActions.setSearchResultForPlaylist(result))
+      .then((result) => this.props.appActions.setSearchResult('playlistVideo', result))
   }
 
   onClickSignIn() {
@@ -151,8 +154,7 @@ class App extends ReactBaseComponent {
       if (error) {
         console.log(error);
       } else {
-        console.log(result)
-        this.props.appActions.setSearchResult(result);
+        this.props.appActions.setSearchResult('search', result.items);
       }
     };
     this.props.appActions.changeValueWithKey('searchedText', this.props.app.searchText);
@@ -242,11 +244,27 @@ class App extends ReactBaseComponent {
           type="text"
           placeholder="Search videos"
           onChange={(e) => { appActions.changeValueWithKey('searchText', e.target.value); }}
-          onFocus={() => { appActions.changeValueWithKey('isSearchActive', true); }}
+          onFocus={() => {
+            appActions.changeValueWithKey('isSearchActive', true);
+            appActions.changeValueWithKey('searchResult', []);
+            appActions.changeValueWithKey('isPlaylistActive', false);
+          }}
           onKeyPress={this.onKeyPressForSearch}
           value={app.searchText}
         >
         </input>
+        <div
+          className={
+            classNames('button-playlist-list', { 'is-playlist-list': app.isPlaylistActive })
+          }
+          onClick={() => {
+            appActions.changeValueWithKey('isPlaylistActive', !app.isPlaylistActive);
+            appActions.changeValueWithKey('isSearchActive', !app.isPlaylistActive);
+            appActions.setSearchResult('playlist', app.playlists);
+          }}
+        >
+          <span />
+        </div>
         <div
           className={classNames('button-que-list', { 'is-quelist-list': app.isQueListActive })}
           onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}
@@ -258,28 +276,30 @@ class App extends ReactBaseComponent {
       </header>
     );
 
-    const resultVideoNode = (result, i) => (
-      <li
-        key={i}
-        className="list-group-item"
-        onClick={() => this.onClickSetQue(result)}
-      >
-        <div
-          className="list-group-item__click"
-        >
-          <img
-            className="list-group-item__thumbnail"
-            src={result.thumbnail.url}
-            alt=""
-          />
+    const videoResult = (result, i) => (
+      <li key={i} className="list-group-item" onClick={() => this.onClickSetQue(result)}>
+        <div className="list-group-item__click">
+          <img className="list-group-item__thumbnail" src={result.thumbnailUrl} alt=""/>
           <div className="list-group-item__body">
             <strong>{result.title}</strong>
           </div>
         </div>
       </li>
-    )
+    );
 
-    const searchResultNode = app.searchResult.map((result, i) => resultVideoNode(result, i));
+    const listResult = (result, i) => (
+      <li key={i} className="list-group-item" onClick={() => this.getPlaylistVideos(result.id)}>
+        <div className="list-group-item__click">
+          <div className="list-group-item__body">
+            <strong>{result.title}</strong>
+          </div>
+        </div>
+      </li>
+    );
+
+    const searchResultNode = app.searchResult.map((result, i) => (
+      (result.type === 'video') ? videoResult(result, i) : listResult(result, i)
+    ));
 
     const queNode = app.que.map((video) => (
       <li key={video.key} className="list-group-item">
@@ -289,7 +309,7 @@ class App extends ReactBaseComponent {
         >
           <img
             className="list-group-item__thumbnail"
-            src={video.thumbnail.url}
+            src={video.thumbnailUrl}
             alt=""
           />
           <div className="list-group-item__body">
@@ -299,14 +319,6 @@ class App extends ReactBaseComponent {
         </div>
         <div className="list-group-item__close" onClick={() => appActions.removeVideo(video)}>
         </div>
-      </li>
-    ));
-
-    const playlistNamesNode = Object.keys(app.playlists).map((list, i) => (
-      <li key={i}>
-        <button onClick={() => this.getPlaylistVideos(app.playlists[list])}>
-          {list}
-        </button>
       </li>
     ));
 
@@ -375,7 +387,7 @@ class App extends ReactBaseComponent {
               className="react-player"
               width={"100%"}
               height={"100%"}
-              url={youtubeUrl(playingVideo.videoId)}
+              url={youtubeUrl(playingVideo.id)}
               playing={app.playing}
               volume={app.volume}
               soundcloudConfig={app.soundcloudConfig}
@@ -433,11 +445,14 @@ class App extends ReactBaseComponent {
                 className="display-search__close"
                 onClick={() => appActions.changeValueWithKey('isSearchActive', false)}
                />
-              <p className="list-group-title">
-                search for
-                <span className="list-group-title__number">{app.searchedText}</span>
-                {playlistNamesNode}
-              </p>
+             {
+                (!app.isPlaylistActive) ?
+                 <p className="list-group-title">
+                   search for
+                   <span className="list-group-title__number">{app.searchedText}</span>
+                 </p> :
+                 <p className="list-group-title">play list</p>
+             }
               <ul className="list-group">
                 {searchResultNode}
               </ul>

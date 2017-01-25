@@ -7,6 +7,25 @@ const remove = (endPoint) => base.remove(endPoint);
 const commentObj = (content, userName, type, keyword) => (
   Object.assign({}, { content, userName, type, keyword })
 );
+const resultObj = (item, resultType) => {
+  switch (resultType) {
+    case 'search':
+      return {
+        id: item.id.videoId,
+        title: item.snippet.title,
+        thumbnailUrl: item.snippet.thumbnails.default.url,
+        type: 'video',
+      };
+    case 'playlistVideo':
+      const { resourceId, title, thumbnails } = item.snippet;
+      return { id: resourceId.videoId, title, thumbnailUrl: thumbnails.default.url, type: 'video' };
+    case 'playlist':
+      const { id, thumbnailUrl } = item;
+      return { id, title: item.title, thumbnailUrl, type: 'list', };
+    default:
+      return {};
+  }
+}
 
 // sync系
 export const postPlayingVideo = (video) => {
@@ -64,20 +83,12 @@ export const setUser = (user) => ({ type: App.SET_USER, user });
 export const setPlaylists = (playlists) => ({ type: App.SET_PLAYLISTS, playlists });
 export const setDefaultUser = () => ({ type: App.SET_DEFAULT_USER });
 export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
-export const setSearchResult = (result) => ({
-  type: App.SET_SEARCH_RESULT,
-  result: result.items.map((item) => ({
-    videoId: item.id.videoId, title: item.snippet.title, thumbnail: item.snippet.thumbnails.default,
-  })),
-});
-export const setSearchResultForPlaylist = (result) => {
-  const filteredItems = result.items.filter((item) => item.snippet.title !== "Deleted video")
+export const setSearchResult = (resultType, result) => {
+  const tempResult = (resultType === 'playlistVideo') ?
+    result.items.filter((item) => item.snippet.title !== "Deleted video") : result
   return {
-    type: App.SET_SEARCH_RESULT_FOR_PLAYLIST,
-    result: filteredItems.map((item) => {
-      const { resourceId, title, thumbnails } = item.snippet;
-      return { videoId: resourceId.videoId, title, thumbnail: thumbnails.default }
-    }),
+    type: App.SET_SEARCH_RESULT,
+    result: tempResult.map((item) =>  resultObj(item, resultType)),
   }
 };
 export const seekDown = () => ({ type: App.SEEK_DOWN });
@@ -102,6 +113,4 @@ export const updateUsers = (users) => {
   ));
   return { type: App.UPDATE_USERS, users: tempUsers }
 };
-export const updateSearchResult = (listType, lists) => {
-  return { type: App.UPDATE_SEARCH_RESULT, listType, lists }
-};
+export const setPlaylistToResult = (results) => ({ type: App.UPDATE_SEARCH_RESULT, results });
