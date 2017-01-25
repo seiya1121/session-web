@@ -39,8 +39,6 @@ const app = (state = App.InitialState, action) => {
       return !state.seeking ? newState(action.playingStatus) : state;
     case App.SET_SEARCH_RESULT:
       return newState({ searchResult: action.result });
-    case App.SET_SEARCH_RESULT_FOR_PLAYLIST:
-        return newState({ searchResult: action.result });
     case App.UPDATE_SYNC_STATE:
       return newState({ [action.key]: action.value });
     case App.UPDATE_QUE:

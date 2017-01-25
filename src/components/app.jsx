@@ -14,7 +14,7 @@ import 'whatwg-fetch';
 import '../styles/base.scss';
 import '../styles/normalize.scss';
 
-const youtubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
+const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 const videoObject = (video, userName) => Object.assign({}, video, { userName });
 const commentObj = (content, user, type, keyword) => (
   Object.assign({}, { content, user, type, keyword })
@@ -114,7 +114,7 @@ class App extends ReactBaseComponent {
     const {accessToken} = this.props.app.currentUser;
     fetch(`${YoutubeUrl}/playlistItems?${playlistItemsParams(accessToken, playlistId)}`)
       .then((response) => response.json())
-      .then((result) => this.props.appActions.setSearchResultForPlaylist(result))
+      .then((result) => this.props.appActions.setSearchResult('playlistVideo', result))
   }
 
   onClickSignIn() {
@@ -151,8 +151,7 @@ class App extends ReactBaseComponent {
       if (error) {
         console.log(error);
       } else {
-        console.log(result)
-        this.props.appActions.setSearchResult(result);
+        this.props.appActions.setSearchResult('search', result);
       }
     };
     this.props.appActions.changeValueWithKey('searchedText', this.props.app.searchText);
@@ -248,6 +247,12 @@ class App extends ReactBaseComponent {
         >
         </input>
         <div
+          className={classNames('button-playlist-list', { 'is-playlist-list': app.isPlaylistActive })}
+          onClick={() => appActions.changeValueWithKey('isPlaylistActive', !app.isPlaylistActive)}
+        >
+          <span />
+        </div>
+        <div
           className={classNames('button-que-list', { 'is-quelist-list': app.isQueListActive })}
           onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}
         >
@@ -269,7 +274,7 @@ class App extends ReactBaseComponent {
         >
           <img
             className="list-group-item__thumbnail"
-            src={result.thumbnail.url}
+            src={result.thumbnailUrl}
             alt=""
           />
           <div className="list-group-item__body">
@@ -287,7 +292,7 @@ class App extends ReactBaseComponent {
         >
           <img
             className="list-group-item__thumbnail"
-            src={video.thumbnail.url}
+            src={video.thumbnailUrl}
             alt=""
           />
           <div className="list-group-item__body">
@@ -373,7 +378,7 @@ class App extends ReactBaseComponent {
               className="react-player"
               width={"100%"}
               height={"100%"}
-              url={youtubeUrl(playingVideo.videoId)}
+              url={youtubeUrl(playingVideo.id)}
               playing={app.playing}
               volume={app.volume}
               soundcloudConfig={app.soundcloudConfig}

@@ -175,6 +175,30 @@ input {
   }
 }
 
+// button-playlist-list
+.button-playlist-list {
+  float: right;
+  width: 17px;
+  height: 30px;
+  margin: 13px 15px 0 0;
+  position: relative;
+  cursor: pointer;
+
+  span {
+    display: block;
+    height: 15px;
+    background: $color-white;
+  }
+
+  &.is-playlist-list span {
+    background: $color-key;
+  }
+
+  span + span {
+    margin-top: 5px;
+  }
+}
+
 /* main の要素
 
 */

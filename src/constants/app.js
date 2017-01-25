@@ -6,7 +6,7 @@ export const DefaultUser = Object.assign(
 );
 export const DefaultVideo = Object.assign(
   {},
-  { videoId: '', title: '', thumbnail: { url: '' }, displayName: '' }
+  { id: '', title: '', thumbnail: { url: '' }, displayName: '' }
 );
 
 export const SyncStates = [
@@ -47,6 +47,7 @@ export const InitialState = {
   isSearchActive: false,
   isCommentActive: false,
   isQueListActive: false,
+  isPlaylistActive: false,
 };
 
 export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
@@ -67,7 +68,6 @@ export const PROGRESS = 'PROGRESS';
 export const SET_DEFAULT_USER = 'SET_DEFAULT_USER';
 export const ADD_COMMENT = 'ADD_COMMENT';
 export const SET_SEARCH_RESULT = 'SET_SEARCH_RESULT';
-export const SET_SEARCH_RESULT_FOR_PLAYLIST = 'SET_SEARCH_RESULT_FOR_PLAYLIST';
 export const SET_PLAYLISTS = 'SET_PLAYLISTS';
 
 export const UPDATE_SYNC_STATE = 'FETCH_SYNC_STATE';
@@ -77,4 +77,3 @@ export const UPDATE_PLAYED = 'UPDATE_PLAYED';
 export const UPDATE_PLAYING = 'UPDATE_PLAYING';
 export const UPDATE_PLAYING_VIDEO = 'UPDATE_PLAYING_VIDEO';
 export const UPDATE_USERS = 'UPDATE_USERS';
-export const UPDATE_SEARCH_RESULT = 'UPDATE_SEARCH_RESULT';
