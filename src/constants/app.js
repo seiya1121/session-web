@@ -1,5 +1,7 @@
 import { getAnimalName } from '../scripts/animal.js';
 
+export const YoutubeApiUrl = 'https://www.googleapis.com/youtube/v3';
+
 export const DefaultUser = Object.assign(
   {},
   { name: getAnimalName(), photoURL: '', accessToken: '', uid: '' }
@@ -29,6 +31,7 @@ export const InitialState = {
   users: [],
   playlists: [],
   playingVideo: DefaultVideo,
+  player: {},
   playing: true,
   startTime: 0,
   commentText: '',
