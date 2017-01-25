@@ -86,7 +86,6 @@ export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (resultType, result) => {
   const tempResult = (resultType === 'playlistVideo') ?
     result.items.filter((item) => item.snippet.title !== "Deleted video") : result
-  console.log(result)
   return {
     type: App.SET_SEARCH_RESULT,
     result: tempResult.map((item) =>  resultObj(item, resultType)),

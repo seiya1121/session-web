@@ -55,7 +55,6 @@ class App extends ReactBaseComponent {
             fetch(`${YoutubeUrl}/channels?${channelsParams(data[0])}`)
               .then((response) => { return response.json(); })
               .then((json) => {
-                console.log(json)
                 const base = json.items[0].contentDetails.relatedPlaylists;
                 const lists = Object.keys(base)
                                     .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
