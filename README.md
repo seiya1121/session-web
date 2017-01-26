@@ -2,7 +2,7 @@
 
 This Application runs on the web and makes you and your friends to watch Youtube Video on this app in real time.
 
-electron ver is [here](https://github.com/seiya1121/session-desktop)
+electron ver is [here](https://github.com/seiya1121/session-desktop).
 
 ### node version: ^v6.2.0
 
