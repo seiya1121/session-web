@@ -1,7 +1,7 @@
 # Session-Web
 
-・　```cd session-web```
+・```cd session-web```
 
-・ ```npm install```
+・```npm install```
 
-・ ```npm start```
+・```npm start```
