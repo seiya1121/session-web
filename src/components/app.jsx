@@ -110,30 +110,30 @@ class App extends ReactBaseComponent {
           <Header app={app} appActions={appActions} />
         </header>
         <div className="main-display">
+          <div className="display-youtube">
+            <ReactPlayer
+              ref={(player) => { this.player = player; }}
+              className="react-player"
+              width={"100%"}
+              height={"100%"}
+              url={youtubeUrl(playingVideo.id)}
+              playing={app.playing}
+              volume={app.volume}
+              soundcloudConfig={app.soundcloudConfig}
+              vimeoConfig={app.vimeoConfig}
+              youtubeConfig={app.youtubeConfig}
+              fileConfig={app.fileConfig}
+              onReady={() => appActions.play()}
+              onPlay={() => appActions.play()}
+              onPause={() => appActions.pause(app.played)}
+              onEnded={() => appActions.postPlayingVideo(app.que[0])}
+              onError={() => appActions.postPlayingVideo(app.que[0])}
+              onProgress={appActions.progress}
+              onDuration={(duration) => appActions.changeValueWithKey('duration', duration)}
+            />
+          </div>
           <Comments app={app} appActions={appActions} />
           <SearchResult app={app} appActions={appActions}/>
-            <div className="display-youtube">
-              <ReactPlayer
-                ref={(player) => { this.player = player; }}
-                className="react-player"
-                width={"100%"}
-                height={"100%"}
-                url={youtubeUrl(playingVideo.id)}
-                playing={app.playing}
-                volume={app.volume}
-                soundcloudConfig={app.soundcloudConfig}
-                vimeoConfig={app.vimeoConfig}
-                youtubeConfig={app.youtubeConfig}
-                fileConfig={app.fileConfig}
-                onReady={() => appActions.play()}
-                onPlay={() => appActions.play()}
-                onPause={() => appActions.pause(app.played)}
-                onEnded={() => appActions.postPlayingVideo(app.que[0])}
-                onError={() => appActions.postPlayingVideo(app.que[0])}
-                onProgress={appActions.progress}
-                onDuration={(duration) => appActions.changeValueWithKey('duration', duration)}
-              />
-            </div>
         </div>
         <div className="footer-bar">
           <div className="play-controll">
