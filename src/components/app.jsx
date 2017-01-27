@@ -162,7 +162,7 @@ class App extends ReactBaseComponent {
             {
               !isPostPlayingVideo &&
                 <p className="progress-box__ttl">
-                  <span className="header-bar__text--message">There're no videos to play.</span>
+                  <span className="header-bar__text--message">Nothing to play.</span>
                 </p>
             }
             <div className="progress-bar">
