@@ -52,6 +52,7 @@ export const InitialState = {
   isCommentActive: false,
   isQueListActive: false,
   isPlaylistActive: false,
+  isLoadedSyncState: false,
 };
 
 export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
