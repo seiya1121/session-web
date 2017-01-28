@@ -139,7 +139,10 @@ class SearchResult extends ReactBaseComponent {
         <div className="display-search">
           <div
             className="display-search__close"
-            onClick={() => appActions.changeValueWithKey('isSearchActive', false)}
+            onClick={() => {
+              appActions.changeValueWithKey('isSearchActive', false);
+              appActions.changeValueWithKey('isPlaylistActive', false);
+            }}
           />
           {searchCategory()}
           <ul className="list-group">
