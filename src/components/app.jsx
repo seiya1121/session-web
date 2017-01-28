@@ -91,6 +91,11 @@ class App extends ReactBaseComponent {
     }});
   }
 
+  componentWillUnmount(){
+    console.log('unmount')
+    this.props.appActions.changePlayed(this.props.app.played);
+  }
+
   notification(title, option) {
     const notification = new Notification(
       `${title} (${this.props.app.que.length + 1} remained)`,
