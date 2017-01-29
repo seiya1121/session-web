@@ -19,7 +19,7 @@ class SearchResult extends ReactBaseComponent {
   onClickSetQue(video) {
     const { que, currentUser, playingVideo } = this.props.app;
     const targetVideo = videoObject(video, currentUser.name);
-    if (que.length === 0 && playingVideo === '') {
+    if (que.length === 0 && playingVideo.title === '') {
       this.props.appActions.postPlayingVideo(targetVideo);
     } else {
       this.props.appActions.pushVideo(targetVideo);
