@@ -211,6 +211,9 @@ class App extends ReactBaseComponent {
                 onChange={(e) => appActions.changeVolume(e.target.value)}
               />
             </div>
+            <p className="volume-box__ttl" onClick={() => appActions.changeVolume(0)}>
+              mute
+            </p>
           </div>
         </div>
       </div>
