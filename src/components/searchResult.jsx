@@ -27,14 +27,15 @@ class SearchResult extends ReactBaseComponent {
   }
 
   getPlaylistVideos(playlistId) {
-    const {accessToken} = this.props.app.currentUser;
+    const { accessToken } = this.props.app.currentUser;
     fetch(`${YoutubeApiUrl}/playlistItems?${playlistItemsParams(accessToken, playlistId)}`)
       .then((response) => response.json())
       .then((result) => this.props.appActions.setSearchResult('playlistVideo', result))
   }
 
   render(){
-    const {app, appActions} = this.props;
+    const { app, appActions } = this.props;
+    const que = app.que.filter((item) => item.key !== app.que[0].key)
     const searchCategory = () => {
       if(!app.isPlaylistActive) {
         return (
@@ -98,7 +99,7 @@ class SearchResult extends ReactBaseComponent {
       (result.type === 'video') ? videoResult(result, i) : listResult(result, i)
     ));
 
-    const queNode = app.que.map((video) => (
+    const queNode = que.map((video) => (
       <li key={video.key} className="list-group-item">
         <div
           className="list-group-item__click"
@@ -130,7 +131,7 @@ class SearchResult extends ReactBaseComponent {
         {/* Play list */}
         <div className="display-list">
           <p className="list-group-title">
-            Up Coming <span className="list-group-title__number">{app.que.length}</span>
+            Up Coming <span className="list-group-title__number">{que.length}</span>
           </p>
           <ul className="list-group">
             {queNode}
