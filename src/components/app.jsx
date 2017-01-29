@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import { DefaultVideo } from '../constants/app';
 import ReactPlayer from 'react-player';
 import 'whatwg-fetch';
+import Loading from 'react-loading';
 // Components
 import Header from './header';
 import SearchResult from './searchResult';
@@ -61,34 +62,40 @@ class App extends ReactBaseComponent {
         this.props.appActions.setDefaultUser();
       }
     })
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.fetch(state, { context: this, asArray, then(data) {
-        this.props.appActions.updateSyncState(state, data);
-      }});
-    });
   }
 
   componentDidMount() {
+    const { appActions } = this.props;
+    SyncStates.forEach((obj, i) => {
+      const { state, asArray } = obj;
+      base.fetch(state, { context: this, asArray, then(data) {
+        appActions.updateSyncState(state, data);
+        (i + 1 === SyncStates.length) && appActions.changeValueWithKey('isLoadedSyncState', true);
+      }});
+    });
     base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
-      this.props.appActions.updatePlayed(startTime);
+      appActions.updatePlayed(startTime);
       this.player.seekTo(startTime);
     }});
     base.listenTo('playing', { context: this, asArray: false, then(playing) {
-      this.props.appActions.updatePlaying(playing);
+      appActions.updatePlaying(playing);
     }});
     base.listenTo('que', { context: this, asArray: true, then(que) {
-      this.props.appActions.updateQue(que);
+      appActions.updateQue(que);
     }});
     base.listenTo('comments', { context: this, asArray: true, then(comments) {
-      this.props.appActions.updateComments(comments);
+      appActions.updateComments(comments);
     }});
     base.listenTo('users', { context: this, asArray: true, then(users) {
-      this.props.appActions.updateUsers(users);
+      appActions.updateUsers(users);
     }});
     base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
-      this.props.appActions.updatePlayingVideo(video);
+      appActions.updatePlayingVideo(video);
     }});
+  }
+
+  componentWillUnmount(){
+    this.props.appActions.changePlayed(this.props.app.played);
   }
 
   notification(title, option) {
@@ -110,6 +117,7 @@ class App extends ReactBaseComponent {
           <Header app={app} appActions={appActions} />
         </header>
         <div className="main-display">
+          {!app.isLoadedSyncState && <Loading type='spinningBubbles' color='#26BFBA' />}
           <div className="display-youtube">
             <ReactPlayer
               ref={(player) => { this.player = player; }}
@@ -203,6 +211,9 @@ class App extends ReactBaseComponent {
                 onChange={(e) => appActions.changeVolume(e.target.value)}
               />
             </div>
+            <p className="volume-box__ttl" onClick={() => appActions.changeVolume(0)}>
+              mute
+            </p>
           </div>
         </div>
       </div>
