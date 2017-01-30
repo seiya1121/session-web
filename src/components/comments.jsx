@@ -46,8 +46,11 @@ class Comments extends ReactBaseComponent {
 
   render() {
     const {app, appActions} = this.props;
-    const comments = (app.isCommentActive) ?
-      app.comments : app.comments.slice(app.comments.length - 3, app.comments.length);
+
+    const comments = app.comments;
+
+    // const comments = (app.isCommentActive) ?
+    //  app.comments : app.comments.slice(app.comments.length - 3, app.comments.length);
 
     const commentClass = (type, index) => (
       (type === CommentType.log) ?
@@ -104,7 +107,12 @@ class Comments extends ReactBaseComponent {
 
     return(
       <div className="display-comments">
-        <ul className="comments-stream">
+        <ul
+          className={classNames(
+            'comments-stream',
+            { 'is-active': app.isCommentActive },
+          )}
+        >
           {commentsNode}
         </ul>
         <input

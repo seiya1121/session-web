@@ -238,16 +238,26 @@ input {
       float: left;
       clear: left;
 
-      &_0 {
+      opacity: 0;
+
+      &:nth-last-child(3) {
         opacity: 0.4;
         // background: transparentize($color-white, 0.8);
       }
-      &_1 {
+      &:nth-last-child(2) {
         opacity: 0.6;
         // background: transparentize($color-white, 0.6);
       }
-      &_2 {
-        background: transparentize($color-white, 0.2);
+      &:nth-last-child(1) {
+        opacity: 1;
+        // background: transparentize($color-white, 0.2);
+      }
+
+      .is-active &,
+      .is-active &:nth-last-child(3),
+      .is-active &:nth-last-child(2),
+      .is-active &:nth-last-child(1){
+        opacity: 1;
       }
     }
 
