@@ -42,10 +42,13 @@ class App extends ReactBaseComponent {
       if (result.credential) {
         const { accessToken } = result.credential;
         const { uid, displayName, photoURL } = result.user;
-        this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken, uid });
+        const user = { name: displayName, photoURL, accessToken, uid };
+        this.props.appActions.postUser(uid, user);
+        this.props.appActions.setUser(user);
       }
     })
     firebaseAuth.onAuthStateChanged((user) => {
+      console.log('hi')
       if (user) {
         base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
           this.props.appActions.setUser(data[0]);
@@ -95,11 +98,7 @@ class App extends ReactBaseComponent {
   }
 
   componentWillUnmount(){
-    const { uid } = this.props.app.currentUser;
     this.props.appActions.changePlayed(this.props.app.played);
-    if (uid !== '')  {
-      this.props.appActions.removeUser(uid);
-    }
   }
 
   notification(title, option) {
