@@ -95,7 +95,11 @@ class App extends ReactBaseComponent {
   }
 
   componentWillUnmount(){
+    const { uid } = this.props.app.currentUser;
     this.props.appActions.changePlayed(this.props.app.played);
+    if (uid !== '')  {
+      this.props.appActions.removeUser(uid);
+    }
   }
 
   notification(title, option) {
