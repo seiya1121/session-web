@@ -47,9 +47,12 @@ class Header extends ReactBaseComponent {
     const { accessToken, name, photoURL } = app.currentUser;
     const isLogin = accessToken;
 
-    const usersNode = app.users.map((user, i) => (
-      <img key={i} src={user.photoURL} alt={user.name} />
-    ));
+    const usersNode = app.users.map((user, i) => {
+      const temp = Object.values(user)[0];
+      return (
+        <img className="login-users__icons" key={i} src={temp.photoURL} alt={temp.name} />
+      );
+    });
 
     return(
       <div>
@@ -65,7 +68,9 @@ class Header extends ReactBaseComponent {
               }
             </p>
           </div>
-          {usersNode}
+          <div className="login-users">
+            {usersNode}
+          </div>
         </div>
         <input
           className={classNames('form-search', { 'is-search-active': app.isSearchActive })}
