@@ -90,6 +90,7 @@ class App extends ReactBaseComponent {
       appActions.updateComments(comments);
     }});
     base.listenTo('users', { context: this, asArray: true, then(users) {
+      console.log(users)
       appActions.updateUsers(users);
     }});
     base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
