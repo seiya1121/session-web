@@ -47,7 +47,7 @@ class Header extends ReactBaseComponent {
     const { accessToken, name, photoURL } = app.currentUser;
     const isLogin = accessToken;
 
-    const usersNode = app.users.filter((u) => app.currentUser.uid !== u.uid).map((u, i) => {
+    const usersNode = app.users.filter((u) => app.currentUser.uid !== u.key).map((u, i) => {
       const temp = Object.values(u)[0];
       return (
         <img className="login-users__icons" key={i} src={temp.photoURL} alt={temp.name} />
