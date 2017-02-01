@@ -59,8 +59,8 @@ const app = (state = App.InitialState, action) => {
     case App.UPDATE_USERS:
       return newState({
         users: action.users.map((user) => {
-          const temp = Object.keys(user).map((k) => user[k]);
-          return Object.assign({}, {name: temp[0].name, photoURL: temp[0].photoURL})
+          const { name, photoURL, uid } = Object.keys(user).map((k) => user[k])[0];
+          return Object.assign({}, { name, photoURL, uid })
         })
       });
     case App.UPDATE_SEARCH_RESULT:
