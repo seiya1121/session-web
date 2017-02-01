@@ -57,7 +57,12 @@ const app = (state = App.InitialState, action) => {
         que: state.que.filter((item) => item.key !== action.playingVideo.key),
       });
     case App.UPDATE_USERS:
-      return newState({ users: action.users });
+      return newState({
+        users: action.users.map((user) => {
+          const temp = Object.keys(user).map((k) => user[k]);
+          return Object.assign({}, {name: temp[0].name, photoURL: temp[0].photoURL})
+        })
+      });
     case App.UPDATE_SEARCH_RESULT:
       return newState({ searchResult: app.lists, isSearchActive: true });
     default:

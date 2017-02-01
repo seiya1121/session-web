@@ -48,7 +48,6 @@ class App extends ReactBaseComponent {
       }
     })
     firebaseAuth.onAuthStateChanged((user) => {
-      console.log('hi')
       if (user) {
         base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
           this.props.appActions.setUser(data[0]);
@@ -90,7 +89,6 @@ class App extends ReactBaseComponent {
       appActions.updateComments(comments);
     }});
     base.listenTo('users', { context: this, asArray: true, then(users) {
-      console.log(users)
       appActions.updateUsers(users);
     }});
     base.listenTo('playingVideo', { context: this, asArray: false, then(video) {

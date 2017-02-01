@@ -47,12 +47,12 @@ class Header extends ReactBaseComponent {
     const { accessToken, name, photoURL } = app.currentUser;
     const isLogin = accessToken;
 
-    // const usersNode = app.users.map((user, i) => {
-    //   const temp = Object.values(user)[0];
-    //   return (
-    //     <img className="login-users__icons" key={i} src={temp.photoURL} alt={temp.name} />
-    //   );
-    // });
+    const usersNode = app.users.map((user, i) => {
+      const temp = Object.values(user)[0];
+      return (
+        <img className="login-users__icons" key={i} src={temp.photoURL} alt={temp.name} />
+      );
+    });
 
     return(
       <div>
@@ -67,6 +67,9 @@ class Header extends ReactBaseComponent {
                   <a className="header-bar-prof__sign" onClick={this.onClickSignIn}>Sign In</a>
               }
             </p>
+          </div>
+          <div className="login-users">
+            {usersNode}
           </div>
         </div>
         <input

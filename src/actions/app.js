@@ -107,10 +107,5 @@ export const updatePlayingVideo = (video) => {
   const playingVideo = Object.keys(video).length === 0 ? App.DefaultVideo : video;
   return { type: App.UPDATE_PLAYING_VIDEO, playingVideo };
 };
-export const updateUsers = (users) => {
-  const tempUsers = users.map((user) => (
-    Object.assign({}, {name: user.name, photoURL: user.photoURL})
-  ));
-  return { type: App.UPDATE_USERS, users: tempUsers }
-};
+export const updateUsers = (users) => ({ type: App.UPDATE_USERS, users });
 export const setPlaylistToResult = (results) => ({ type: App.UPDATE_SEARCH_RESULT, results });
