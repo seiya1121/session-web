@@ -47,6 +47,7 @@ class App extends ReactBaseComponent {
                             .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
         this.props.appActions.setPlaylists(lists)
       })
+      .catch((error) => console.log(error));
   }
 
   componentWillMount() {
