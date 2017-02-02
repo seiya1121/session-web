@@ -37,6 +37,17 @@ class App extends ReactBaseComponent {
     this.player.seekTo(played);
   }
 
+  getPlaylist(user) {
+    fetch(`${YoutubeApiUrl}/channels?${channelsParams(user)}`)
+      .then((response) => { return response.json(); })
+      .then((json) => {
+        const base = json.items[0].contentDetails.relatedPlaylists;
+        const lists = Object.keys(base)
+                            .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
+        this.props.appActions.setPlaylists(lists)
+      })
+  }
+
   componentWillMount() {
     firebaseAuth.getRedirectResult().then((result) => {
       if (result.credential) {
@@ -50,15 +61,15 @@ class App extends ReactBaseComponent {
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
-          this.props.appActions.setUser(data[0]);
-          fetch(`${YoutubeApiUrl}/channels?${channelsParams(data[0])}`)
-            .then((response) => { return response.json(); })
-            .then((json) => {
-              const base = json.items[0].contentDetails.relatedPlaylists;
-              const lists = Object.keys(base)
-                                  .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
-              this.props.appActions.setPlaylists(lists)
-            })
+          if(data.length > 0) {
+            this.props.appActions.setUser(data[0]);
+            this.getPlaylist(data[0]);
+          } else {
+            const { displayName, photoURL, uid } = user;
+            const tempUser = { name: displayName, photoURL, uid, accessToken: '' };
+            this.props.appActions.setUser(tempUser);
+            this.getPlaylist(tempUser);
+          }
         }})
       } else {
         this.props.appActions.setDefaultUser();
