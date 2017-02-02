@@ -3,7 +3,7 @@ import { base } from '../config/firebaseApp.js';
 
 const push = (stateName, data) => base.push(stateName, { data });
 const post = (stateName, data) => base.post(stateName, { data });
-const remove = (endPoint) => base.remove(endPoint);
+const remove = (endPoint, successFunc) => base.remove(endPoint).then(successFunc());
 const commentObj = (content, userName, type, keyword) => (
   Object.assign({}, { content, userName, type, keyword })
 );
@@ -45,8 +45,9 @@ export const postUser = (uid, user) => {
   push(`users/${uid}`, user);
   return { type: App.POST_USER };
 };
-export const removeUser = (uid) => {
-  remove(`users/${uid}`);
+export const removeUser = (uid, successFunc) => {
+  console.log(successFunc)
+  remove(`users/${uid}`, successFunc);
   return { type: App.REMOVE_USER };
 }
 export const pushVideo = (video) => {
@@ -81,7 +82,6 @@ export const changeValueWithKey = (key, value) => ({
 });
 export const setUser = (user) => ({ type: App.SET_USER, user });
 export const setPlaylists = (playlists) => ({ type: App.SET_PLAYLISTS, playlists });
-export const setDefaultUser = () => ({ type: App.SET_DEFAULT_USER });
 export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (resultType, result) => {
   const tempResult = (resultType === 'playlistVideo') ?

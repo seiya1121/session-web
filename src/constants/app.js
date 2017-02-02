@@ -1,10 +1,8 @@
-import { getAnimalName } from '../scripts/animal.js';
-
 export const YoutubeApiUrl = 'https://www.googleapis.com/youtube/v3';
 
 export const DefaultUser = Object.assign(
   {},
-  { name: getAnimalName(), photoURL: '', accessToken: '', uid: '' }
+  { name: '', photoURL: '', accessToken: '', uid: '' }
 );
 export const DefaultVideo = Object.assign(
   {},
@@ -70,7 +68,6 @@ export const CHANGE_PLAYED = 'CHANGE_PLAYED';
 export const PLAY = 'PLAY';
 export const PAUSE = 'PAUSE';
 export const PROGRESS = 'PROGRESS';
-export const SET_DEFAULT_USER = 'SET_DEFAULT_USER';
 export const ADD_COMMENT = 'ADD_COMMENT';
 export const SET_SEARCH_RESULT = 'SET_SEARCH_RESULT';
 export const SET_PLAYLISTS = 'SET_PLAYLISTS';

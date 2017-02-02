@@ -25,8 +25,6 @@ const app = (state = App.InitialState, action) => {
       return newState({ playlists: action.playlists });
     case App.ADD_COMMENT:
       return newState({ commentText: '', isCommentActive: false });
-    case App.SET_DEFAULT_USER:
-      return newState({ currentUser: App.DefaultUser });
     case App.CHANGE_VOLUME:
       return newState({ volume: parseFloat(action.volume) });
     case App.SEEK_DOWN:

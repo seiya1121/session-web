@@ -24,12 +24,13 @@ const channelsParams = (user) => (
 );
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
+const animalName = getAnimalName();
 
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.bind('notification');
-    this.bind('onSeekMouseUp');
+    this.bind('onSeekMouseUp', 'getPlaylist');
   }
 
   onSeekMouseUp(e) {
@@ -55,7 +56,6 @@ class App extends ReactBaseComponent {
       if (result.credential) {
         const { accessToken } = result.credential;
         const { uid, displayName, photoURL } = result.user;
-        result.user.updateProfile({ accessToken });
         const user = { name: displayName, photoURL, accessToken, uid };
         this.props.appActions.postUser(uid, user);
         this.props.appActions.setUser(user);
@@ -64,29 +64,29 @@ class App extends ReactBaseComponent {
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         if (user.isAnonymous) {
-          const temp = { name: getAnimalName(), photoURL: '../images/avatar.png', uid: user.uid, accessToken: '' };
+          const temp = {
+            name: animalName,
+            photoURL: '../images/avatar.png',
+            uid: user.uid,
+            accessToken: ''
+          };
           this.props.appActions.postUser(user.uid, temp);
           this.props.appActions.setUser(temp);
-          // this.props.appActions.setDefaultUser();
+        } else {
+          base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
+            if(data.length > 0) {
+              this.props.appActions.setUser(data[0]);
+              this.getPlaylist(data[0]);
+            } else {
+              const { displayName, photoURL, uid } = user;
+              const tempUser = { name: displayName, photoURL, uid, accessToken: '' };
+              this.props.appActions.setUser(tempUser);
+              this.getPlaylist(tempUser);
+            }
+          }});
         }
-        base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
-          if(data.length > 0) {
-            this.props.appActions.setUser(data[0]);
-            this.getPlaylist(data[0]);
-          } else {
-            const { displayName, photoURL, uid } = user;
-            const tempUser = { name: displayName, photoURL, uid, accessToken: '' };
-            this.props.appActions.setUser(tempUser);
-            this.getPlaylist(tempUser);
-          }
-        }})
       } else {
-        firebaseAuth.signInAnonymously().catch((error) => {
-          // Handle Errors here.
-          console.log(error.code);
-          console.log(error.message);
-          // ...
-        });
+        firebaseAuth.signInAnonymously();
       }
     })
   }
