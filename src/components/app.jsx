@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import { SyncStates, YoutubeApiUrl } from '../constants/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
+import { getAnimalName } from '../scripts/animal.js';
 import classNames from 'classnames';
 import { DefaultVideo } from '../constants/app';
 import ReactPlayer from 'react-player';
@@ -53,6 +54,7 @@ class App extends ReactBaseComponent {
       if (result.credential) {
         const { accessToken } = result.credential;
         const { uid, displayName, photoURL } = result.user;
+        result.user.updateProfile({ accessToken });
         const user = { name: displayName, photoURL, accessToken, uid };
         this.props.appActions.postUser(uid, user);
         this.props.appActions.setUser(user);
@@ -60,6 +62,12 @@ class App extends ReactBaseComponent {
     })
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
+        if (user.isAnonymous) {
+          const temp = { name: getAnimalName(), photoURL: '../images/avatar.png', uid: user.uid, accessToken: '' };
+          this.props.appActions.postUser(user.uid, temp);
+          this.props.appActions.setUser(temp);
+          // this.props.appActions.setDefaultUser();
+        }
         base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
           if(data.length > 0) {
             this.props.appActions.setUser(data[0]);
@@ -72,7 +80,12 @@ class App extends ReactBaseComponent {
           }
         }})
       } else {
-        this.props.appActions.setDefaultUser();
+        firebaseAuth.signInAnonymously().catch((error) => {
+          // Handle Errors here.
+          console.log(error.code);
+          console.log(error.message);
+          // ...
+        });
       }
     })
   }
