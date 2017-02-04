@@ -9,25 +9,6 @@ const remove = (endPoint, successFunc) => {
 const commentObj = (content, userName, type, keyword) => (
   Object.assign({}, { content, userName, type, keyword })
 );
-const resultObj = (item, resultType) => {
-  switch (resultType) {
-    case 'search':
-      return {
-        id: item.id.videoId,
-        title: item.snippet.title,
-        thumbnailUrl: item.snippet.thumbnails.default.url,
-        type: 'video',
-      };
-    case 'playlistVideo':
-      const { resourceId, title, thumbnails } = item.snippet;
-      return { id: resourceId.videoId, title, thumbnailUrl: thumbnails.default.url, type: 'video' };
-    case 'playlist':
-      const { id, thumbnailUrl } = item;
-      return { id, title: item.title, thumbnailUrl, type: 'list', };
-    default:
-      return {};
-  }
-}
 
 // sync系
 export const postPlayingVideo = (video) => {
@@ -78,35 +59,21 @@ export const playPause = (isPlaying) => {
 };
 
 // local系
-export const changeValueWithKey = (key, value) => ({
-  type: App.CHANGE_VALUE_WITH_KEY, key, value,
-});
+export const changeValueWithKey = (key, value) => ({ type: App.CHANGE_VALUE_WITH_KEY, key, value });
 export const setUser = (user) => ({ type: App.SET_USER, user });
 export const setPlaylists = (playlists) => ({ type: App.SET_PLAYLISTS, playlists });
 export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
-export const setSearchResult = (resultType, result) => {
-  const tempResult = (resultType === 'playlistVideo') ?
-    result.items.filter((item) => item.snippet.title !== "Deleted video") : result
-  return {
-    type: App.SET_SEARCH_RESULT,
-    result: tempResult.map((item) =>  resultObj(item, resultType)),
-  }
-};
+export const setSearchResult = (resultType, result) => ({
+  type: App.SET_SEARCH_RESULT, result, resultType
+});
 export const seekDown = () => ({ type: App.SEEK_DOWN });
 export const seekUp = (played) => ({ type: App.SEEK_UP, played });
-export const progress = (state) => {
-  const { played, loaded } = state;
-  const playingStatus = (state.loaded) ? { played, loaded } : { played };
-  return { type: App.PROGRESS, playingStatus };
-};
+export const progress = (state) => ({ type: App.PROGRESS, state });
 export const updateSyncState = (key, value) => ({ type: App.UPDATE_SYNC_STATE, key, value });
 export const updateQue = (que) => ({ type: App.UPDATE_QUE, que });
 export const updateComments = (comments) => ({ type: App.UPDATE_COMMENTS, comments });
 export const updatePlayed = (played) => ({ type: App.UPDATE_PLAYED, played });
 export const updatePlaying = (playing) => ({ type: App.UPDATE_PLAYING, playing });
-export const updatePlayingVideo = (video) => {
-  const playingVideo = Object.keys(video).length === 0 ? App.DefaultVideo : video;
-  return { type: App.UPDATE_PLAYING_VIDEO, playingVideo };
-};
+export const updatePlayingVideo = (video) => ({ type: App.UPDATE_PLAYING_VIDEO, video });
 export const updateUsers = (users) => ({ type: App.UPDATE_USERS, users });
 export const setPlaylistToResult = (results) => ({ type: App.UPDATE_SEARCH_RESULT, results });

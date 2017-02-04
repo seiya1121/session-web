@@ -1,5 +1,25 @@
 import * as App from '../constants/app';
 
+const resultObj = (item, resultType) => {
+  switch (resultType) {
+    case 'search':
+      return {
+        id: item.id.videoId,
+        title: item.snippet.title,
+        thumbnailUrl: item.snippet.thumbnails.default.url,
+        type: 'video',
+      };
+    case 'playlistVideo':
+      const { resourceId, title, thumbnails } = item.snippet;
+      return { id: resourceId.videoId, title, thumbnailUrl: thumbnails.default.url, type: 'video' };
+    case 'playlist':
+      const { id, thumbnailUrl } = item;
+      return { id, title: item.title, thumbnailUrl, type: 'list', };
+    default:
+      return {};
+  }
+}
+
 const app = (state = App.InitialState, action) => {
   const newState = (obj) => Object.assign({}, state, obj);
   switch (action.type) {
@@ -34,9 +54,14 @@ const app = (state = App.InitialState, action) => {
     case App.CHANGE_PLAYED:
       return newState({ played: action.played, seeking: false });
     case App.PROGRESS:
-      return !state.seeking ? newState(action.playingStatus) : state;
+      const { played, loaded } = action.state;
+      const playingStatus = (loaded) ? { played, loaded } : { played };
+      return !state.seeking ? newState(playingStatus) : state;
     case App.SET_SEARCH_RESULT:
-      return newState({ searchResult: action.result });
+      const { result, resultType } = action;
+      const tempResult = (resultType === 'playlistVideo') ?
+        result.items.filter((item) => item.snippet.title !== "Deleted video") : result;
+      return newState({ searchResult: tempResult.map((item) =>  resultObj(item, resultType)) });
     case App.UPDATE_SYNC_STATE:
       return newState({ [action.key]: action.value });
     case App.UPDATE_QUE:
@@ -48,11 +73,12 @@ const app = (state = App.InitialState, action) => {
     case App.UPDATE_PLAYING:
       return newState({ playing: action.playing });
     case App.UPDATE_PLAYING_VIDEO:
+    const playingVideo = Object.keys(action.video).length === 0 ? App.DefaultVideo : action.video;
       return newState({
         playing: true,
         startTime: 0,
-        playingVideo: action.playingVideo,
-        que: state.que.filter((item) => item.key !== action.playingVideo.key),
+        playingVideo,
+        que: state.que.filter((item) => item.key !== playingVideo.key),
       });
     case App.UPDATE_USERS:
       return newState({
