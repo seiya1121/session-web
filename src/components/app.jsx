@@ -195,12 +195,6 @@ class App extends ReactBaseComponent {
                   {playingVideo.title} {playingVideo.displayName}
                 </p>
             }
-            {
-              !isPostPlayingVideo &&
-                <p className="progress-box__ttl">
-                  <span className="header-bar__text--message">No video</span>
-                </p>
-            }
             <div className="progress-bar">
               <input
                 className="progress-bar__seek"
@@ -210,14 +204,10 @@ class App extends ReactBaseComponent {
                 onChange={(e) => appActions.changePlayed(parseFloat(e.target.value))}
                 onMouseUp={this.onSeekMouseUp}
               />
-              <div
-                className="progress-bar__played"
-                style={{ width: `${100 * app.played}%` }}
-              ></div>
-              <div
-                className="progress-bar__loaded"
-                style={{ width: `${100 * app.loaded}%` }}
-              ></div>
+              <div className="progress-bar__played" style={{ width: `${100 * app.played}%` }}>
+              </div>
+              <div className="progress-bar__loaded" style={{ width: `${100 * app.loaded}%` }}>
+              </div>
             </div>
             <div className="progress-box__status">
               <p>played {app.played.toFixed(3)} / loaded {app.loaded.toFixed(3)}</p>
@@ -225,9 +215,7 @@ class App extends ReactBaseComponent {
           </div>
 
           <div className="volume-box">
-            <p className="volume-box__ttl">
-              Volume
-            </p>
+            <p className="volume-box__ttl">Volume</p>
             <div className="volume-box__range-wrap">
               <input
                 className="volume-box__range"
@@ -239,9 +227,7 @@ class App extends ReactBaseComponent {
                 onChange={(e) => appActions.changeVolume(e.target.value)}
               />
             </div>
-            <p className="volume-box__ttl" onClick={() => appActions.changeVolume(0)}>
-              mute
-            </p>
+            <p className="volume-box__ttl" onClick={() => appActions.changeVolume(0)}>mute</p>
           </div>
         </div>
       </div>
