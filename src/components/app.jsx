@@ -30,8 +30,13 @@ class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.bind('notification');
-    this.bind('onSeekMouseUp', 'getPlaylist');
+    this.bind('onSeekMouseUp', 'getPlaylist', 'onUnload');
   }
+
+  onUnload(e) {
+    const { uid } = this.props.app.currentUser;
+    this.props.appActions.removeUser(uid);
+  };
 
   onSeekMouseUp(e) {
     const played = parseFloat(e.target.value);
@@ -92,6 +97,7 @@ class App extends ReactBaseComponent {
   }
 
   componentDidMount() {
+    window.addEventListener("beforeunload", this.onUnload);
     const { appActions } = this.props;
     SyncStates.forEach((obj, i) => {
       const { state, asArray } = obj;
@@ -122,8 +128,7 @@ class App extends ReactBaseComponent {
   }
 
   componentWillUnmount(){
-    this.props.appActions.removeUser(this.props.app.currentUser.uid);
-    this.props.appActions.changePlayed(this.props.app.played);
+     window.removeEventListener("beforeunload", this.onUnload);
   }
 
   notification(title, option) {

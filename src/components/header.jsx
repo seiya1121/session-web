@@ -48,8 +48,8 @@ class Header extends ReactBaseComponent {
 
   render(){
     const {app, appActions} = this.props;
-    const { accessToken, name, photoURL } = app.currentUser;
-    const isLogin = accessToken;
+    const { name, photoURL, uid } = app.currentUser;
+    const isLogin = uid;
     const nextVideo = app.que[0];
     const usersNode = app.users.filter((u) => app.currentUser.uid !== u.key).map((u, i) => {
       const temp = Object.values(u)[0];

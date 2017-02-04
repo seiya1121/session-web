@@ -48,7 +48,6 @@ export const postUser = (uid, user) => {
   return { type: App.POST_USER };
 };
 export const removeUser = (uid, successFunc) => {
-  console.log(successFunc)
   remove(`users/${uid}`, successFunc);
   return { type: App.REMOVE_USER };
 }
