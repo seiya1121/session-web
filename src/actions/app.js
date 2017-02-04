@@ -6,9 +6,6 @@ const post = (stateName, data) => base.post(stateName, { data });
 const remove = (endPoint, successFunc) => {
   base.remove(endPoint).then(() => successFunc && successFunc());
 };
-const commentObj = (content, userName, type, keyword) => (
-  Object.assign({}, { content, userName, type, keyword })
-);
 
 // sync系
 export const postPlayingVideo = (video) => {
@@ -16,7 +13,7 @@ export const postPlayingVideo = (video) => {
     post('playingVideo', video);
     post('startTime', 0);
     remove(`que/${video.key}`);
-    const comment = commentObj(`# ${video.title}`, video.userName, App.CommentType.log, '');
+    const comment = App.commentObj(`# ${video.title}`, video.user, App.CommentType.log, '');
     push('comments', comment);
   } else {
     post('playingVideo', App.DefaultVideo);

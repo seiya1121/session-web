@@ -9,6 +9,10 @@ export const DefaultVideo = Object.assign(
   { id: '', title: '', thumbnail: { url: '' }, displayName: '' }
 );
 
+export const commentObj = (content, user, type, keyword) => (
+  Object.assign({}, { content, user, type, keyword })
+);
+
 export const SyncStates = [
   { state: 'que', asArray: true },
   { state: 'users', asArray: true },

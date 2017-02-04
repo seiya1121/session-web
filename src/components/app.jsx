@@ -25,6 +25,9 @@ const channelsParams = (user) => (
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 const animalName = getAnimalName();
+const userObj = ({ displayName, photoURL, uid }, overrideState) => Object.assign(
+  { displayName, photoURL, uid }, overrideState
+);
 
 class App extends ReactBaseComponent {
   constructor(props) {
@@ -34,8 +37,8 @@ class App extends ReactBaseComponent {
   }
 
   onUnload(e) {
-    const { uid } = this.props.app.currentUser;
-    this.props.appActions.removeUser(uid);
+    const u = Object.assign(this.props.app.currentUser, { isHere: false });
+    this.props.appActions.postUser(u.uid, u);
   };
 
   onSeekMouseUp(e) {
@@ -60,33 +63,29 @@ class App extends ReactBaseComponent {
     firebaseAuth.getRedirectResult().then((result) => {
       if (result.credential) {
         const { accessToken } = result.credential;
-        const { uid, displayName, photoURL } = result.user;
-        const user = { name: displayName, photoURL, accessToken, uid };
-        this.props.appActions.postUser(uid, user);
+        const user = userObj(result.user, { accessToken, isHere: true });
+        console.log(user);
+        this.props.appActions.postUser(user.uid, user);
         this.props.appActions.setUser(user);
       }
     })
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         if (user.isAnonymous) {
-          const temp = {
-            name: animalName,
-            photoURL: '../images/avatar.png',
-            uid: user.uid,
-            accessToken: ''
-          };
-          this.props.appActions.postUser(user.uid, temp);
-          this.props.appActions.setUser(temp);
+          const temp = { displayName: animalName, photoURL: '../images/avatar.png', uid: user.uid };
+          const u = userObj(temp, { accessToken: '', isHere: true });
+          this.props.appActions.postUser(u.uid, u);
+          this.props.appActions.setUser(u);
         } else {
           base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
             if(data.length > 0) {
-              this.props.appActions.setUser(data[0]);
-              this.getPlaylist(data[0]);
+              const u = userObj(data[0], { accessToken: data[0].accessToken, isHere: true });
+              this.props.appActions.setUser(u);
+              this.getPlaylist(u);
             } else {
-              const { displayName, photoURL, uid } = user;
-              const tempUser = { name: displayName, photoURL, uid, accessToken: '' };
-              this.props.appActions.setUser(tempUser);
-              this.getPlaylist(tempUser);
+              const u = userObj(user, { accessToken: '', isHere: true });
+              this.props.appActions.setUser(u);
+              this.getPlaylist(u);
             }
           }});
         }

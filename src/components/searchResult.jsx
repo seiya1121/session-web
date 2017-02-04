@@ -8,7 +8,7 @@ const playlistItemsParams = (accessToken, playlistId) => (
   `access_token=${accessToken}&part=snippet&playlistId=${playlistId}&maxResults=50`
 );
 
-const videoObject = (video, userName) => Object.assign({}, video, { userName });
+const videoObject = (video, user) => Object.assign(video, { user });
 
 class SearchResult extends ReactBaseComponent {
   constructor(props) {
@@ -18,7 +18,7 @@ class SearchResult extends ReactBaseComponent {
 
   onClickSetQue(video) {
     const { que, currentUser, playingVideo } = this.props.app;
-    const targetVideo = videoObject(video, currentUser.name);
+    const targetVideo = videoObject(video, currentUser);
     if (que.length === 0 && playingVideo.title === '') {
       this.props.appActions.postPlayingVideo(targetVideo);
     } else {
@@ -112,7 +112,7 @@ class SearchResult extends ReactBaseComponent {
           />
           <div className="list-group-item__body">
             <strong>{video.title}</strong>
-            <p className="list-group-item__name">added by {video.userName}</p>
+            <p className="list-group-item__name">added by {video.user.displayName}</p>
           </div>
         </div>
         <div className="list-group-item__close" onClick={() => appActions.removeVideo(video)}>

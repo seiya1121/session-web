@@ -48,15 +48,15 @@ class Header extends ReactBaseComponent {
 
   render(){
     const {app, appActions} = this.props;
-    const { name, photoURL, uid } = app.currentUser;
-    const isLogin = uid;
+    const { displayName, photoURL, accessToken } = app.currentUser;
+    const isLogin = accessToken;
     const nextVideo = app.que[0];
-    const usersNode = app.users.filter((u) => app.currentUser.uid !== u.key).map((u, i) => {
-      const temp = Object.values(u)[0];
-      return (
-        <img className="login-users__icons" key={i} src={temp.photoURL} alt={temp.name} />
-      );
-    });
+    const users = app.users.filter((u) => app.currentUser.uid !== u.key && Object.keys(u).map((k) => u[k][0]).isHere);
+    console.log(app.users)
+    console.log(users)
+    const usersNode = users.map((u, i) => (
+      <img className="login-users__icons" key={i} src={u.photoURL} alt={u.displayName} />
+    ));
     const authrizeButton = (isLogin) => (
       (isLogin) ?
         <a className="header-bar-prof__sign" onClick={this.onClickSignOut}>Sign Out</a> :
@@ -82,7 +82,7 @@ class Header extends ReactBaseComponent {
         <div className="header-bar__left">
           <div className="header-bar-prof">
             <img className="header-bar-prof__icon" src={photoURL} alt="" />
-            <p className="header-bar-prof__name">{name}{authrizeButton(isLogin)}</p>
+            <p className="header-bar-prof__name">{displayName}{authrizeButton(isLogin)}</p>
           </div>
           <div className="login-users">{usersNode}</div>
         </div>
