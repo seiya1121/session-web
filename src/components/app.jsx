@@ -35,7 +35,13 @@ class App extends ReactBaseComponent {
   }
 
   onUnload(e) {
-    const u = Object.assign(this.props.app.currentUser, { isHere: false });
+    const { currentUser } = this.props.app;
+    if (currentUser.isAnonymous) {
+      firebaseAuth.signOut().then(() => {
+        this.props.appActions.removeUser(currentUser.uid);
+      })
+    };
+    const u = Object.assign(currentUser, { isHere: false });
     this.props.appActions.postUser(u.uid, u);
   };
 
@@ -69,7 +75,6 @@ class App extends ReactBaseComponent {
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         if (user.isAnonymous) {
-          console.log('Anonymous');
           const temp = { displayName: 'User', photoURL: '../images/avatar.png', uid: user.uid, isAnonymous: user.isAnonymous };
           const u = userObj(temp, { accessToken: '', isHere: true });
           this.props.appActions.postUser(u.uid, u);
@@ -78,10 +83,12 @@ class App extends ReactBaseComponent {
           base.listenTo(`users/${user.uid}`, { context: this, asArray: false, then(data) {
             if(data) {
               const u = userObj(data, { accessToken: data.accessToken, isHere: true });
+              this.props.appActions.postUser(u.uid, u);
               this.props.appActions.setUser(u);
               this.getPlaylist(u);
             } else {
               const u = userObj(user, { accessToken: '', isHere: true });
+              this.props.appActions.postUser(u.uid, u);
               this.props.appActions.setUser(u);
               this.getPlaylist(u);
             }

@@ -3,9 +3,7 @@ import { base } from '../config/firebaseApp.js';
 
 const push = (stateName, data) => base.push(stateName, { data });
 const post = (stateName, data) => base.post(stateName, { data });
-const remove = (endPoint, successFunc) => {
-  base.remove(endPoint).then(() => successFunc && successFunc());
-};
+const remove = (endPoint) => base.remove(endPoint);
 
 // sync系
 export const postPlayingVideo = (video) => {
@@ -25,8 +23,8 @@ export const postUser = (uid, user) => {
   post(`users/${uid}`, user);
   return { type: App.POST_USER };
 };
-export const removeUser = (uid, successFunc) => {
-  remove(`users/${uid}`, successFunc);
+export const removeUser = (uid) => {
+  remove(`users/${uid}`);
   return { type: App.REMOVE_USER };
 }
 export const pushVideo = (video) => {
