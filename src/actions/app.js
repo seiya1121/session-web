@@ -22,7 +22,7 @@ export const postPlayingVideo = (video) => {
   return { type: App.POST_PLAYING_VIDEO };
 };
 export const postUser = (uid, user) => {
-  push(`users/${uid}`, user);
+  post(`users/${uid}`, user);
   return { type: App.POST_USER };
 };
 export const removeUser = (uid, successFunc) => {

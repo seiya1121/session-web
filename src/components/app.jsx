@@ -69,14 +69,15 @@ class App extends ReactBaseComponent {
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         if (user.isAnonymous) {
+          console.log('Anonymous');
           const temp = { displayName: 'User', photoURL: '../images/avatar.png', uid: user.uid, isAnonymous: user.isAnonymous };
           const u = userObj(temp, { accessToken: '', isHere: true });
           this.props.appActions.postUser(u.uid, u);
           this.props.appActions.setUser(u);
         } else {
-          base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
-            if(data.length > 0) {
-              const u = userObj(data[0], { accessToken: data[0].accessToken, isHere: true });
+          base.listenTo(`users/${user.uid}`, { context: this, asArray: false, then(data) {
+            if(data) {
+              const u = userObj(data, { accessToken: data.accessToken, isHere: true });
               this.props.appActions.setUser(u);
               this.getPlaylist(u);
             } else {
