@@ -3,7 +3,9 @@ import { base } from '../config/firebaseApp.js';
 
 const push = (stateName, data) => base.push(stateName, { data });
 const post = (stateName, data) => base.post(stateName, { data });
-const remove = (endPoint, successFunc) => base.remove(endPoint).then(successFunc());
+const remove = (endPoint, successFunc) => {
+  base.remove(endPoint).then(() => successFunc && successFunc());
+};
 const commentObj = (content, userName, type, keyword) => (
   Object.assign({}, { content, userName, type, keyword })
 );
