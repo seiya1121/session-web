@@ -48,12 +48,14 @@ class Header extends ReactBaseComponent {
 
   render(){
     const {app, appActions} = this.props;
-    const { displayName, photoURL, accessToken } = app.currentUser;
-    const isLogin = accessToken;
+    const { displayName, photoURL, isAnonymous } = app.currentUser;
+    const isLogin = !isAnonymous;
     const nextVideo = app.que[0];
-    const users = app.users.filter((u) => app.currentUser.uid !== u.key && Object.keys(u).map((k) => u[k][0]).isHere);
-    console.log(app.users)
-    console.log(users)
+    const rootObj = (obj) => {
+      const keys = Object.keys(obj);
+      return keys.map((k) => obj[k])[keys.length -1]
+    };
+    const users = app.users.filter((u) => app.currentUser.uid !== u.key && rootObj(u).isHere);
     const usersNode = users.map((u, i) => (
       <img className="login-users__icons" key={i} src={u.photoURL} alt={u.displayName} />
     ));

@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import { SyncStates, YoutubeApiUrl } from '../constants/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
-import { getAnimalName } from '../scripts/animal.js';
 import classNames from 'classnames';
 import { DefaultVideo } from '../constants/app';
 import ReactPlayer from 'react-player';
@@ -24,9 +23,8 @@ const channelsParams = (user) => (
 );
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
-const animalName = getAnimalName();
-const userObj = ({ displayName, photoURL, uid }, overrideState) => Object.assign(
-  { displayName, photoURL, uid }, overrideState
+const userObj = ({ displayName, photoURL, uid, isAnonymous }, overrideState) => Object.assign(
+  { displayName, photoURL, uid, isAnonymous }, overrideState
 );
 
 class App extends ReactBaseComponent {
@@ -64,7 +62,6 @@ class App extends ReactBaseComponent {
       if (result.credential) {
         const { accessToken } = result.credential;
         const user = userObj(result.user, { accessToken, isHere: true });
-        console.log(user);
         this.props.appActions.postUser(user.uid, user);
         this.props.appActions.setUser(user);
       }
@@ -72,7 +69,7 @@ class App extends ReactBaseComponent {
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         if (user.isAnonymous) {
-          const temp = { displayName: animalName, photoURL: '../images/avatar.png', uid: user.uid };
+          const temp = { displayName: 'User', photoURL: '../images/avatar.png', uid: user.uid, isAnonymous: user.isAnonymous };
           const u = userObj(temp, { accessToken: '', isHere: true });
           this.props.appActions.postUser(u.uid, u);
           this.props.appActions.setUser(u);
