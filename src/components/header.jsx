@@ -12,16 +12,18 @@ class Header extends ReactBaseComponent {
   }
 
   onClickSignIn() {
-    const { uid } = this.props.app.currentUser;
-    this.props.appActions.removeUser(uid);
+    const { uid, isAnonymous } = this.props.app.currentUser;
+    if(isAnonymous){
+      this.props.appActions.removeUser(uid);
+    }
     provider.addScope('https://www.googleapis.com/auth/youtube');
     firebaseAuth.signInWithRedirect(provider)
   }
 
   onClickSignOut() {
     const { uid } = this.props.app.currentUser;
+    this.props.appActions.removeUser(uid);
     firebaseAuth.signOut().then(() => {
-      this.props.appActions.removeUser(uid);
       firebaseAuth.signInAnonymously();
     });
   }

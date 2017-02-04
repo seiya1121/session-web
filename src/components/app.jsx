@@ -37,9 +37,8 @@ class App extends ReactBaseComponent {
   onUnload(e) {
     const { currentUser } = this.props.app;
     if (currentUser.isAnonymous) {
-      firebaseAuth.signOut().then(() => {
-        this.props.appActions.removeUser(currentUser.uid);
-      })
+      this.props.appActions.removeUser(currentUser.uid);
+      firebaseAuth.signOut();
     };
     const u = Object.assign(currentUser, { isHere: false });
     this.props.appActions.postUser(u.uid, u);
