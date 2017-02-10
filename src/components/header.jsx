@@ -87,7 +87,7 @@ class Header extends ReactBaseComponent {
         <input
           className={classNames('form-search', { 'is-search-active': app.isSearchActive })}
           type="text"
-          placeholder="Search videos"
+          placeholder="Search"
           onChange={(e) => { appActions.changeValueWithKey('searchText', e.target.value); }}
           onFocus={() => {
             appActions.changeValueWithKey('isSearchActive', true);
