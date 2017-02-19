@@ -24,6 +24,8 @@ const app = (state = App.InitialState, action) => {
   const newState = (obj) => Object.assign({}, state, obj);
   switch (action.type) {
     case App.CHANGE_VALUE_WITH_KEY:
+      console.log(action.key);
+						console.log(action.value);
       return newState({ [action.key]: action.value });
     case App.POST_PLAYING_VIDE:
       return state;
