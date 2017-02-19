@@ -39,10 +39,10 @@ class SearchResult extends ReactBaseComponent {
     const searchCategory = () => {
       if(!app.isPlaylistActive) {
         return (
-          <p className="list-group-title">
+          <div className="list-group-title">
             search for
             <span className="list-group-title__number">{app.searchedText}</span>
-          </p>
+          </div>
         )
       }
       if(app.isPlaylistActive && app.selectedPlaylist) {
@@ -61,11 +61,11 @@ class SearchResult extends ReactBaseComponent {
                 </div>
               </div>
             </li>
-            <p className="list-group-title"><strong>{app.selectedPlaylist}</strong></p>
+            <div className="list-group-title"><strong>{app.selectedPlaylist}</strong></div>
           </div>
         )
       }
-       return ( <p className="list-group-title">Playlists</p> );
+       return ( <div className="list-group-title">Playlists</div> );
     };
 
     const videoResult = (result, i) => (
@@ -130,9 +130,9 @@ class SearchResult extends ReactBaseComponent {
       >
         {/* Play list */}
         <div className="display-list">
-          <p className="list-group-title">
+          <div className="list-group-title">
             Up Coming <span className="list-group-title__number">{que.length}</span>
-          </p>
+          </div>
           <ul className="list-group">
             {queNode}
           </ul>
