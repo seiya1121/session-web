@@ -489,6 +489,27 @@ input {
   overflow: hidden;
   cursor: pointer;
 
+  animation: listItemAnimation .5s ease 0s 1 normal;
+
+  transform-origin: 0% 100%;
+
+  @keyframes listItemAnimation {
+    0% {
+      background: transparentize($color-white, 0);
+    }
+    100% {
+      background: transparentize($color-white, 1);
+    }
+  }
+  @-webkit-keyframes listItemAnimation {
+    0% {
+      background: transparentize($color-white, 0);
+    }
+    100% {
+      background: transparentize($color-white, 1);
+    }
+  }
+
   &:hover {
     background: transparentize($color-white, .8);
   }
