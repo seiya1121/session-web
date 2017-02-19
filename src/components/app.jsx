@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import { SyncStates, YoutubeApiUrl } from '../constants/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
+import Duration from '../scripts/duration';
 import classNames from 'classnames';
 import { DefaultVideo } from '../constants/app';
 import ReactPlayer from 'react-player';
@@ -218,7 +219,7 @@ class App extends ReactBaseComponent {
               </div>
             </div>
             <div className="progress-box__status">
-              <p>played {app.played.toFixed(3)}</p>
+														<Duration seconds={app.duration * app.played} />
             </div>
           </div>
 
