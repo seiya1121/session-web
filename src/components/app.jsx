@@ -218,7 +218,7 @@ class App extends ReactBaseComponent {
               </div>
             </div>
             <div className="progress-box__status">
-														{app.duration * app.played}
+              <p>{app.duration * app.played}</p>
             </div>
           </div>
 
