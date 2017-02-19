@@ -12,15 +12,19 @@ class Header extends ReactBaseComponent {
   }
 
   onClickSignIn() {
+    const { uid, isAnonymous } = this.props.app.currentUser;
+    if(isAnonymous){
+      this.props.appActions.removeUser(uid);
+    }
     provider.addScope('https://www.googleapis.com/auth/youtube');
     firebaseAuth.signInWithRedirect(provider)
   }
 
   onClickSignOut() {
     const { uid } = this.props.app.currentUser;
+    this.props.appActions.removeUser(uid);
     firebaseAuth.signOut().then(() => {
-      this.props.appActions.removeUser(uid);
-      this.props.appActions.setDefaultUser();
+      firebaseAuth.signInAnonymously();
     });
   }
 
@@ -44,33 +48,46 @@ class Header extends ReactBaseComponent {
 
   render(){
     const {app, appActions} = this.props;
-    const { accessToken, name, photoURL } = app.currentUser;
-    const isLogin = accessToken;
-
-    const usersNode = app.users.map((user, i) => (
-      <img key={i} src={user.photoURL} alt={user.name} />
+    const { displayName, photoURL, isAnonymous } = app.currentUser;
+    const isLogin = !isAnonymous;
+    const nextVideo = app.que[0];
+    const users = app.users.filter((u) => (app.currentUser.uid !== u.uid && u.isHere));
+    const usersNode = users.map((u, i) => (
+      <img className="login-users__icons" key={i} src={u.photoURL} alt={u.displayName} />
     ));
+    const authrizeButton = (isLogin) => (
+      (isLogin) ?
+        <a className="header-bar-prof__sign" onClick={this.onClickSignOut}>Sign Out</a> :
+        <a className="header-bar-prof__sign" onClick={this.onClickSignIn}>Sign In</a>
+    );
+    const playlistButton = (
+      <div
+        className={
+          classNames('button-playlist-list', { 'is-playlist-list': app.isPlaylistActive })
+        }
+        onClick={() => {
+          appActions.changeValueWithKey('isPlaylistActive', !app.isPlaylistActive);
+          appActions.changeValueWithKey('isSearchActive', !app.isPlaylistActive);
+          appActions.setSearchResult('playlist', app.playlists);
+        }}
+      >
+        <span />
+      </div>
+    )
 
     return(
       <div>
         <div className="header-bar__left">
           <div className="header-bar-prof">
             <img className="header-bar-prof__icon" src={photoURL} alt="" />
-            <p className="header-bar-prof__name">
-              {name}
-              {
-                (isLogin) ?
-                  <a className="header-bar-prof__sign" onClick={this.onClickSignOut}>Sign Out</a> :
-                  <a className="header-bar-prof__sign" onClick={this.onClickSignIn}>Sign In</a>
-              }
-            </p>
+            <p className="header-bar-prof__name">{displayName}{authrizeButton(isLogin)}</p>
           </div>
-          {usersNode}
+          <div className="login-users">{usersNode}</div>
         </div>
         <input
           className={classNames('form-search', { 'is-search-active': app.isSearchActive })}
           type="text"
-          placeholder="Search videos"
+          placeholder="Search"
           onChange={(e) => { appActions.changeValueWithKey('searchText', e.target.value); }}
           onFocus={() => {
             appActions.changeValueWithKey('isSearchActive', true);
@@ -81,18 +98,7 @@ class Header extends ReactBaseComponent {
           value={app.searchText}
         >
         </input>
-        <div
-          className={
-            classNames('button-playlist-list', { 'is-playlist-list': app.isPlaylistActive })
-          }
-          onClick={() => {
-            appActions.changeValueWithKey('isPlaylistActive', !app.isPlaylistActive);
-            appActions.changeValueWithKey('isSearchActive', !app.isPlaylistActive);
-            appActions.setSearchResult('playlist', app.playlists);
-          }}
-        >
-          <span />
-        </div>
+        {app.currentUser.accessToken !== '' && playlistButton}
         <div
           className={classNames('button-que-list', { 'is-quelist-list': app.isQueListActive })}
           onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}
@@ -101,6 +107,13 @@ class Header extends ReactBaseComponent {
           <span />
           <span />
         </div>
+        {
+          nextVideo &&
+            <div className='next-video' onClick={() => appActions.postPlayingVideo(nextVideo)}>
+              <img className='next-video-img' src={nextVideo.thumbnailUrl} alt=""/>
+              <p className='next-video-title'>{nextVideo.title}</p>
+            </div>
+        }
       </div>
     )
   }

@@ -151,6 +151,20 @@ input {
   }
 }
 
+.login-users {
+  position: absolute;
+  margin: -30px 0px 0 215px;
+
+  &__icons {
+    float: right;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    left: 15px;
+    top: 5px;
+  }
+}
+
 // button-que-list
 .button-que-list {
   float: right;
@@ -174,6 +188,31 @@ input {
     margin-top: 5px;
   }
 }
+.next-video-img {
+  width: 15%;
+  height: auto;
+  float: left;
+  margin: 0px 15px 10px 0;
+}
+
+.next-video-title {
+  width: 350px;
+  height: 10px;
+  margin: 13px 0 0 0;
+  position: relative;
+  cursor: pointer;
+
+}
+
+.next-video {
+  float: right;
+  width: auto;
+  height: 30px;
+  margin: 2px 0 0 0;
+  position: relative;
+  cursor: pointer;
+}
+
 
 // button-playlist-list
 .button-playlist-list {

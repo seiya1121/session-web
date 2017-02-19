@@ -1,12 +1,8 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
 import classNames from 'classnames';
-import { CommandType, CommentType} from '../constants/app';
+import { CommandType, CommentType, commentObj } from '../constants/app';
 import giphy from 'giphy-api';
-
-const commentObj = (content, user, type, keyword) => (
-  Object.assign({}, { content, user, type, keyword })
-);
 
 class Comments extends ReactBaseComponent {
   constructor(props) {
@@ -72,14 +68,14 @@ class Comments extends ReactBaseComponent {
               <img
                 className="comments-stream__img-prof"
                 src={comment.user.photoURL}
-                alt={comment.user.name}
+                alt={comment.user.displayName}
               />
               <div className="commemt-comment">
                 <div className="comment-single">
                   {comment.content}
                 </div>
                 <div className="comment-author">
-                  {comment.user.name}
+                  {comment.user.displayName}
                 </div>
               </div>
             </li>
@@ -87,7 +83,7 @@ class Comments extends ReactBaseComponent {
         case CommentType.log:
           return (
             <li key={i} className={commentClass(comment.type, i)}>
-              {comment.content} by {comment.userName}
+              {comment.content} by {comment.user.displayName}
             </li>
           );
         case CommentType.gif:
@@ -96,7 +92,7 @@ class Comments extends ReactBaseComponent {
               <p>{comment.keyword}</p>
               <img className="comments-stream__img-giphy" src={comment.content} alt=""></img>
               <div className="comment-author">
-                {comment.userName}
+                {comment.user.displayName}
               </div>
             </li>
           );

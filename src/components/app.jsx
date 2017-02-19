@@ -5,10 +5,12 @@ import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import { SyncStates, YoutubeApiUrl } from '../constants/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
+import Duration from '../scripts/duration';
 import classNames from 'classnames';
 import { DefaultVideo } from '../constants/app';
 import ReactPlayer from 'react-player';
 import 'whatwg-fetch';
+import Loading from 'react-loading';
 // Components
 import Header from './header';
 import SearchResult from './searchResult';
@@ -22,13 +24,26 @@ const channelsParams = (user) => (
 );
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
+const userObj = ({ displayName, photoURL, uid, isAnonymous }, overrideState) => Object.assign(
+  { displayName, photoURL, uid, isAnonymous }, overrideState
+);
 
 class App extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.bind('notification');
-    this.bind('onSeekMouseUp');
+    this.bind('onSeekMouseUp', 'getPlaylist', 'onUnload');
   }
+
+  onUnload(e) {
+    const { currentUser } = this.props.app;
+    if (currentUser.isAnonymous) {
+      this.props.appActions.removeUser(currentUser.uid);
+      firebaseAuth.signOut();
+    };
+    const u = Object.assign(currentUser, { isHere: false });
+    this.props.appActions.postUser(u.uid, u);
+  };
 
   onSeekMouseUp(e) {
     const played = parseFloat(e.target.value);
@@ -36,59 +51,88 @@ class App extends ReactBaseComponent {
     this.player.seekTo(played);
   }
 
+  getPlaylist(user) {
+    fetch(`${YoutubeApiUrl}/channels?${channelsParams(user)}`)
+      .then((response) => { return response.json(); })
+      .then((json) => {
+        const base = json.items[0].contentDetails.relatedPlaylists;
+        const lists = Object.keys(base)
+                            .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
+        this.props.appActions.setPlaylists(lists)
+      })
+      .catch((error) => console.log(error));
+  }
+
   componentWillMount() {
     firebaseAuth.getRedirectResult().then((result) => {
       if (result.credential) {
         const { accessToken } = result.credential;
-        const { uid, displayName, photoURL } = result.user;
-        this.props.appActions.postUser(uid, { name: displayName, photoURL, accessToken, uid });
+        const user = userObj(result.user, { accessToken, isHere: true });
+        this.props.appActions.postUser(user.uid, user);
+        this.props.appActions.setUser(user);
       }
     })
     firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
-        base.listenTo(`users/${user.uid}`, { context: this, asArray: true, then(data) {
-          this.props.appActions.setUser(data[0]);
-          fetch(`${YoutubeApiUrl}/channels?${channelsParams(data[0])}`)
-            .then((response) => { return response.json(); })
-            .then((json) => {
-              const base = json.items[0].contentDetails.relatedPlaylists;
-              const lists = Object.keys(base)
-                                  .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
-              this.props.appActions.setPlaylists(lists)
-            })
-        }})
+        if (user.isAnonymous) {
+          const temp = { displayName: 'User', photoURL: '../images/avatar.png', uid: user.uid, isAnonymous: user.isAnonymous };
+          const u = userObj(temp, { accessToken: '', isHere: true });
+          this.props.appActions.postUser(u.uid, u);
+          this.props.appActions.setUser(u);
+        } else {
+          base.listenTo(`users/${user.uid}`, { context: this, asArray: false, then(data) {
+            if(data) {
+              const u = userObj(data, { accessToken: data.accessToken, isHere: true });
+              this.props.appActions.postUser(u.uid, u);
+              this.props.appActions.setUser(u);
+              this.getPlaylist(u);
+            } else {
+              const u = userObj(user, { accessToken: '', isHere: true });
+              this.props.appActions.postUser(u.uid, u);
+              this.props.appActions.setUser(u);
+              this.getPlaylist(u);
+            }
+          }});
+        }
       } else {
-        this.props.appActions.setDefaultUser();
+        firebaseAuth.signInAnonymously();
       }
     })
-    SyncStates.forEach((obj) => {
-      const { state, asArray } = obj;
-      base.fetch(state, { context: this, asArray, then(data) {
-        this.props.appActions.updateSyncState(state, data);
-      }});
-    });
   }
 
   componentDidMount() {
+    window.addEventListener("beforeunload", this.onUnload);
+    const { appActions } = this.props;
+    SyncStates.forEach((obj, i) => {
+      const { state, asArray } = obj;
+      base.fetch(state, { context: this, asArray, then(data) {
+        appActions.updateSyncState(state, data);
+        (i + 1 === SyncStates.length) && appActions.changeValueWithKey('isLoadedSyncState', true);
+      }});
+    });
     base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
-      this.props.appActions.updatePlayed(startTime);
+      appActions.updatePlayed(startTime);
       this.player.seekTo(startTime);
     }});
     base.listenTo('playing', { context: this, asArray: false, then(playing) {
-      this.props.appActions.updatePlaying(playing);
+      appActions.updatePlaying(playing);
     }});
     base.listenTo('que', { context: this, asArray: true, then(que) {
-      this.props.appActions.updateQue(que);
+      appActions.updateQue(que);
     }});
     base.listenTo('comments', { context: this, asArray: true, then(comments) {
-      this.props.appActions.updateComments(comments);
+      appActions.updateComments(comments);
     }});
     base.listenTo('users', { context: this, asArray: true, then(users) {
-      this.props.appActions.updateUsers(users);
+      appActions.updateUsers(users);
     }});
     base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
-      this.props.appActions.updatePlayingVideo(video);
+      appActions.updatePlayingVideo(video);
     }});
+  }
+
+  componentWillUnmount(){
+     window.removeEventListener("beforeunload", this.onUnload);
   }
 
   notification(title, option) {
@@ -110,6 +154,7 @@ class App extends ReactBaseComponent {
           <Header app={app} appActions={appActions} />
         </header>
         <div className="main-display">
+          {!app.isLoadedSyncState && <Loading type='spinningBubbles' color='#26BFBA' />}
           <div className="display-youtube">
             <ReactPlayer
               ref={(player) => { this.player = player; }}
@@ -159,12 +204,6 @@ class App extends ReactBaseComponent {
                   {playingVideo.title} {playingVideo.displayName}
                 </p>
             }
-            {
-              !isPostPlayingVideo &&
-                <p className="progress-box__ttl">
-                  <span className="header-bar__text--message">Nothing to play.</span>
-                </p>
-            }
             <div className="progress-bar">
               <input
                 className="progress-bar__seek"
@@ -174,24 +213,18 @@ class App extends ReactBaseComponent {
                 onChange={(e) => appActions.changePlayed(parseFloat(e.target.value))}
                 onMouseUp={this.onSeekMouseUp}
               />
-              <div
-                className="progress-bar__played"
-                style={{ width: `${100 * app.played}%` }}
-              ></div>
-              <div
-                className="progress-bar__loaded"
-                style={{ width: `${100 * app.loaded}%` }}
-              ></div>
+              <div className="progress-bar__played" style={{ width: `${100 * app.played}%` }}>
+              </div>
+              <div className="progress-bar__loaded" style={{ width: `${100 * app.loaded}%` }}>
+              </div>
             </div>
             <div className="progress-box__status">
-              <p>played {app.played.toFixed(3)} / loaded {app.loaded.toFixed(3)}</p>
+														<Duration seconds={app.duration * app.played} />
             </div>
           </div>
 
           <div className="volume-box">
-            <p className="volume-box__ttl">
-              Volume
-            </p>
+            <p className="volume-box__ttl">Volume</p>
             <div className="volume-box__range-wrap">
               <input
                 className="volume-box__range"
@@ -203,6 +236,7 @@ class App extends ReactBaseComponent {
                 onChange={(e) => appActions.changeVolume(e.target.value)}
               />
             </div>
+            <p className="volume-box__ttl" onClick={() => appActions.changeVolume(0)}>mute</p>
           </div>
         </div>
       </div>
