@@ -44,8 +44,9 @@ export const changePlayed = (played) => {
   return { type: App.CHANGE_PLAYED, played };
 };
 export const play = () => ({ type: App.PLAY });
-export const pause = (startTime) => {
+export const pause = (startTime, duration) => {
   post('startTime', startTime);
+  post('currentTime', duration * startTime);
   return { type: App.PAUSE };
 };
 export const playPause = (isPlaying) => {

@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
 import { SyncStates, YoutubeApiUrl } from '../constants/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
-// import Duration from '../scripts/duration';
 import classNames from 'classnames';
 import { DefaultVideo } from '../constants/app';
 import ReactPlayer from 'react-player';
@@ -170,7 +169,7 @@ class App extends ReactBaseComponent {
               fileConfig={app.fileConfig}
               onReady={() => appActions.play()}
               onPlay={() => appActions.play()}
-              onPause={() => appActions.pause(app.played)}
+              onPause={() => appActions.pause(app.played, app.duration)}
               onEnded={() => appActions.postPlayingVideo(app.que[0])}
               onError={() => appActions.postPlayingVideo(app.que[0])}
               onProgress={appActions.progress}
@@ -187,7 +186,7 @@ class App extends ReactBaseComponent {
                 { 'play-controll__pause': app.playing },
                 { 'play-controll__play': !app.playing },
               )}
-              onClick={() => appActions.playPause(app.playing)}
+              onClick={() => appActions.playPause(app.playing, app.duration)}
             >
               &nbsp;
             </button>
@@ -219,7 +218,7 @@ class App extends ReactBaseComponent {
               </div>
             </div>
             <div className="progress-box__status">
-														{/*<Duration seconds={app.duration * app.played} />*/}
+														{app.duration * app.played}
             </div>
           </div>
 
