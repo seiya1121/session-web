@@ -258,95 +258,6 @@ input {
   padding: 0;
   overflow: auto;
 
-  .comments-stream {
-    position: absolute;
-    left: 0;
-    bottom: 40px;
-    padding: 0;
-    width: 100%;
-    overflow: hidden;
-
-    &__item {
-      margin: 10px 0 0;
-      position: relative;
-      list-style: none;
-      border-radius: 10px;
-      padding: 10px;
-      font-size: 12px;
-      background: transparentize($color-white, 0.2);
-      float: left;
-      clear: left;
-
-      opacity: 0;
-
-      &:nth-last-child(3) {
-        opacity: 0.4;
-        // background: transparentize($color-white, 0.8);
-      }
-      &:nth-last-child(2) {
-        opacity: 0.6;
-        // background: transparentize($color-white, 0.6);
-      }
-      &:nth-last-child(1) {
-        opacity: 1;
-        // background: transparentize($color-white, 0.2);
-      }
-
-      .is-active &,
-      .is-active &:nth-last-child(3),
-      .is-active &:nth-last-child(2),
-      .is-active &:nth-last-child(1){
-        opacity: 1;
-      }
-    }
-
-    &__img-prof {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      position: absolute;
-      left: 10px;
-      top: 10px;
-    }
-
-    &__img-giphy {
-      width: 100%;
-    }
-
-    &__item--play {
-      @extend .comments-stream__item;
-      background: $color-key;
-      background: transparentize($color-key, 0.2);
-      font-size: 12px;
-
-      &_0 {
-        opacity: 0.4;
-        // background: transparentize($color-key, 0.8);
-      }
-      &_1 {
-        opacity: 0.6;
-        // background: transparentize($color-key, 0.6);
-      }
-      &_2 {
-        background: transparentize($color-key, 0.2);
-      }
-    }
-
-    .commemt-comment {
-      padding-left: 40px;
-    }
-
-    .comment-single {
-      color: $color-black;
-      font-size: 22px;
-    }
-
-    .comment-author {
-      padding: 5px 0 0;
-      color: #777777;
-    }
-  }
-
   .comment-input {
     -webkit-app-region: no-drag;
 
@@ -369,6 +280,83 @@ input {
       width: calc( 30% - 40px );
       transition: .5s;
     }
+  }
+}
+
+.comments-stream {
+  position: absolute;
+  left: 0;
+  bottom: 40px;
+  padding: 0;
+  width: 100%;
+  overflow: hidden;
+
+  &__item {
+    margin: 10px 0 0;
+    position: relative;
+    list-style: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 12px;
+    background: transparentize($color-white, 0.2);
+    float: left;
+    clear: left;
+
+    opacity: 0;
+
+    &:nth-last-child(3) {
+      opacity: 0.4;
+      // background: transparentize($color-white, 0.8);
+    }
+    &:nth-last-child(2) {
+      opacity: 0.6;
+      // background: transparentize($color-white, 0.6);
+    }
+    &:nth-last-child(1) {
+      opacity: 1;
+      // background: transparentize($color-white, 0.2);
+    }
+  }
+
+  &.is-active .comments-stream__item,
+  &.is-active .comments-stream__item:nth-last-child(3),
+  &.is-active .comments-stream__item:nth-last-child(2),
+  &.is-active .comments-stream__item:nth-last-child(1){
+    opacity: 1;
+  }
+
+  &__img-prof {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+  }
+
+  &__img-giphy {
+    width: 100%;
+  }
+
+  &__item--play {
+    @extend .comments-stream__item;
+    background: $color-key;
+    background: transparentize($color-key, 0.2);
+    font-size: 12px;
+  }
+
+  .commemt-comment {
+    padding-left: 40px;
+  }
+
+  .comment-single {
+    color: $color-black;
+    font-size: 22px;
+  }
+
+  .comment-author {
+    padding: 5px 0 0;
+    color: #777777;
   }
 }
 
