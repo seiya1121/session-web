@@ -51,12 +51,10 @@ class Comments extends ReactBaseComponent {
     const commentClass = (type, index) => (
       (type === CommentType.log) ?
         classNames(
-          'comments-stream__item--play',
-          { [`comments-stream__item--play_${index}`]: !app.isCommentActive },
+          'comments-stream__item--play'
         ) :
         classNames(
-          'comments-stream__item',
-          { [`comments-stream__item_${index}`]: !app.isCommentActive },
+          'comments-stream__item'
         )
     );
 
