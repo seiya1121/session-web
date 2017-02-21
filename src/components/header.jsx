@@ -51,10 +51,10 @@ class Header extends ReactBaseComponent {
     const { displayName, photoURL, isAnonymous } = app.currentUser;
     const isLogin = !isAnonymous;
     const nextVideo = app.que[0];
-    const users = app.users.filter((u) => (app.currentUser.uid !== u.uid && u.isHere));
-    const usersNode = users.map((u, i) => (
-      <img className="login-users__icons" key={i} src={u.photoURL} alt={u.displayName} />
-    ));
+    // const users = app.users.filter((u) => (app.currentUser.uid !== u.uid && u.isHere));
+    // const usersNode = users.map((u, i) => (
+    //   <img className="login-users__icons" key={i} src={u.photoURL} alt={u.displayName} />
+    // ));
     const authrizeButton = (isLogin) => (
       (isLogin) ?
         <a className="header-bar-prof__sign" onClick={this.onClickSignOut}>Sign Out</a> :
@@ -73,7 +73,7 @@ class Header extends ReactBaseComponent {
       >
         <span />
       </div>
-    )
+    );
 
     return(
       <div>
@@ -82,7 +82,7 @@ class Header extends ReactBaseComponent {
             <img className="header-bar-prof__icon" src={photoURL} alt="" />
             <p className="header-bar-prof__name">{displayName}{authrizeButton(isLogin)}</p>
           </div>
-          <div className="login-users">{usersNode}</div>
+          {/*<div className="login-users">{usersNode}</div>*/}
         </div>
         <input
           className={classNames('form-search', { 'is-search-active': app.isSearchActive })}
