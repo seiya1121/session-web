@@ -33,7 +33,6 @@ export const InitialState = {
   users: [],
   playlists: [],
   playingVideo: DefaultVideo,
-  player: {},
   playing: true,
   startTime: 0,
   commentText: '',
