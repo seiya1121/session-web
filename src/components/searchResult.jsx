@@ -128,7 +128,6 @@ class SearchResult extends ReactBaseComponent {
           { 'is-quelist-list': app.isQueListActive },
         )}
       >
-        {/* Play list */}
         <div className="display-list">
           <div className="list-group-title">
             Up Coming <span className="list-group-title__number">{que.length}</span>
