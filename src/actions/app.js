@@ -1,5 +1,6 @@
 import * as App from '../constants/app';
 import { base } from '../config/firebaseApp.js';
+import { createAction } from 'redux-actions';
 
 const push = (stateName, data) => base.push(stateName, { data });
 const post = (stateName, data) => base.post(stateName, { data });
@@ -62,7 +63,7 @@ export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (resultType, result) => ({
   type: App.SET_SEARCH_RESULT, result, resultType
 });
-export const seekDown = () => ({ type: App.SEEK_DOWN });
+export const seekDown = createAction(App.SEEK_DOWN);
 export const seekUp = (played) => ({ type: App.SEEK_UP, played });
 export const progress = (state) => ({ type: App.PROGRESS, state });
 export const updateSyncState = (key, value) => ({ type: App.UPDATE_SYNC_STATE, key, value });
