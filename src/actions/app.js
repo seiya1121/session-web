@@ -59,7 +59,7 @@ export const playPause = (isPlaying) => {
 export const changeValueWithKey = createAction(App.CHANGE_VALUE_WITH_KEY,
   (key, value) => ({ key, value })
 );
-export const setUser = (user) => ({ type: App.SET_USER, user });
+export const setUser = createAction(App.SET_USER, (user) => ({user}));
 export const setPlaylists = (playlists) => ({ type: App.SET_PLAYLISTS, playlists });
 export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
 export const setSearchResult = (resultType, result) => ({
