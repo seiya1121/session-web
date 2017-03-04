@@ -61,7 +61,7 @@ export const changeValueWithKey = createAction(App.CHANGE_VALUE_WITH_KEY,
 );
 export const setUser = createAction(App.SET_USER, (user) => ({user}));
 export const setPlaylists = createAction(App.SET_PLAYLISTS, (playlists) => ({playlists}));
-export const changeVolume = (volume) => ({ type: App.CHANGE_VOLUME, volume });
+export const changeVolume = createAction(App.CHANGE_VOLUME, (volume) => ({ volume }));
 export const setSearchResult = (resultType, result) => ({
   type: App.SET_SEARCH_RESULT, result, resultType
 });
