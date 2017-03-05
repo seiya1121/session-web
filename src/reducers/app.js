@@ -22,11 +22,10 @@ const resultObj = (item, resultType) => {
 
 const app = (state = App.InitialState, action) => {
   const newState = (obj) => Object.assign({}, state, obj);
+  const { payload } = action;
   switch (action.type) {
     case App.CHANGE_VALUE_WITH_KEY:
-      console.log(action.key);
-						console.log(action.value);
-      return newState({ [action.key]: action.value });
+      return newState({ [payload.key]: payload.value });
     case App.POST_PLAYING_VIDE:
       return state;
     case App.REMOVE_VIDEO:
@@ -42,40 +41,40 @@ const app = (state = App.InitialState, action) => {
     case App.REMOVE_USER:
       return state;
     case App.SET_USER:
-      return newState({ currentUser: action.user });
+      return newState({ currentUser: payload.user });
     case App.SET_PLAYLISTS:
-      return newState({ playlists: action.playlists });
+      return newState({ playlists: payload.playlists });
     case App.ADD_COMMENT:
       return newState({ commentText: '', isCommentActive: false });
     case App.CHANGE_VOLUME:
-      return newState({ volume: parseFloat(action.volume) });
+      return newState({ volume: parseFloat(payload.volume) });
     case App.SEEK_DOWN:
       return newState({ seeking: true });
     case App.SEEK_UP:
-      return newState({ seeking: false, startTime: action.played });
+      return newState({ seeking: false, startTime: payload.played });
     case App.CHANGE_PLAYED:
-      return newState({ played: action.played, seeking: false });
+      return newState({ played: payload.played, seeking: false });
     case App.PROGRESS:
-      const { played, loaded } = action.state;
+      const { played, loaded } = payload.state;
       const playingStatus = (loaded) ? { played, loaded } : { played };
       return !state.seeking ? newState(playingStatus) : state;
     case App.SET_SEARCH_RESULT:
-      const { result, resultType } = action;
+      const { result, resultType } = payload;
       const tempResult = (resultType === 'playlistVideo') ?
         result.items.filter((item) => item.snippet.title !== "Deleted video") : result;
       return newState({ searchResult: tempResult.map((item) =>  resultObj(item, resultType)) });
     case App.UPDATE_SYNC_STATE:
-      return newState({ [action.key]: action.value });
+      return newState({ [payload.key]: payload.value });
     case App.UPDATE_QUE:
-      return newState({ que: action.que });
+      return newState({ que: payload.que });
     case App.UPDATE_COMMENTS:
-      return newState({ comments: action.comments });
+      return newState({ comments: payload.comments });
     case App.UPDATE_PLAYED:
-      return newState({ played: action.played });
+      return newState({ played: payload.played });
     case App.UPDATE_PLAYING:
-      return newState({ playing: action.playing });
+      return newState({ playing: payload.playing });
     case App.UPDATE_PLAYING_VIDEO:
-    const playingVideo = Object.keys(action.video).length === 0 ? App.DefaultVideo : action.video;
+    const playingVideo = Object.keys(payload.video).length === 0 ? App.DefaultVideo : payload.video;
       return newState({
         playing: true,
         startTime: 0,
@@ -83,7 +82,7 @@ const app = (state = App.InitialState, action) => {
         que: state.que.filter((item) => item.key !== playingVideo.key),
       });
     case App.UPDATE_USERS:
-      return newState({ users: action.users });
+      return newState({ users: payload.users });
     case App.UPDATE_SEARCH_RESULT:
       return newState({ searchResult: app.lists, isSearchActive: true });
     default:
