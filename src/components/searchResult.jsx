@@ -3,7 +3,7 @@ import ReactBaseComponent from './reactBaseComponent';
 import classNames from 'classnames';
 import { YoutubeApiUrl } from '../constants/app';
 import 'whatwg-fetch';
-import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
+import { SortableContainer, SortableElement, arrayMove, SortableHandle } from 'react-sortable-hoc';
 
 const playlistItemsParams = (accessToken, playlistId) => (
   `access_token=${accessToken}&part=snippet&playlistId=${playlistId}&maxResults=50`
@@ -42,9 +42,10 @@ class SearchResult extends ReactBaseComponent {
 
   render(){
     const { app, appActions } = this.props;
-
+				const DragHandle = SortableHandle(() => <span>::</span>);
     const VideoList = SortableElement(({ video }) =>
       <li key={video.key} className="list-group-item">
+        <DragHandle />
         <div
           className="list-group-item__click"
           onClick={() => appActions.postPlayingVideo(video)}
@@ -150,7 +151,7 @@ class SearchResult extends ReactBaseComponent {
             Up Coming <span className="list-group-title__number">{app.que.length}</span>
           </div>
           <ul className="list-group">
-            <SortableQueList que={app.que} onSortEnd={this.onSortEnd} />
+            <SortableQueList que={app.que} onSortEnd={this.onSortEnd} useDragHandle={true} />
           </ul>
         </div>
         <div className="display-search">
