@@ -10,6 +10,7 @@ import { DefaultVideo } from '../constants/app';
 import ReactPlayer from 'react-player';
 import 'whatwg-fetch';
 import Loading from 'react-loading';
+
 // Components
 import Header from './header';
 import SearchResult from './searchResult';
