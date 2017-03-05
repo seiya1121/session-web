@@ -109,7 +109,7 @@ class Header extends ReactBaseComponent {
         </div>
         {
           nextVideo &&
-            <div className='next-video' onClick={() => appActions.postPlayingVideo(nextVideo)}>
+            <div className='next-video'>
               <img className='next-video-img' src={nextVideo.thumbnailUrl} alt=""/>
               <p className='next-video-title'>{nextVideo.title}</p>
             </div>

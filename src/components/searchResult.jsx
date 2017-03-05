@@ -3,6 +3,7 @@ import ReactBaseComponent from './reactBaseComponent';
 import classNames from 'classnames';
 import { YoutubeApiUrl } from '../constants/app';
 import 'whatwg-fetch';
+import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 
 const playlistItemsParams = (accessToken, playlistId) => (
   `access_token=${accessToken}&part=snippet&playlistId=${playlistId}&maxResults=50`
@@ -13,8 +14,14 @@ const videoObject = (video, user) => Object.assign(video, { user });
 class SearchResult extends ReactBaseComponent {
   constructor(props) {
     super(props);
-    this.bind('getPlaylistVideos', 'onClickSetQue');
+    this.bind('getPlaylistVideos', 'onClickSetQue', 'onSortEnd');
   }
+
+		onSortEnd({oldIndex, newIndex}) {
+    const { que } = this.props.app;
+				this.props.appActions.updateQue(arrayMove(que, oldIndex, newIndex));
+
+		};
 
   onClickSetQue(video) {
     const { que, currentUser, playingVideo } = this.props.app;
@@ -35,7 +42,38 @@ class SearchResult extends ReactBaseComponent {
 
   render(){
     const { app, appActions } = this.props;
-    const que = app.que.filter((item) => item.key !== app.que[0].key)
+
+    const VideoList = SortableElement(({ video }) =>
+      <li key={video.key} className="list-group-item">
+        <div
+          className="list-group-item__click"
+          onClick={() => appActions.postPlayingVideo(video)}
+        >
+          <img
+            className="list-group-item__thumbnail"
+            src={video.thumbnailUrl}
+            alt=""
+          />
+          <div className="list-group-item__body">
+            <strong>{video.title}</strong>
+            <p className="list-group-item__name">added by {video.user.displayName}</p>
+          </div>
+        </div>
+        <div className="list-group-item__close" onClick={() => appActions.removeVideo(video)}>
+        </div>
+      </li>
+    );
+
+    const SortableQueList = SortableContainer(({que}) => {
+						return (
+        <ul>
+          {que.map((video, i) =>
+            <VideoList key={i} index={i} video={video} />
+          )}
+        </ul>
+						);
+				})
+
     const searchCategory = () => {
       if(!app.isPlaylistActive) {
         return (
@@ -99,27 +137,6 @@ class SearchResult extends ReactBaseComponent {
       (result.type === 'video') ? videoResult(result, i) : listResult(result, i)
     ));
 
-    const queNode = que.map((video) => (
-      <li key={video.key} className="list-group-item">
-        <div
-          className="list-group-item__click"
-          onClick={() => appActions.postPlayingVideo(video)}
-        >
-          <img
-            className="list-group-item__thumbnail"
-            src={video.thumbnailUrl}
-            alt=""
-          />
-          <div className="list-group-item__body">
-            <strong>{video.title}</strong>
-            <p className="list-group-item__name">added by {video.user.displayName}</p>
-          </div>
-        </div>
-        <div className="list-group-item__close" onClick={() => appActions.removeVideo(video)}>
-        </div>
-      </li>
-    ));
-
     return (
       <div
         className={classNames(
@@ -130,10 +147,10 @@ class SearchResult extends ReactBaseComponent {
       >
         <div className="display-list">
           <div className="list-group-title">
-            Up Coming <span className="list-group-title__number">{que.length}</span>
+            Up Coming <span className="list-group-title__number">{app.que.length}</span>
           </div>
           <ul className="list-group">
-            {queNode}
+            <SortableQueList que={app.que} onSortEnd={this.onSortEnd} />
           </ul>
         </div>
         <div className="display-search">
