@@ -8,11 +8,19 @@ import giphy from 'giphy-api';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux';
 import * as CommentsActions from '../actions/comments';
+import { base } from '../config/firebaseApp';
 
 class Comments extends ReactBaseComponent {
   constructor(props) {
     super(props);
     this.bind('setGifUrl', 'onKeyPressForComment');
+  }
+
+		componentDidMount() {
+				const { actions } = this.props;
+				base.listenTo('comments', { context: this, asArray: true, then(comments) {
+						actions.updateComments(comments);
+				}});
   }
 
   setGifUrl(keyword) {
@@ -36,20 +44,17 @@ class Comments extends ReactBaseComponent {
     } else {
       const comment = commentObj(
         commentText,
-        this.props.state.currentUser,
+        this.props.currentUser,
         CommentType.text,
         ''
       );
-      this.props.actions.addComment(comment);
+      this.props.actions.asyncAddComment(comment);
     }
     return true;
   }
 
   render() {
     const {state, actions} = this.props;
-
-    // const comments = state.comments;
-
     const comments = (state.isCommentActive) ?
      state.comments : state.comments.slice(state.comments.length - 3, state.comments.length);
 

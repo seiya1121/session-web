@@ -7,15 +7,20 @@ import createLogger from 'redux-logger';
 // Reducers
 import app from './reducers/app';
 import comments from './reducers/comments';
+import rootSaga from './sagas/index';
+import createSagaMiddleware from 'redux-saga';
 
+const sagaMiddleware = createSagaMiddleware();
 const logger = createLogger();
 
 const reducer = combineReducers({ app, comments });
 
 const store = createStore(
   reducer,
-  applyMiddleware(logger)
+  applyMiddleware(logger, sagaMiddleware)
 );
+
+sagaMiddleware.run(rootSaga);
 
 ReactDOM.render(
   <Provider store={store}><App /></Provider>,

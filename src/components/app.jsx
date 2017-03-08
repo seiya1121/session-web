@@ -120,9 +120,6 @@ class App extends ReactBaseComponent {
     base.listenTo('que', { context: this, asArray: true, then(que) {
       appActions.updateQue(que);
     }});
-    base.listenTo('comments', { context: this, asArray: true, then(comments) {
-      appActions.updateComments(comments);
-    }});
     base.listenTo('users', { context: this, asArray: true, then(users) {
       appActions.updateUsers(users);
     }});
