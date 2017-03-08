@@ -74,7 +74,7 @@ class SearchResult extends ReactBaseComponent {
             <p className="list-group-item__name">added by {video.user.displayName}</p>
           </div>
         </div>
-        <div className="list-group-item__close" onClick={() => actions.removeVideo(video)}>
+        <div className="list-group-item__close" onClick={() => actions.asyncRemoveVideo(video.key)}>
         </div>
       </li>
     );
