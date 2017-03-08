@@ -1,4 +1,35 @@
-import * as App from '../constants/app';
+import * as App from '../action_types/app';
+
+export const DefaultUser = Object.assign({ name: '', photoURL: '', accessToken: '', uid: '' });
+export const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url: '' }, displayName: '' });
+
+const InitialState = {
+		currentUser: DefaultUser,
+		searchResult: [],
+		que: [],
+		users: [],
+		playlists: [],
+		playingVideo: DefaultVideo,
+		playing: true,
+		startTime: 0,
+		displayName: '',
+		mailAddressForSignUp: '',
+		passwordForSignUp: '',
+		mailAddressForSignIn: '',
+		passwordForSignIn: '',
+		searchText: '',
+		searchedText: '',
+		selectedPlaylist: '',
+		volume: 0.8,
+		played: 0,
+		loaded: 0,
+		duration: 0,
+		seeking: false,
+		isSearchActive: false,
+		isQueListActive: false,
+		isPlaylistActive: false,
+		isLoadedSyncState: false,
+};
 
 const resultObj = (item, resultType) => {
   switch (resultType) {
@@ -20,7 +51,7 @@ const resultObj = (item, resultType) => {
   }
 }
 
-const app = (state = App.InitialState, action) => {
+const app = (state = InitialState, action) => {
   const newState = (obj) => Object.assign({}, state, obj);
   const { payload } = action;
   switch (action.type) {
@@ -44,8 +75,6 @@ const app = (state = App.InitialState, action) => {
       return newState({ currentUser: payload.user });
     case App.SET_PLAYLISTS:
       return newState({ playlists: payload.playlists });
-    case App.ADD_COMMENT:
-      return newState({ commentText: '', isCommentActive: false });
     case App.CHANGE_VOLUME:
       return newState({ volume: parseFloat(payload.volume) });
     case App.SEEK_DOWN:
@@ -67,8 +96,6 @@ const app = (state = App.InitialState, action) => {
       return newState({ [payload.key]: payload.value });
     case App.UPDATE_QUE:
       return newState({ que: payload.que });
-    case App.UPDATE_COMMENTS:
-      return newState({ comments: payload.comments });
     case App.UPDATE_PLAYED:
       return newState({ played: payload.played });
     case App.UPDATE_PLAYING:

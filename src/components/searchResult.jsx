@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactBaseComponent from './reactBaseComponent';
 import classNames from 'classnames';
-import { YoutubeApiUrl } from '../constants/app';
+import { YoutubeApiUrl } from '../action_types/app';
 import 'whatwg-fetch';
 import { SortableContainer, SortableElement, arrayMove, SortableHandle } from 'react-sortable-hoc';
 

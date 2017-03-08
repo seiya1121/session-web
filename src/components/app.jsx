@@ -3,10 +3,10 @@ import ReactBaseComponent from './reactBaseComponent';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
-import { SyncStates, YoutubeApiUrl } from '../constants/app';
+import { SyncStates, YoutubeApiUrl } from '../action_types/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
 import classNames from 'classnames';
-import { DefaultVideo } from '../constants/app';
+import { DefaultVideo } from '../action_types/app';
 import ReactPlayer from 'react-player';
 import 'whatwg-fetch';
 import Loading from 'react-loading';
@@ -150,9 +150,7 @@ class App extends ReactBaseComponent {
 
     return (
       <div className="contents">
-        <header className="header-bar">
-          <Header app={app} appActions={appActions} />
-        </header>
+        <Header app={app} appActions={appActions} />
         <div className="main-display">
           {!app.isLoadedSyncState && <Loading type='spinningBubbles' color='#26BFBA' />}
           <div className="display-youtube">
@@ -177,7 +175,7 @@ class App extends ReactBaseComponent {
               onDuration={(duration) => appActions.changeValueWithKey('duration', duration)}
             />
           </div>
-          <Comments app={app} appActions={appActions} />
+          <Comments currentUser={app.currentUser} />
           <SearchResult app={app} appActions={appActions}/>
         </div>
         <div className="footer-bar">

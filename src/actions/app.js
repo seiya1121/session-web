@@ -1,4 +1,4 @@
-import * as App from '../constants/app';
+import * as App from '../action_types/app';
 import { base } from '../config/firebaseApp.js';
 import { createAction } from 'redux-actions';
 

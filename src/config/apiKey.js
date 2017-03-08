@@ -1,7 +1,10 @@
+const isProduction = process.env.NODE_ENV === 'production';
+
 export const FIREBASE_CONFIG = {
-  apiKey: process.env.REACT_APP_FIREBASE_DEV_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_DEV_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_FIREBASE_DEV_DATABASE_URL,
-  storageBucket: process.env.REACT_APP_FIREBASE_DEV_STORAGE_BUCKET,
+  apiKey: isProduction ? process.env.REACT_APP_FIREBASE_DEV_API_KEY : process.env.REACT_APP_DEV_FIREBASE_API_KEY,
+  authDomain: isProduction ? process.env.REACT_APP_FIREBASE_DEV_AUTH_DOMAIN : process.env.REACT_APP_DEV_FIREBASE_AUTH_DOMAIN,
+  databaseURL: isProduction ? process.env.REACT_APP_FIREBASE_DEV_DATABASE_URL : process.env.REACT_APP_DEV_FIREBASE_DATABASE_URL,
+  storageBucket: isProduction ? process.env.REACT_APP_FIREBASE_DEV_STORAGE_BUCKET : process.env.REACT_APP_DEV_FIREBASE_STORAGE_BUCKET,
 };
+
 export const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;

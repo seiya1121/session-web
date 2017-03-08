@@ -76,7 +76,7 @@ class Header extends ReactBaseComponent {
     );
 
     return(
-      <div>
+      <header className="header-bar">
         <div className="header-bar__left">
           <div className="header-bar-prof">
             <img className="header-bar-prof__icon" src={photoURL} alt="" />
@@ -114,7 +114,7 @@ class Header extends ReactBaseComponent {
               <p className='next-video-title'>{nextVideo.title}</p>
             </div>
         }
-      </div>
+      </header>
     )
   }
 }
