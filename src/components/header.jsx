@@ -93,6 +93,7 @@ class Header extends ReactBaseComponent {
             appActions.changeValueWithKey('searchResult', []);
             appActions.changeValueWithKey('isPlaylistActive', false);
           }}
+          onBlur={() => appActions.changeValueWithKey('isSearchActive', false)}
           onKeyPress={this.onKeyPressForSearch}
           value={app.searchText}
         >

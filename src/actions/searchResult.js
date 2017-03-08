@@ -11,6 +11,3 @@ export const setSearchResult = createAction(Types.SET_SEARCH_RESULT,
 		(resultType, result) => ({result, resultType})
 );
 export const updateQue = createAction(Types.UPDATE_QUE, (que) => ({ que }));
-export const updateComments = createAction(Types.UPDATE_COMMENTS, (comments) => ({ comments }));
-export const updatePlayingVideo = createAction(Types.UPDATE_PLAYING_VIDEO, (video) => ({ video }));
-export const setPlaylistToResult = createAction(Types.UPDATE_SEARCH_RESULT, (results) => ({ results }));
