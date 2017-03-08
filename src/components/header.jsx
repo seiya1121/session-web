@@ -50,7 +50,6 @@ class Header extends ReactBaseComponent {
     const {app, appActions} = this.props;
     const { displayName, photoURL, isAnonymous } = app.currentUser;
     const isLogin = !isAnonymous;
-    const nextVideo = app.que[0];
     // const users = app.users.filter((u) => (app.currentUser.uid !== u.uid && u.isHere));
     // const usersNode = users.map((u, i) => (
     //   <img className="login-users__icons" key={i} src={u.photoURL} alt={u.displayName} />
@@ -107,13 +106,6 @@ class Header extends ReactBaseComponent {
           <span />
           <span />
         </div>
-        {
-          nextVideo &&
-            <div className='next-video'>
-              <img className='next-video-img' src={nextVideo.thumbnailUrl} alt=""/>
-              <p className='next-video-title'>{nextVideo.title}</p>
-            </div>
-        }
       </header>
     )
   }

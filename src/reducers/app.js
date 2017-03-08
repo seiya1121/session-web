@@ -5,10 +5,8 @@ export const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url:
 
 const InitialState = {
 		currentUser: DefaultUser,
-		searchResult: [],
-		que: [],
 		users: [],
-		playlists: [],
+		searchResult: [],
 		playingVideo: DefaultVideo,
 		playing: true,
 		startTime: 0,
@@ -19,7 +17,6 @@ const InitialState = {
 		passwordForSignIn: '',
 		searchText: '',
 		searchedText: '',
-		selectedPlaylist: '',
 		volume: 0.8,
 		played: 0,
 		loaded: 0,
@@ -32,24 +29,24 @@ const InitialState = {
 };
 
 const resultObj = (item, resultType) => {
-  switch (resultType) {
-    case 'search':
-      return {
-        id: item.id.videoId,
-        title: item.snippet.title,
-        thumbnailUrl: item.snippet.thumbnails.default.url,
-        type: 'video',
-      };
-    case 'playlistVideo':
-      const { resourceId, title, thumbnails } = item.snippet;
-      return { id: resourceId.videoId, title, thumbnailUrl: thumbnails.default.url, type: 'video' };
-    case 'playlist':
-      const { id, thumbnailUrl } = item;
-      return { id, title: item.title, thumbnailUrl, type: 'list', };
-    default:
-      return {};
-  }
-}
+		switch (resultType) {
+				case 'search':
+						return {
+								id: item.id.videoId,
+								title: item.snippet.title,
+								thumbnailUrl: item.snippet.thumbnails.default.url,
+								type: 'video',
+						};
+				case 'playlistVideo':
+						const { resourceId, title, thumbnails } = item.snippet;
+						return { id: resourceId.videoId, title, thumbnailUrl: thumbnails.default.url, type: 'video' };
+				case 'playlist':
+						const { id, thumbnailUrl } = item;
+						return { id, title: item.title, thumbnailUrl, type: 'list', };
+				default:
+						return {};
+		}
+};
 
 const app = (state = InitialState, action) => {
   const newState = (obj) => Object.assign({}, state, obj);
@@ -57,8 +54,6 @@ const app = (state = InitialState, action) => {
   switch (action.type) {
     case App.CHANGE_VALUE_WITH_KEY:
       return newState({ [payload.key]: payload.value });
-    case App.POST_PLAYING_VIDE:
-      return state;
     case App.REMOVE_VIDEO:
       return state;
     case App.PLAY:
@@ -69,12 +64,8 @@ const app = (state = InitialState, action) => {
       return state;
     case App.POST_USER:
       return state;
-    case App.REMOVE_USER:
-      return state;
     case App.SET_USER:
       return newState({ currentUser: payload.user });
-    case App.SET_PLAYLISTS:
-      return newState({ playlists: payload.playlists });
     case App.CHANGE_VOLUME:
       return newState({ volume: parseFloat(payload.volume) });
     case App.SEEK_DOWN:
@@ -94,8 +85,6 @@ const app = (state = InitialState, action) => {
       return newState({ searchResult: tempResult.map((item) =>  resultObj(item, resultType)) });
     case App.UPDATE_SYNC_STATE:
       return newState({ [payload.key]: payload.value });
-    case App.UPDATE_QUE:
-      return newState({ que: payload.que });
     case App.UPDATE_PLAYED:
       return newState({ played: payload.played });
     case App.UPDATE_PLAYING:
@@ -110,8 +99,6 @@ const app = (state = InitialState, action) => {
       });
     case App.UPDATE_USERS:
       return newState({ users: payload.users });
-    case App.UPDATE_SEARCH_RESULT:
-      return newState({ searchResult: app.lists, isSearchActive: true });
     default:
       return state;
   }

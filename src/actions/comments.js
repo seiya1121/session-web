@@ -2,7 +2,7 @@ import * as Types from '../action_types/comments';
 import { createAction } from 'redux-actions';
 
 // sync系
-export const asyncAddComment = createAction(Types.ASYNC_ADD_COMMENT, (comment) => ({ comment }));
+export const asyncPushComment = createAction(Types.ASYNC_PUSH_COMMENT, (comment) => ({ comment }));
 
 // local系
 export const changeCommentText = createAction(Types.CHANGE_COMMENT_TEXT, (comment) => ({ comment }));

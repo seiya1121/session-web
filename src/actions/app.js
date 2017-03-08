@@ -32,10 +32,6 @@ export const pushVideo = (video) => {
   push('que', video);
   return { type: App.PUSH_VIDEO };
 };
-export const addComment = (comment) => {
-  push('comments', comment);
-  return { type: App.ADD_COMMENT };
-};
 export const removeVideo = (video) => {
   remove(`que/${video.key}`);
   return { type: App.REMOVE_VIDEO };

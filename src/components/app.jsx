@@ -117,9 +117,6 @@ class App extends ReactBaseComponent {
     base.listenTo('playing', { context: this, asArray: false, then(playing) {
       appActions.updatePlaying(playing);
     }});
-    base.listenTo('que', { context: this, asArray: true, then(que) {
-      appActions.updateQue(que);
-    }});
     base.listenTo('users', { context: this, asArray: true, then(users) {
       appActions.updateUsers(users);
     }});
@@ -173,7 +170,13 @@ class App extends ReactBaseComponent {
             />
           </div>
           <Comments currentUser={app.currentUser} />
-          <SearchResult app={app} appActions={appActions}/>
+          <SearchResult
+            currentUser={app.currentUser}
+            searchedText={app.searchedText}
+            isSearchActive={app.isSearchActive}
+            isQueListActive={app.isQueListActive}
+            searchResult={app.searchResult}
+          />
         </div>
         <div className="footer-bar">
           <div className="play-controll">

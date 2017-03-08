@@ -29,7 +29,7 @@ class Comments extends ReactBaseComponent {
     giphyApp.random(key).then((res) => {
       const imageUrl = res.data.fixed_height_downsampled_url;
       const comment = commentObj(imageUrl, this.props.currentUser, CommentType.gif, key);
-      this.props.actions.addComment(comment);
+      this.props.actions.asyncPushComment(comment);
     });
   }
 
@@ -48,7 +48,7 @@ class Comments extends ReactBaseComponent {
         CommentType.text,
         ''
       );
-      this.props.actions.asyncAddComment(comment);
+      this.props.actions.asyncPushComment(comment);
     }
     return true;
   }

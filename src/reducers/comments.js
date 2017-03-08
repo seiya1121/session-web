@@ -14,8 +14,6 @@ const comments = (state = InitialState, action) => {
 						return newState({ commentText: payload.comment });
 				case Types.CHANGE_IS_COMMENT_ACTIVE:
 						return newState({ isCommentActive: payload.value });
-				case Types.ADD_COMMENT:
-						return newState({ commentText: '', isCommentActive: false });
 				case Types.UPDATE_COMMENTS:
 						return newState({ comments: payload.comments });
 				default:

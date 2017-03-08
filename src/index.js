@@ -7,13 +7,14 @@ import createLogger from 'redux-logger';
 // Reducers
 import app from './reducers/app';
 import comments from './reducers/comments';
+import searchResult from './reducers/searchResult';
 import rootSaga from './sagas/index';
 import createSagaMiddleware from 'redux-saga';
 
 const sagaMiddleware = createSagaMiddleware();
 const logger = createLogger();
 
-const reducer = combineReducers({ app, comments });
+const reducer = combineReducers({ app, comments, searchResult });
 
 const store = createStore(
   reducer,
