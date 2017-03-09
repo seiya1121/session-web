@@ -11,3 +11,8 @@ export const setSearchResult = createAction(Types.SET_SEARCH_RESULT,
 		(resultType, result) => ({result, resultType})
 );
 export const updateQue = createAction(Types.UPDATE_QUE, (que) => ({ que }));
+
+// success系
+export const successPostPlayingVideo = createAction(Types.SUCCESS_POST_PLAYING_VIDEO,
+		(video) => ({ video })
+);

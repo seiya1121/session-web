@@ -116,8 +116,7 @@ input {
   &.is-search-active {
     color: $color-black;
     background: $color-white;
-    margin: 5px 20px 0 20px;
-    width: calc( 30% - 40px );
+    width: calc( 30% - 55px );
     transition: .5s;
   }
 }
@@ -181,6 +180,30 @@ input {
   }
 
   &.is-quelist-list span {
+    background: $color-key;
+  }
+
+  span + span {
+    margin-top: 5px;
+  }
+}
+
+// button-search-list
+.button-search-list {
+  float: right;
+  width: 17px;
+  height: 30px;
+  margin: 13px 15px 0 0;
+  position: relative;
+  cursor: pointer;
+
+  span {
+    display: block;
+    height: 1px;
+    background: $color-white;
+  }
+
+  &.is-search-active span {
     background: $color-key;
   }
 

@@ -1,6 +1,7 @@
-import { call, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
 import { push, post, remove } from '../scripts/db';
 import * as Types from '../action_types/searchResult';
+import * as Actions from '../actions/searchResult';
 
 function* pushVideo({ payload }) {
 		yield call(() => push('que', payload.video));
@@ -8,6 +9,7 @@ function* pushVideo({ payload }) {
 
 function* postPlayingVideo({ payload }) {
 		yield call(() => post('playingVideo', payload.video));
+		yield put(Actions.successPostPlayingVideo(payload.video))
 }
 
 function* removeVideo({ payload }) {

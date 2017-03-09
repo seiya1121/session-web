@@ -47,7 +47,7 @@ class Header extends ReactBaseComponent {
   }
 
   render(){
-    const {app, appActions} = this.props;
+    const { app, appActions } = this.props;
     const { displayName, photoURL, isAnonymous } = app.currentUser;
     const isLogin = !isAnonymous;
     // const users = app.users.filter((u) => (app.currentUser.uid !== u.uid && u.isHere));
@@ -83,6 +83,14 @@ class Header extends ReactBaseComponent {
           </div>
           {/*<div className="login-users">{usersNode}</div>*/}
         </div>
+        <div
+          className={classNames('button-search-list', { 'is-search-active': app.isSearchActive })}
+          onClick={() => appActions.changeValueWithKey('isSearchActive', !app.isSearchActive)}
+        >
+          <span />
+          <span />
+          <span />
+        </div>
         <input
           className={classNames('form-search', { 'is-search-active': app.isSearchActive })}
           type="text"
@@ -93,12 +101,11 @@ class Header extends ReactBaseComponent {
             appActions.changeValueWithKey('searchResult', []);
             appActions.changeValueWithKey('isPlaylistActive', false);
           }}
-          onBlur={() => appActions.changeValueWithKey('isSearchActive', false)}
           onKeyPress={this.onKeyPressForSearch}
           value={app.searchText}
         >
         </input>
-        {app.currentUser.accessToken !== '' && playlistButton}
+        {/*{app.currentUser.accessToken !== '' && playlistButton}*/}
         <div
           className={classNames('button-que-list', { 'is-quelist-list': app.isQueListActive })}
           onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}

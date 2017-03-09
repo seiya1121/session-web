@@ -176,6 +176,7 @@ class App extends ReactBaseComponent {
             isSearchActive={app.isSearchActive}
             isQueListActive={app.isQueListActive}
             searchResult={app.searchResult}
+            isNoPlayingVideo={app.playingVideo.title === ''}
           />
         </div>
         <div className="footer-bar">

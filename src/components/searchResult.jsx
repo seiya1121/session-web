@@ -37,10 +37,10 @@ class SearchResult extends ReactBaseComponent {
 		};
 
   onClickSetQue(video) {
-    const { currentUser } = this.props;
-    const { que, playingVideo } = this.props.state;
+    const { currentUser, isNoPlayingVideo } = this.props;
+    const { que } = this.props.state;
     const targetVideo = videoObject(video, currentUser);
-    if (que.length === 0 && playingVideo.title === '') {
+    if (que.length === 0 && isNoPlayingVideo ) {
       this.props.actions.asyncPostPlayingVideo(targetVideo);
     } else {
       this.props.actions.asyncPushVideo(targetVideo);
@@ -55,7 +55,7 @@ class SearchResult extends ReactBaseComponent {
   }
 
   render(){
-    const { state, actions } = this.props;
+    const { state, actions, isPlaylistActive, playlists } = this.props;
 				const DragHandle = SortableHandle(() => <span>::</span>);
     const VideoList = SortableElement(({ video }) =>
       <li key={video.key} className="list-group-item">
@@ -90,7 +90,7 @@ class SearchResult extends ReactBaseComponent {
 				})
 
     const searchCategory = () => {
-      if(!state.isPlaylistActive) {
+      if(!isPlaylistActive) {
         return (
           <div className="list-group-title">
             search for
@@ -98,13 +98,13 @@ class SearchResult extends ReactBaseComponent {
           </div>
         )
       }
-      if(state.isPlaylistActive && state.selectedPlaylist) {
+      if(isPlaylistActive && state.selectedPlaylist) {
         return (
           <div>
             <li
               className="list-group-item"
               onClick={() => {
-                actions.setSearchResult('playlist', state.playlists);
+                actions.setSearchResult('playlist', playlists);
                 actions.setSearchResult('selectedPlaylist', '')
               }}
             >
