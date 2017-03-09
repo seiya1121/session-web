@@ -90,7 +90,7 @@ const app = (state = InitialState, action) => {
     case App.UPDATE_PLAYING:
       return newState({ playing: payload.playing });
     case App.UPDATE_PLAYING_VIDEO:
-    const playingVideo = Object.keys(payload.video).length === 0 ? App.DefaultVideo : payload.video;
+      const playingVideo = Object.keys(payload.video).length === 0 ? App.DefaultVideo : payload.video;
       return newState({
         playing: true,
         startTime: 0,

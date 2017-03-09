@@ -47,7 +47,7 @@ class Header extends ReactBaseComponent {
   }
 
   render(){
-    const { app, appActions } = this.props;
+    const { app, actions } = this.props;
     const { displayName, photoURL, isAnonymous } = app.currentUser;
     const isLogin = !isAnonymous;
     // const users = app.users.filter((u) => (app.currentUser.uid !== u.uid && u.isHere));
@@ -59,20 +59,20 @@ class Header extends ReactBaseComponent {
         <a className="header-bar-prof__sign" onClick={this.onClickSignOut}>Sign Out</a> :
         <a className="header-bar-prof__sign" onClick={this.onClickSignIn}>Sign In</a>
     );
-    const playlistButton = (
-      <div
-        className={
-          classNames('button-playlist-list', { 'is-playlist-list': app.isPlaylistActive })
-        }
-        onClick={() => {
-          appActions.changeValueWithKey('isPlaylistActive', !app.isPlaylistActive);
-          appActions.changeValueWithKey('isSearchActive', !app.isPlaylistActive);
-          appActions.setSearchResult('playlist', app.playlists);
-        }}
-      >
-        <span />
-      </div>
-    );
+    // const playlistButton = (
+    //   <div
+    //     className={
+    //       classNames('button-playlist-list', { 'is-playlist-list': app.isPlaylistActive })
+    //     }
+    //     onClick={() => {
+    //       actions.changeValueWithKey('isPlaylistActive', !app.isPlaylistActive);
+    //       actions.changeValueWithKey('isSearchActive', !app.isPlaylistActive);
+    //       actions.setSearchResult('playlist', app.playlists);
+    //     }}
+    //   >
+    //     <span />
+    //   </div>
+    // );
 
     return(
       <header className="header-bar">
@@ -85,7 +85,7 @@ class Header extends ReactBaseComponent {
         </div>
         <div
           className={classNames('button-search-list', { 'is-search-active': app.isSearchActive })}
-          onClick={() => appActions.changeValueWithKey('isSearchActive', !app.isSearchActive)}
+          onClick={() => actions.changeValueWithKey('isSearchActive', !app.isSearchActive)}
         >
           <span />
           <span />
@@ -95,11 +95,11 @@ class Header extends ReactBaseComponent {
           className={classNames('form-search', { 'is-search-active': app.isSearchActive })}
           type="text"
           placeholder="Search"
-          onChange={(e) => { appActions.changeValueWithKey('searchText', e.target.value); }}
+          onChange={(e) => { actions.changeValueWithKey('searchText', e.target.value); }}
           onFocus={() => {
-            appActions.changeValueWithKey('isSearchActive', true);
-            appActions.changeValueWithKey('searchResult', []);
-            appActions.changeValueWithKey('isPlaylistActive', false);
+            actions.changeValueWithKey('isSearchActive', true);
+            actions.changeValueWithKey('searchResult', []);
+            actions.changeValueWithKey('isPlaylistActive', false);
           }}
           onKeyPress={this.onKeyPressForSearch}
           value={app.searchText}
@@ -108,7 +108,7 @@ class Header extends ReactBaseComponent {
         {/*{app.currentUser.accessToken !== '' && playlistButton}*/}
         <div
           className={classNames('button-que-list', { 'is-quelist-list': app.isQueListActive })}
-          onClick={() => appActions.changeValueWithKey('isQueListActive', !app.isQueListActive)}
+          onClick={() => actions.changeValueWithKey('isQueListActive', !app.isQueListActive)}
         >
           <span />
           <span />
@@ -121,7 +121,7 @@ class Header extends ReactBaseComponent {
 
 Header.propTypes = {
   app: React.PropTypes.object,
-  appActions: React.PropTypes.object,
+  actions: React.PropTypes.object,
 };
 
 export default Header;

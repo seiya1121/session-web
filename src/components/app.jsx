@@ -36,18 +36,18 @@ class App extends ReactBaseComponent {
   }
 
   onUnload(e) {
-    const { currentUser } = this.props.app;
+    const { currentUser } = this.props.state.app;
     if (currentUser.isAnonymous) {
-      this.props.appActions.removeUser(currentUser.uid);
+      this.props.actions.removeUser(currentUser.uid);
       firebaseAuth.signOut();
     };
     const u = Object.assign(currentUser, { isHere: false });
-    this.props.appActions.postUser(u.uid, u);
+    this.props.actions.postUser(u.uid, u);
   };
 
   onSeekMouseUp(e) {
     const played = parseFloat(e.target.value);
-    this.props.appActions.seekUp(played);
+    this.props.actions.seekUp(played);
     this.player.seekTo(played);
   }
 
@@ -58,7 +58,7 @@ class App extends ReactBaseComponent {
         const base = json.items[0].contentDetails.relatedPlaylists;
         const lists = Object.keys(base)
                             .map((k) => ({ id: base[k], title: k, thumbnailUrl: ''}))
-        this.props.appActions.setPlaylists(lists)
+        this.props.actions.setPlaylists(lists)
       })
       .catch((error) => console.log(error));
   }
@@ -68,8 +68,8 @@ class App extends ReactBaseComponent {
       if (result.credential) {
         const { accessToken } = result.credential;
         const user = userObj(result.user, { accessToken, isHere: true });
-        this.props.appActions.postUser(user.uid, user);
-        this.props.appActions.setUser(user);
+        this.props.actions.postUser(user.uid, user);
+        this.props.actions.setUser(user);
       }
     })
     firebaseAuth.onAuthStateChanged((user) => {
@@ -77,19 +77,19 @@ class App extends ReactBaseComponent {
         if (user.isAnonymous) {
           const temp = { displayName: 'User', photoURL: '../images/avatar.png', uid: user.uid, isAnonymous: user.isAnonymous };
           const u = userObj(temp, { accessToken: '', isHere: true });
-          this.props.appActions.postUser(u.uid, u);
-          this.props.appActions.setUser(u);
+          this.props.actions.postUser(u.uid, u);
+          this.props.actions.setUser(u);
         } else {
           base.listenTo(`users/${user.uid}`, { context: this, asArray: false, then(data) {
             if(data) {
               const u = userObj(data, { accessToken: data.accessToken, isHere: true });
-              this.props.appActions.postUser(u.uid, u);
-              this.props.appActions.setUser(u);
+              this.props.actions.postUser(u.uid, u);
+              this.props.actions.setUser(u);
               this.getPlaylist(u);
             } else {
               const u = userObj(user, { accessToken: '', isHere: true });
-              this.props.appActions.postUser(u.uid, u);
-              this.props.appActions.setUser(u);
+              this.props.actions.postUser(u.uid, u);
+              this.props.actions.setUser(u);
               this.getPlaylist(u);
             }
           }});
@@ -102,26 +102,26 @@ class App extends ReactBaseComponent {
 
   componentDidMount() {
     window.addEventListener("beforeunload", this.onUnload);
-    const { appActions } = this.props;
+    const { actions } = this.props;
     SyncStates.forEach((obj, i) => {
       const { state, asArray } = obj;
       base.fetch(state, { context: this, asArray, then(data) {
-        appActions.updateSyncState(state, data);
-        (i + 1 === SyncStates.length) && appActions.changeValueWithKey('isLoadedSyncState', true);
+        actions.updateSyncState(state, data);
+        (i + 1 === SyncStates.length) && actions.changeValueWithKey('isLoadedSyncState', true);
       }});
     });
     base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
-      appActions.updatePlayed(startTime);
+      actions.updatePlayed(startTime);
       this.player.seekTo(startTime);
     }});
     base.listenTo('playing', { context: this, asArray: false, then(playing) {
-      appActions.updatePlaying(playing);
+      actions.updatePlaying(playing);
     }});
     base.listenTo('users', { context: this, asArray: true, then(users) {
-      appActions.updateUsers(users);
+      actions.updateUsers(users);
     }});
     base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
-      appActions.updatePlayingVideo(video);
+      actions.updatePlayingVideo(video);
     }});
   }
 
@@ -138,13 +138,14 @@ class App extends ReactBaseComponent {
   }
 
   render() {
-    const { app, appActions } = this.props;
+    const { state, actions } = this.props
+    const { app, searchResult } = state;
     const isPostPlayingVideo = app.playingVideo !== '';
     const playingVideo = app.playingVideo || DefaultVideo;
 
     return (
       <div className="contents">
-        <Header app={app} appActions={appActions} />
+        <Header app={app} actions={actions} />
         <div className="main-display">
           {!app.isLoadedSyncState && <Loading type='spinningBubbles' color='#26BFBA' />}
           <div className="display-youtube">
@@ -160,13 +161,13 @@ class App extends ReactBaseComponent {
               vimeoConfig={app.vimeoConfig}
               youtubeConfig={app.youtubeConfig}
               fileConfig={app.fileConfig}
-              onReady={() => appActions.play()}
-              onPlay={() => appActions.play()}
-              onPause={() => appActions.pause(app.played, app.duration)}
-              onEnded={() => appActions.postPlayingVideo(app.que[0])}
-              onError={() => appActions.postPlayingVideo(app.que[0])}
-              onProgress={appActions.progress}
-              onDuration={(duration) => appActions.changeValueWithKey('duration', duration)}
+              onReady={() => actions.play()}
+              onPlay={() => actions.play()}
+              onPause={() => actions.pause(app.played, app.duration)}
+              onEnded={() => actions.postPlayingVideo(searchResult.que[0])}
+              onError={() => actions.postPlayingVideo(searchResult.que[0])}
+              onProgress={actions.progress}
+              onDuration={(duration) => actions.changeValueWithKey('duration', duration)}
             />
           </div>
           <Comments currentUser={app.currentUser} />
@@ -186,13 +187,13 @@ class App extends ReactBaseComponent {
                 { 'play-controll__pause': app.playing },
                 { 'play-controll__play': !app.playing },
               )}
-              onClick={() => appActions.playPause(app.playing, app.duration)}
+              onClick={() => actions.playPause(app.playing, app.duration)}
             >
               &nbsp;
             </button>
             <button
               className="play-controll__skip"
-              onClick={() => appActions.postPlayingVideo(app.que[0])}
+              onClick={() => actions.postPlayingVideo(searchResult.que[0])}
             >&nbsp;</button>
           </div>
 
@@ -208,8 +209,8 @@ class App extends ReactBaseComponent {
                 className="progress-bar__seek"
                 type="range" min={0} max={1} step="any"
                 value={app.played}
-                onMouseDown={appActions.seekDown}
-                onChange={(e) => appActions.changePlayed(parseFloat(e.target.value))}
+                onMouseDown={actions.seekDown}
+                onChange={(e) => actions.changePlayed(parseFloat(e.target.value))}
                 onMouseUp={this.onSeekMouseUp}
               />
               <div className="progress-bar__played" style={{ width: `${100 * app.played}%` }}>
@@ -232,10 +233,10 @@ class App extends ReactBaseComponent {
                 max={1}
                 step="any"
                 value={app.volume}
-                onChange={(e) => appActions.changeVolume(e.target.value)}
+                onChange={(e) => actions.changeVolume(e.target.value)}
               />
             </div>
-            <p className="volume-box__ttl" onClick={() => appActions.changeVolume(0)}>mute</p>
+            <p className="volume-box__ttl" onClick={() => actions.changeVolume(0)}>mute</p>
           </div>
         </div>
       </div>
@@ -244,14 +245,14 @@ class App extends ReactBaseComponent {
 }
 
 App.propTypes = {
-  app: React.PropTypes.object,
-  appActions: React.PropTypes.object,
+  state: React.PropTypes.object,
+  actions: React.PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({ app: state.app });
+const mapStateToProps = (state) => ({ state: state });
 
 const mapDispatchToProps = (dispatch) => ({
-  appActions: bindActionCreators(AppActions, dispatch),
+  actions: bindActionCreators(AppActions, dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
