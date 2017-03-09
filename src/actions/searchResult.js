@@ -5,6 +5,7 @@ import { createAction } from 'redux-actions';
 export const asyncPushVideo = createAction(Types.ASYNC_PUSH_VIDEO, (video) => ({ video }));
 export const asyncRemoveVideo = createAction(Types.ASYNC_REMOVE_VIDEO, (videoKey) => ({ videoKey }));
 export const asyncPostPlayingVideo = createAction(Types.ASYNC_POST_PLAYING_VIDEO, (video) => ({ video }));
+export const asyncUpdateQue  = createAction(Types.ASYNC_UPDATE_QUE, (que) => ({ que }));
 
 // local系
 export const setSearchResult = createAction(Types.SET_SEARCH_RESULT,

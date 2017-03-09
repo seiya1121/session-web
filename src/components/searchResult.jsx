@@ -32,8 +32,7 @@ class SearchResult extends ReactBaseComponent {
 
 		onSortEnd({oldIndex, newIndex}) {
     const { que } = this.props.state;
-				this.props.actions.updateQue(arrayMove(que, oldIndex, newIndex));
-
+				this.props.actions.asyncUpdateQue(arrayMove(que, oldIndex, newIndex));
 		};
 
   onClickSetQue(video) {

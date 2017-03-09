@@ -65,7 +65,6 @@ export const seekDown = createAction(App.SEEK_DOWN);
 export const seekUp = createAction(App.SEEK_UP, (played) => ({ played }));
 export const progress = createAction(App.PROGRESS, (state) => ({ state }));
 export const updateSyncState = createAction(App.UPDATE_SYNC_STATE, (key, value) => ({key, value }));
-export const updateQue = createAction(App.UPDATE_QUE, (que) => ({que }));
 export const updateComments = createAction(App.UPDATE_COMMENTS, (comments) => ({ comments }));
 export const updatePlayed = createAction(App.UPDATE_PLAYED, (played) => ({ played }));
 export const updatePlaying = createAction(App.UPDATE_PLAYING, (playing) => ({ playing }));
