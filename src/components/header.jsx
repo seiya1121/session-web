@@ -14,7 +14,7 @@ class Header extends ReactBaseComponent {
   onClickSignIn() {
     const { uid, isAnonymous } = this.props.app.currentUser;
     if(isAnonymous){
-      this.props.appActions.removeUser(uid);
+      this.props.actions.removeUser(uid);
     }
     provider.addScope('https://www.googleapis.com/auth/youtube');
     firebaseAuth.signInWithRedirect(provider)
@@ -22,7 +22,7 @@ class Header extends ReactBaseComponent {
 
   onClickSignOut() {
     const { uid } = this.props.app.currentUser;
-    this.props.appActions.removeUser(uid);
+    this.props.actions.removeUser(uid);
     firebaseAuth.signOut().then(() => {
       firebaseAuth.signInAnonymously();
     });
@@ -35,10 +35,10 @@ class Header extends ReactBaseComponent {
       if (error) {
         console.log(error);
       } else {
-        this.props.appActions.setSearchResult('search', result.items);
+        this.props.actions.setSearchResult('search', result.items);
       }
     };
-    this.props.appActions.changeValueWithKey('searchedText', this.props.app.searchText);
+    this.props.actions.changeValueWithKey('searchedText', this.props.app.searchText);
     const youTubeNode = new YouTubeNode();
     youTubeNode.setKey(YOUTUBE_API_KEY);
     youTubeNode.addParam('type', 'video');
