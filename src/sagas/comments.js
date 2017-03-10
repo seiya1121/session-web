@@ -5,9 +5,8 @@ import * as Types from '../action_types/comments';
 
 function* pushComment({ payload }) {
 		yield call(() => push('comments', payload.comment));
-		yield put(Actions.initCommentText);
+		yield put(Actions.initCommentText());
 }
-
 
 export default function* commentsSaga() {
 		yield takeLatest(Types.ASYNC_PUSH_COMMENT, pushComment);
