@@ -36,7 +36,7 @@ class App extends ReactBaseComponent {
   }
 
   onUnload(e) {
-    const { currentUser } = this.props.state.app;
+    const { currentUser } = this.props.app;
     if (currentUser.isAnonymous) {
       this.props.actions.removeUser(currentUser.uid);
       firebaseAuth.signOut();
@@ -138,8 +138,7 @@ class App extends ReactBaseComponent {
   }
 
   render() {
-    const { state, actions } = this.props
-    const { app, searchResult } = state;
+    const { app, searchResult, actions } = this.props;
     const isPostPlayingVideo = app.playingVideo !== '';
     const playingVideo = app.playingVideo || DefaultVideo;
 
@@ -245,11 +244,12 @@ class App extends ReactBaseComponent {
 }
 
 App.propTypes = {
-  state: React.PropTypes.object,
+  app: React.PropTypes.object,
+		searchResult: React.PropTypes.object,
   actions: React.PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({ state: state });
+const mapStateToProps = ({app, searchResult}) => ({ app, searchResult });
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(AppActions, dispatch),

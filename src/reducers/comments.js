@@ -16,6 +16,8 @@ const comments = (state = InitialState, action) => {
 						return newState({ isCommentActive: payload.value });
 				case Types.UPDATE_COMMENTS:
 						return newState({ comments: payload.comments });
+				case Types.INIT_COMMENT_TEXT:
+						return newState({ commentText: '' });
 				default:
 						return state;
 		}

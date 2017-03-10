@@ -8,3 +8,4 @@ export const asyncPushComment = createAction(Types.ASYNC_PUSH_COMMENT, (comment)
 export const changeCommentText = createAction(Types.CHANGE_COMMENT_TEXT, (comment) => ({ comment }));
 export const updateComments = createAction(Types.UPDATE_COMMENTS, (comments) => ({ comments }));
 export const changeIsCommentActive = createAction(Types.CHANGE_IS_COMMENT_ACTIVE, (value) => ({ value }));
+export const initCommentText = createAction(Types.INIT_COMMENT_TEXT);
