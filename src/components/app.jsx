@@ -3,13 +3,12 @@ import ReactBaseComponent from './reactBaseComponent';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as AppActions from '../actions/app';
-import { SyncStates, YoutubeApiUrl } from '../action_types/app';
+import { YoutubeApiUrl } from '../action_types/app';
 import { base, firebaseAuth } from '../config/firebaseApp';
 import classNames from 'classnames';
 import { DefaultVideo } from '../action_types/app';
 import ReactPlayer from 'react-player';
 import 'whatwg-fetch';
-import Loading from 'react-loading';
 
 // Components
 import Header from './header';
@@ -103,13 +102,6 @@ class App extends ReactBaseComponent {
   componentDidMount() {
     window.addEventListener("beforeunload", this.onUnload);
     const { actions } = this.props;
-    SyncStates.forEach((obj, i) => {
-      const { state, asArray } = obj;
-      base.fetch(state, { context: this, asArray, then(data) {
-        actions.updateSyncState(state, data);
-        (i + 1 === SyncStates.length) && actions.changeValueWithKey('isLoadedSyncState', true);
-      }});
-    });
     base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
       actions.updatePlayed(startTime);
       this.player.seekTo(startTime);
@@ -146,7 +138,6 @@ class App extends ReactBaseComponent {
       <div className="contents">
         <Header app={app} actions={actions} />
         <div className="main-display">
-          {!app.isLoadedSyncState && <Loading type='spinningBubbles' color='#26BFBA' />}
           <div className="display-youtube">
             <ReactPlayer
               ref={(player) => { this.player = player; }}
@@ -163,8 +154,8 @@ class App extends ReactBaseComponent {
               onReady={() => actions.play()}
               onPlay={() => actions.play()}
               onPause={() => actions.pause(app.played, app.duration)}
-              onEnded={() => actions.postPlayingVideo(searchResult.que[0])}
-              onError={() => actions.postPlayingVideo(searchResult.que[0])}
+              onEnded={() => actions.asyncPostPlayingVideo(searchResult.que[0])}
+              onError={() => actions.asyncPostPlayingVideo(searchResult.que[0])}
               onProgress={actions.progress}
               onDuration={(duration) => actions.changeValueWithKey('duration', duration)}
             />
@@ -192,7 +183,7 @@ class App extends ReactBaseComponent {
             </button>
             <button
               className="play-controll__skip"
-              onClick={() => actions.postPlayingVideo(searchResult.que[0])}
+              onClick={() => actions.asyncPostPlayingVideo(searchResult.que[0])}
             >&nbsp;</button>
           </div>
 

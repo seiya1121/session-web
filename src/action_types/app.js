@@ -6,20 +6,11 @@ export const commentObj = (content, user, type, keyword) => (
   Object.assign({}, { content, user, type, keyword })
 );
 
-export const SyncStates = [
-  { state: 'que', asArray: true },
-  { state: 'users', asArray: true },
-  { state: 'comments', asArray: true },
-  { state: 'playingVideo', asArray: false },
-  { state: 'playing', asArray: false },
-  { state: 'startTime', asArray: false },
-];
-
 export const CommandType = { giphy: '/giphy ' };
 export const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 
 export const CHANGE_VALUE_WITH_KEY = 'CHANGE_VALUE_WITH_KEY';
-export const POST_PLAYING_VIDEO = 'POST_PLAYING_VIDEO';
+export const ASYNC_POST_PLAYING_VIDEO = 'ASYNC_POST_PLAYING_VIDEO';
 export const POST_USER = 'POST_USER';
 export const REMOVE_USER = 'REMOVE_USER';
 export const SET_USER = 'SET_USER';

@@ -25,7 +25,6 @@ const InitialState = {
 		isSearchActive: false,
 		isQueListActive: false,
 		isPlaylistActive: false,
-		isLoadedSyncState: false,
 };
 
 const resultObj = (item, resultType) => {
@@ -91,12 +90,7 @@ const app = (state = InitialState, action) => {
       return newState({ playing: payload.playing });
     case App.UPDATE_PLAYING_VIDEO:
       const playingVideo = Object.keys(payload.video).length === 0 ? App.DefaultVideo : payload.video;
-      return newState({
-        playing: true,
-        startTime: 0,
-        playingVideo,
-        que: state.que.filter((item) => item.key !== playingVideo.key),
-      });
+      return newState({ playingVideo });
     case App.UPDATE_USERS:
       return newState({ users: payload.users });
     default:

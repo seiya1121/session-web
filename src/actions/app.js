@@ -1,25 +1,11 @@
 import * as App from '../action_types/app';
-import { base } from '../config/firebaseApp.js';
 import { createAction } from 'redux-actions';
-
-const push = (stateName, data) => base.push(stateName, { data });
-const post = (stateName, data) => base.post(stateName, { data });
-const remove = (endPoint) => base.remove(endPoint);
+import { post, remove, push } from '../scripts/db';
 
 // sync系
-export const postPlayingVideo = (video) => {
-  if (video) {
-    post('playingVideo', video);
-    post('startTime', 0);
-    remove(`que/${video.key}`);
-    const comment = App.commentObj(`# ${video.title}`, video.user, App.CommentType.log, '');
-    push('comments', comment);
-  } else {
-    post('playingVideo', App.DefaultVideo);
-    post('startTime', 0);
-  }
-  return { type: App.POST_PLAYING_VIDEO };
-};
+export const asyncPostPlayingVideo = createAction(App.ASYNC_POST_PLAYING_VIDEO,
+  (video) => ({ video })
+);
 export const postUser = (uid, user) => {
   post(`users/${uid}`, user);
   return { type: App.POST_USER };
