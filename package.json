@@ -53,6 +53,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "firebase": "^3.6.2",
+    "firebase-saga": "^1.1.2",
     "giphy-api": "^1.2.3",
     "re-base": "^2.5.1",
     "react": "^15.4.1",

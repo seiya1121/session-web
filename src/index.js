@@ -4,6 +4,7 @@ import { combineReducers, createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import App from './components/app.jsx';
 import createLogger from 'redux-logger';
+
 // Reducers
 import app from './reducers/app';
 import comments from './reducers/comments';

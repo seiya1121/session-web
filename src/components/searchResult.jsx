@@ -23,6 +23,13 @@ class SearchResult extends ReactBaseComponent {
     this.bind('getPlaylistVideos', 'onClickSetQue', 'onSortEnd');
   }
 
+  componentWillMount() {
+				const { actions } = this.props;
+				base.fetch('que', { context: this, asArray: true, then(que) {
+						actions.updateQue(que);
+				}});
+  }
+
 		componentDidMount() {
 				const { actions } = this.props;
 				base.listenTo('que', { context: this, asArray: true, then(que) {

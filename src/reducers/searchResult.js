@@ -19,8 +19,6 @@ const searchResult = (state = InitialState, action) => {
 						return newState({ que: payload.que });
 				case Types.UPDATE_SEARCH_RESULT:
 						return newState({ searchResult: payload.lists, isSearchActive: true });
-				case Types.SUCCESS_POST_PLAYING_VIDEO:
-						return newState({ que: state.que.filter((video) => video.id !== payload.video.id) });
 				default:
 						return state;
 		}

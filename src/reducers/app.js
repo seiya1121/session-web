@@ -72,7 +72,7 @@ const app = (state = InitialState, action) => {
     case App.SEEK_UP:
       return newState({ seeking: false, startTime: payload.played });
     case App.CHANGE_PLAYED:
-      return newState({ played: payload.played, seeking: false });
+      return newState({ played: action.played, seeking: false });
     case App.PROGRESS:
       const { played, loaded } = payload.state;
       const playingStatus = (loaded) ? { played, loaded } : { played };
@@ -90,7 +90,11 @@ const app = (state = InitialState, action) => {
       return newState({ playing: payload.playing });
     case App.UPDATE_PLAYING_VIDEO:
       const playingVideo = Object.keys(payload.video).length === 0 ? App.DefaultVideo : payload.video;
-      return newState({ playingVideo });
+						return newState({
+								playing: true,
+						  startTime: 0,
+						  playingVideo,
+						});
     case App.UPDATE_USERS:
       return newState({ users: payload.users });
     default:

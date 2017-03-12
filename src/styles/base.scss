@@ -89,6 +89,7 @@ input {
 }
 
 .footer-bar {
+  z-index: 2;
   box-sizing: border-box;
   height: $footer-height;
   background: $color-bar-bg;
