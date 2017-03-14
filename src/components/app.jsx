@@ -8,16 +8,18 @@ import { base, firebaseAuth } from '../config/firebaseApp';
 import 'whatwg-fetch';
 import classNames from 'classnames';
 import { DefaultVideo } from '../action_types/app';
+import ReactPlayer from 'react-player';
 
 // Components
 import Header from './header';
 import SearchResult from './searchResult';
 import Comments from './comments';
-import Player from './player'
 
 // Styles
 import '../styles/base.scss';
 import '../styles/normalize.scss';
+
+const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 
 const channelsParams = (user) => (
   `access_token=${user.accessToken}&part=contentDetails&mine=true`
@@ -86,6 +88,7 @@ class App extends ReactBaseComponent {
 						actions.updateUsers(users);
 				}});
 				base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
+						console.log(video);
 						actions.updatePlayingVideo(video);
 				}});
 		}
@@ -139,17 +142,39 @@ class App extends ReactBaseComponent {
     return (
       <div className="contents">
         <Header app={app} actions={actions} />
-        <Player app={app} nextVideo={nextVideo} actions={actions}>
-          <Comments currentUser={app.currentUser} />
-          <SearchResult
-            currentUser={app.currentUser}
-            searchedText={app.searchedText}
-            isSearchActive={app.isSearchActive}
-            isQueListActive={app.isQueListActive}
-            searchResult={app.searchResult}
-            isNoPlayingVideo={app.playingVideo.title === ''}
-          />
-        </Player>
+								<div className="main-display">
+										<div className="display-youtube">
+												<ReactPlayer
+														ref={(player) => { this.player = player; }}
+														className="react-player"
+														width={"100%"}
+														height={"100%"}
+														url={youtubeUrl(playingVideo.id)}
+														playing={app.playing}
+														volume={app.volume}
+														soundcloudConfig={app.soundcloudConfig}
+														vimeoConfig={app.vimeoConfig}
+														youtubeConfig={app.youtubeConfig}
+														fileConfig={app.fileConfig}
+														onReady={() => actions.play()}
+														onPlay={() => actions.play()}
+														onPause={() => actions.pause(app.played, app.duration)}
+														onEnded={() => actions.asyncPostPlayingVideo(nextVideo)}
+														onError={() => actions.asyncPostPlayingVideo(nextVideo)}
+														onProgress={actions.progress}
+														onDuration={(duration) => actions.changeValueWithKey('duration', duration)}
+												/>
+										</div>
+										<Comments currentUser={app.currentUser} />
+										<SearchResult
+												currentUser={app.currentUser}
+												searchedText={app.searchedText}
+												isSearchActive={app.isSearchActive}
+												isQueListActive={app.isQueListActive}
+												searchResult={app.searchResult}
+												isNoPlayingVideo={app.playingVideo.title === ''}
+										/>
+								</div>
 								<div className="footer-bar">
 										<div className="play-controll">
 												<button

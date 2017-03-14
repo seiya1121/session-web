@@ -11,6 +11,7 @@ const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 
 function* postPlayingVideo({ payload }) {
 		const { video } = payload;
+		console.log(video);
 		if (video) {
 				yield call(() => post('playingVideo', video));
 				yield call(() => post('startTime', 0));
