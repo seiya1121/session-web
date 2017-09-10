@@ -15,9 +15,9 @@ class Comments extends React.Component {
     super(props);
 
     this.state = {
-						commentText: '',
-						isCommentActive: false,
-						comments: [],
+      commentText: '',
+      isCommentActive: false,
+      comments: [],
     };
 
     this.setGifUrl = this.setGifUrl.bind(this);
@@ -25,9 +25,9 @@ class Comments extends React.Component {
   }
 
 		componentDidMount() {
-				base.listenTo('comments', { context: this, asArray: true, then(comments) {
-						this.setState({ comments });
-				}});
+    base.listenTo('comments', { context: this, asArray: true, then(comments) {
+      this.setState({ comments });
+    }});
   }
 
   setGifUrl(keyword) {
