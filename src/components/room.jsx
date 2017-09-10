@@ -32,102 +32,101 @@ class Room extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({
-			currentUser: DefaultUser,
-			playingVideo: DefaultVideo,
-			que: [],
-			searchResult: [],
-			searchText: '',
-			searchedText: '',
-			isSearchActive: false,
-			isQueListActive: false,
-			isPlaylistActive: false,
-			isPlaying: true,
-			seeking: false,
-			duration: 0,
-			loaded: 0,
-			volume: 0.8,
-			played: 0,
-			startTime: 0,
+      currentUser: DefaultUser,
+      playingVideo: DefaultVideo,
+      que: [],
+      searchResult: [],
+      searchText: '',
+      searchedText: '',
+      isSearchActive: false,
+      isQueListActive: false,
+      isPlaylistActive: false,
+      isPlaying: true,
+      seeking: false,
+      duration: 0,
+      loaded: 0,
+      volume: 0.8,
+      played: 0,
+      startTime: 0,
 		});
 
-		this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
-		this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
-		this.goNext = this.goNext.bind(this);
-		this.progress = this.progress.bind(this);
+    this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
+    this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
+    this.goNext = this.goNext.bind(this);
+    this.progress = this.progress.bind(this);
   }
 
-	componentDidMount() {
-		base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
-			this.setState({ played: startTime });
-			this.player.seekTo(startTime);
-		}});
-		base.listenTo('playing', { context: this, asArray: false, then(playing) {
-			this.setState({ isPlaying: playing });
-		}});
-		base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
-			const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
-			this.setState({ playingVideo });
-		}});
-		base.listenTo('que', { context: this, asArray: true, then(que) { this.setState({ que }) } });
-	}
+  componentDidMount() {
+  	base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
+  		this.setState({ played: startTime });
+  		this.player.seekTo(startTime);
+  	}});
+  	base.listenTo('playing', { context: this, asArray: false, then(playing) {
+  		this.setState({ isPlaying: playing });
+  	}});
+  	base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
+  		const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
+  		this.setState({ playingVideo });
+  	}});
+  	base.listenTo('que', { context: this, asArray: true, then(que) { this.setState({ que }) } });
+  }
 
-	onKeyPressForSearch(e) {
-		if (e.which !== 13) return false;
-		e.preventDefault();
-		this.search(this.state.searchText);
-		return true;
-	}
+  onKeyPressForSearch(e) {
+  	if (e.which !== 13) return false;
+  	e.preventDefault();
+  	this.search(this.state.searchText);
+  	return true;
+  }
 
-	onSeekMouseUp(e) {
-		const startTime = parseFloat(e.target.value);
-		this.setState({ seeking: false, startTime: startTime });
-		this.player.seekTo(startTime);
-	};
+  onSeekMouseUp(e) {
+  	const startTime = parseFloat(e.target.value);
+  	this.setState({ seeking: false, startTime: startTime });
+  	this.player.seekTo(startTime);
+  };
 
   search(searchText) {
-		const youTubeNode = new YouTubeNode();
-		youTubeNode.setKey(YOUTUBE_API_KEY);
-		youTubeNode.addParam('type', 'video');
-		youTubeNode.search(searchText, 50,
+  	const youTubeNode = new YouTubeNode();
+  	youTubeNode.setKey(YOUTUBE_API_KEY);
+  	youTubeNode.addParam('type', 'video');
+  	youTubeNode.search(searchText, 50,
 			(error, result) => {
-				if (error) {
-					console.log(error);
-				} else {
-					const searchResult = result.items.map(item => ({
+  		  if (error) {
+  		  	console.log(error);
+  		  } else {
+  		  	const searchResult = result.items.map(item => ({
 						id: item.id.videoId,
 						title: item.snippet.title,
-						thumbnailUrl: item.snippet.thumbnails.default.url,
-						type: 'video',
+            thumbnailUrl: item.snippet.thumbnails.default.url,
+            type: 'video',
 					}));
-					this.setState({ searchResult, searchedText: searchText });
-				}
-			}
+  		  	this.setState({ searchResult, searchedText: searchText });
+  		  }
+  	  }
 		);
-		}
+  }
 
-		goNext() {
-  		const video = this.state.que[0];
-			if (video) {
-				post('playingVideo', video);
-				post('startTime', 0);
-				remove(`que/${video.key}`);
-				push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
-			} else {
-				post('playingVideo', DefaultVideo);
-				post('startTime', 0);
-			}
-		}
+	goNext() {
+  	const video = this.state.que[0];
+  	if (video) {
+  		post('playingVideo', video);
+  		post('startTime', 0);
+  		remove(`que/${video.key}`);
+  		push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
+  	} else {
+  		post('playingVideo', DefaultVideo);
+  		post('startTime', 0);
+  	}
+  }
 
-		progress({ played, loaded }) {
-			const playingStatus = (loaded) ? { played, loaded } : { played };
-			return !this.state.seeking && this.setState(playingStatus);
-		}
+  progress({ played, loaded }) {
+  	const playingStatus = (loaded) ? { played, loaded } : { played };
+  	return !this.state.seeking && this.setState(playingStatus);
+  }
 
   render() {
-		const isPostPlayingVideo = this.state.playingVideo !== '';
-		const playingVideo = this.state.playingVideo || DefaultVideo;
-
-    return (
+  	const isPostPlayingVideo = this.state.playingVideo !== '';
+  	const playingVideo = this.state.playingVideo || DefaultVideo;
+		return (
       <div className="contents">
 				<header className="header-bar">
 					<div className="header-bar__left">
