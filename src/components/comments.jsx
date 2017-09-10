@@ -1,9 +1,14 @@
 import React from 'react';
 import classNames from 'classnames';
-import { CommandType, CommentType, commentObj } from '../action_types/app.js';
 import giphy from 'giphy-api';
 import { push } from '../scripts/db.js';
 import { base } from '../config/firebaseApp';
+
+const CommentType = { text: 'text', log: 'log', gif: 'gif' };
+const commentObj = (content, user, type, keyword) => (
+		Object.assign({ content, user, type, keyword })
+);
+const CommandType = { giphy: '/giphy ' };
 
 class Comments extends React.Component {
   constructor(props) {
