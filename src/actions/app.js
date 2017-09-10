@@ -1,6 +1,6 @@
-import * as App from '../action_types/app';
+import * as App from '../action_types/app.js';
 import { createAction } from 'redux-actions';
-import { post, remove, push } from '../scripts/db';
+import { post, remove, push } from '../scripts/db.js';
 
 // sync系
 export const asyncPostPlayingVideo = createAction(App.ASYNC_POST_PLAYING_VIDEO,
