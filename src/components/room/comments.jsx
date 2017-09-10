@@ -52,8 +52,8 @@ class Comments extends React.Component {
         CommentType.text,
         ''
       );
-						push('comments', comment);
-						this.setState({ commentText: '' });
+      push('comments', comment);
+      this.setState({ commentText: '' });
     }
     return true;
   }
