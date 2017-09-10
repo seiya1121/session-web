@@ -1,74 +1,44 @@
 import React from 'react';
-import ReactBaseComponent from './reactBaseComponent';
 import classNames from 'classnames';
-import { YoutubeApiUrl } from '../action_types/app';
-import 'whatwg-fetch';
-import { SortableContainer, SortableElement, arrayMove, SortableHandle } from 'react-sortable-hoc';
+import { post, remove, push } from '../scripts/db.js';
 
-// Redux系
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux';
-import * as Actions from '../actions/searchResult';
-import { base } from '../config/firebaseApp';
-
-const playlistItemsParams = (accessToken, playlistId) => (
-  `access_token=${accessToken}&part=snippet&playlistId=${playlistId}&maxResults=50`
+const CommentType = { text: 'text', log: 'log', gif: 'gif' };
+const commentObj = (content, user, type, keyword) => (
+		Object.assign({ content, user, type, keyword })
 );
-
 const videoObject = (video, user) => Object.assign(video, { user });
 
-class SearchResult extends ReactBaseComponent {
-  constructor(props) {
-    super(props);
-    this.bind('getPlaylistVideos', 'onClickSetQue', 'onSortEnd');
-  }
-
-  componentWillMount() {
-				const { actions } = this.props;
-				base.fetch('que', { context: this, asArray: true, then(que) {
-						actions.updateQue(que);
-				}});
-  }
-
-		componentDidMount() {
-				const { actions } = this.props;
-				base.listenTo('que', { context: this, asArray: true, then(que) {
-						actions.updateQue(que);
-				}});
+class SearchResult extends React.Component {
+  static goTargetVideo(video) {
+				post('playingVideo', video);
+				post('playingVideo', video);
+				post('startTime', 0);
+				remove(`que/${video.key}`);
+				const comment = commentObj(`# ${video.title}`, video.user, CommentType.log, '');
+				push('comments', comment);
 		}
 
-		onSortEnd({oldIndex, newIndex}) {
-    const { que } = this.props.state;
-				this.props.actions.asyncUpdateQue(arrayMove(que, oldIndex, newIndex));
-		};
+  constructor(props) {
+    super(props);
+    this.onClickSetQue = this.onClickSetQue.bind(this);
+  }
 
   onClickSetQue(video) {
     const { currentUser, isNoPlayingVideo } = this.props;
-    const { que } = this.props.state;
     const targetVideo = videoObject(video, currentUser);
-    if (que.length === 0 && isNoPlayingVideo ) {
-      this.props.actions.asyncPostPlayingVideo(targetVideo);
+    if (this.props.que.length === 0 && isNoPlayingVideo ) {
+						SearchResult.goTargetVideo(targetVideo);
     } else {
-      this.props.actions.asyncPushVideo(targetVideo);
+						push('que', targetVideo);
     }
   }
 
-  getPlaylistVideos(playlistId) {
-    const { accessToken } = this.props.currentUser;
-    fetch(`${YoutubeApiUrl}/playlistItems?${playlistItemsParams(accessToken, playlistId)}`)
-      .then((response) => response.json())
-      .then((result) => this.props.actions.setSearchResult('playlistVideo', result))
-  }
-
-  render(){
-    const { state, actions, isPlaylistActive, playlists } = this.props;
-				const DragHandle = SortableHandle(() => <span>::</span>);
-    const VideoList = SortableElement(({ video }) =>
+  renderVideoNode() {
+				return this.props.que.map((video, i) => (
       <li key={video.key} className="list-group-item">
-        <DragHandle />
         <div
           className="list-group-item__click"
-          onClick={() => actions.asyncPostPlayingVideo(video)}
+          onClick={() =>SearchResult.goTargetVideo(video)}
         >
           <img
             className="list-group-item__thumbnail"
@@ -80,54 +50,14 @@ class SearchResult extends ReactBaseComponent {
             <p className="list-group-item__name">added by {video.user.displayName}</p>
           </div>
         </div>
-        <div className="list-group-item__close" onClick={() => actions.asyncRemoveVideo(video.key)}>
+        <div className="list-group-item__close" onClick={() => remove(`que/${video.key}`)}>
         </div>
       </li>
-    );
+    ))
+  }
 
-    const SortableQueList = SortableContainer(({que}) => {
-						return (
-        <ul>
-          {que.map((video, i) =>
-            <VideoList key={i} index={i} video={video} />
-          )}
-        </ul>
-						);
-				})
-
-    const searchCategory = () => {
-      if(!isPlaylistActive) {
-        return (
-          <div className="list-group-title">
-            search for
-            <span className="list-group-title__number">{this.props.searchedText}</span>
-          </div>
-        )
-      }
-      if(isPlaylistActive && state.selectedPlaylist) {
-        return (
-          <div>
-            <li
-              className="list-group-item"
-              onClick={() => {
-                actions.setSearchResult('playlist', playlists);
-                actions.setSearchResult('selectedPlaylist', '')
-              }}
-            >
-              <div className="list-group-item__click">
-                <div className="list-group-item__body">
-                  Back
-                </div>
-              </div>
-            </li>
-            <div className="list-group-title"><strong>{state.selectedPlaylist}</strong></div>
-          </div>
-        )
-      }
-       return ( <div className="list-group-title">Playlists</div> );
-    };
-
-    const videoResult = (result, i) => (
+  renderSearchResultNode() {
+				return this.props.searchResult.map((result, i) => (
       <li key={i} className="list-group-item" onClick={() => this.onClickSetQue(result)}>
         <div className="list-group-item__click">
           <img className="list-group-item__thumbnail" src={result.thumbnailUrl} alt=""/>
@@ -136,28 +66,10 @@ class SearchResult extends ReactBaseComponent {
           </div>
         </div>
       </li>
-    );
-
-    const listResult = (result, i) => (
-      <li
-        key={i}
-        className="list-group-item"
-        onClick={() => {
-          this.getPlaylistVideos(result.id);
-          actions.changeValueWithKey('selectedPlaylist', result.title);
-        }}>
-        <div className="list-group-item__click">
-          <div className="list-group-item__body">
-            <strong>{result.title}</strong>
-          </div>
-        </div>
-      </li>
-    );
-
-    const searchResultNode = this.props.searchResult.map((result, i) => (
-      (result.type === 'video') ? videoResult(result, i) : listResult(result, i)
     ));
+  }
 
+  render(){
     return (
       <div
         className={classNames(
@@ -168,16 +80,19 @@ class SearchResult extends ReactBaseComponent {
       >
         <div className="display-list">
           <div className="list-group-title">
-            Up Coming <span className="list-group-title__number">{state.que.length}</span>
+            Up Coming <span className="list-group-title__number">{this.props.que.length}</span>
           </div>
           <ul className="list-group">
-            <SortableQueList que={state.que} onSortEnd={this.onSortEnd} useDragHandle={true} />
+            {this.renderVideoNode()}
           </ul>
         </div>
         <div className="display-search">
-          {searchCategory()}
+          <div className="list-group-title">
+            search for
+            <span className="list-group-title__number">{this.props.searchedText}</span>
+          </div>
           <ul className="list-group">
-            {searchResultNode}
+            {this.renderSearchResultNode()}
           </ul>
         </div>
       </div>
@@ -186,14 +101,13 @@ class SearchResult extends ReactBaseComponent {
 }
 
 SearchResult.propTypes = {
-  state: React.PropTypes.object,
-  actions: React.PropTypes.object,
+		que: React.PropTypes.array,
+  searchResult: React.PropTypes.array,
+		isSearchActive: React.PropTypes.bool,
+		isQueListActive: React.PropTypes.bool,
+		currentUser: React.PropTypes.object,
+  searchedText: React.PropTypes.string,
+  isNoPlayingVideo: React.PropTypes.bool,
 };
 
-const mapStateToProps = (state) => ({ state: state.searchResult });
-
-const mapDispatchToProps = (dispatch) => ({
-		actions: bindActionCreators(Actions, dispatch),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(SearchResult);
+export default SearchResult;
