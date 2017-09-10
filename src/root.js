@@ -13,7 +13,7 @@ class Root extends React.Component {
  render() {
   return (
     <Router>
-      <div>
+      <div className="contents">
         <Route exact path="/" component={Top} />
         <Route path="/:groupName" component={Room} />
       </div>
