@@ -1,25 +1,27 @@
 import React from 'react';
-import ReactBaseComponent from './reactBaseComponent';
 import classNames from 'classnames';
-import { CommandType, CommentType, commentObj } from '../action_types/app';
+import { CommandType, CommentType, commentObj } from '../action_types/app.js';
 import giphy from 'giphy-api';
-
-// Redux系
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux';
-import * as CommentsActions from '../actions/comments';
+import { push } from '../scripts/db.js';
 import { base } from '../config/firebaseApp';
 
-class Comments extends ReactBaseComponent {
+class Comments extends React.Component {
   constructor(props) {
     super(props);
-    this.bind('setGifUrl', 'onKeyPressForComment');
+
+    this.state = {
+						commentText: '',
+						isCommentActive: false,
+						comments: [],
+    };
+
+    this.setGifUrl = this.setGifUrl.bind(this);
+    this.onKeyPressForComment = this.onKeyPressForComment.bind(this);
   }
 
 		componentDidMount() {
-				const { actions } = this.props;
 				base.listenTo('comments', { context: this, asArray: true, then(comments) {
-						actions.updateComments(comments);
+						this.setState({ comments });
 				}});
   }
 
@@ -48,15 +50,15 @@ class Comments extends ReactBaseComponent {
         CommentType.text,
         ''
       );
-      this.props.actions.asyncPushComment(comment);
+						push('comments', comment);
+						this.setState({ commentText: '' });
     }
     return true;
   }
 
   render() {
-    const {state, actions} = this.props;
-    const comments = (state.isCommentActive) ?
-     state.comments : state.comments.slice(state.comments.length - 3, state.comments.length);
+    const comments = (this.state.isCommentActive) ?
+     this.state.comments : this.state.comments.slice(this.state.comments.length - 3, this.state.comments.length);
 
     const commentClass = (type, index) => (
       (type === CommentType.log) ?
@@ -110,20 +112,20 @@ class Comments extends ReactBaseComponent {
         <ul
           className={classNames(
             'comments-stream',
-            { 'is-active': state.isCommentActive },
+            { 'is-active': this.state.isCommentActive },
           )}
         >
           {commentsNode}
         </ul>
         <input
-          className={classNames('comment-input', { 'is-active': !state.isCommentActive })}
+          className={classNames('comment-input', { 'is-active': !this.state.isCommentActive })}
           type="text"
           placeholder="type comment"
-          onChange={(e) => { actions.changeCommentText(e.target.value); }}
-          onFocus={() => { actions.changeIsCommentActive(true); }}
-          onBlur={() => { actions.changeIsCommentActive(false); }}
+          onChange={(e) => this.setState({ commentText: e.target.value })}
+          onFocus={() => this.setState({ isCommentActive: true })}
+          onBlur={() => this.setState({ isCommentActive: false })}
           onKeyPress={this.onKeyPressForComment}
-          value={state.commentText}
+          value={this.state.commentText}
         >
         </input>
       </div>
@@ -132,15 +134,7 @@ class Comments extends ReactBaseComponent {
 }
 
 Comments.propTypes = {
-  state: React.PropTypes.object,
-  actions: React.PropTypes.object,
   currentUser: React.PropTypes.object,
 };
 
-const mapStateToProps = (state) => ({ state: state.comments });
-
-const mapDispatchToProps = (dispatch) => ({
-		actions: bindActionCreators(CommentsActions, dispatch),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Comments);
+export default Comments;
