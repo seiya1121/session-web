@@ -8,8 +8,8 @@ import YouTubeNode from 'youtube-node';
 import { post, remove, push } from '../scripts/db';
 
 // Components
-import SearchResult from './searchResult';
-import Comments from './comments';
+import SearchResult from './room/searchResult';
+import Comments from './room/comments';
 
 // Styles
 import '../styles/base.scss';
@@ -28,7 +28,7 @@ const commentObj = (content, user, type, keyword) => (
 const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url: '' }, displayName: '' });
 const DefaultUser = Object.assign({ name: '', photoURL: '', accessToken: '', uid: '' });
 
-class App extends React.Component {
+class Room extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({
@@ -259,4 +259,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default Room;
