@@ -56,66 +56,66 @@ class Room extends React.Component {
 		this.progress = this.progress.bind(this);
   }
 
-		componentDidMount() {
-			base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
-				this.setState({ played: startTime });
-				this.player.seekTo(startTime);
-			}});
-			base.listenTo('playing', { context: this, asArray: false, then(playing) {
-				this.setState({ isPlaying: playing });
-			}});
-			base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
-				const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
-				this.setState({ playingVideo });
-			}});
-			base.listenTo('que', { context: this, asArray: true, then(que) { this.setState({ que }) } });
-		}
-
-		onKeyPressForSearch(e) {
-			if (e.which !== 13) return false;
-			e.preventDefault();
-			this.search(this.state.searchText);
-			return true;
-		}
-
-		onSeekMouseUp(e) {
-			const startTime = parseFloat(e.target.value);
-			this.setState({ seeking: false, startTime: startTime });
+	componentDidMount() {
+		base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
+			this.setState({ played: startTime });
 			this.player.seekTo(startTime);
-		};
+		}});
+		base.listenTo('playing', { context: this, asArray: false, then(playing) {
+			this.setState({ isPlaying: playing });
+		}});
+		base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
+			const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
+			this.setState({ playingVideo });
+		}});
+		base.listenTo('que', { context: this, asArray: true, then(que) { this.setState({ que }) } });
+	}
+
+	onKeyPressForSearch(e) {
+		if (e.which !== 13) return false;
+		e.preventDefault();
+		this.search(this.state.searchText);
+		return true;
+	}
+
+	onSeekMouseUp(e) {
+		const startTime = parseFloat(e.target.value);
+		this.setState({ seeking: false, startTime: startTime });
+		this.player.seekTo(startTime);
+	};
 
   search(searchText) {
-			const youTubeNode = new YouTubeNode();
-			youTubeNode.setKey(YOUTUBE_API_KEY);
-			youTubeNode.addParam('type', 'video');
-			youTubeNode.search(searchText, 50,
-				(error, result) => {
-					if (error) {
-						console.log(error);
-					} else {
-						const searchResult = result.items.map(item => ({
-									id: item.id.videoId,
-										title: item.snippet.title,
-										thumbnailUrl: item.snippet.thumbnails.default.url,
-										type: 'video',
-						}));
-						this.setState({ searchResult, searchedText: searchText });
-					}
+		const youTubeNode = new YouTubeNode();
+		youTubeNode.setKey(YOUTUBE_API_KEY);
+		youTubeNode.addParam('type', 'video');
+		youTubeNode.search(searchText, 50,
+			(error, result) => {
+				if (error) {
+					console.log(error);
+				} else {
+					const searchResult = result.items.map(item => ({
+						id: item.id.videoId,
+						title: item.snippet.title,
+						thumbnailUrl: item.snippet.thumbnails.default.url,
+						type: 'video',
+					}));
+					this.setState({ searchResult, searchedText: searchText });
 				}
-			);
+			}
+		);
 		}
 
 		goNext() {
   		const video = this.state.que[0];
-				if (video) {
-					post('playingVideo', video);
-					post('startTime', 0);
-					remove(`que/${video.key}`);
-					push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
-				} else {
-					post('playingVideo', DefaultVideo);
-					post('startTime', 0);
-				}
+			if (video) {
+				post('playingVideo', video);
+				post('startTime', 0);
+				remove(`que/${video.key}`);
+				push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
+			} else {
+				post('playingVideo', DefaultVideo);
+				post('startTime', 0);
+			}
 		}
 
 		progress({ played, loaded }) {
