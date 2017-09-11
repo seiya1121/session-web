@@ -32,7 +32,7 @@ class Room extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({
-			room: { name: '', key: '' },
+			room: { name: '', id: '' },
       currentUser: DefaultUser,
       playingVideo: DefaultVideo,
       que: [],
@@ -63,6 +63,7 @@ class Room extends React.Component {
   	base.fetch('rooms', { context: this, asArray: true})
 			.then(data => {
 				const room = data.find(r => r.name === roomName);
+				console.log(room);
 				if(room == null) {
 					this.props.history.push({ pathname: '/' })
 					return false;
@@ -73,26 +74,31 @@ class Room extends React.Component {
 	}
 
   componentDidMount() {
+		base.listenTo(this.roomPath(), { context: this, asArray: false, then(room) {
+		//	ここで各プロパティにsetState
+		}});
   	base.listenTo(this.path('startTime'), { context: this, asArray: false, then(startTime) {
-  		this.setState({ played: startTime });
-  		this.player.seekTo(startTime);
+  		const played = typeof startTime === 'object' ? 0 : startTime;
+  		this.setState({ played });
+  		this.player.seekTo(played);
   	}});
   	base.listenTo(this.path('playing'), { context: this, asArray: true, then(playing) {
   		this.setState({ isPlaying: typeof playing === 'object' ? false : playing});
   	}});
   	base.listenTo(this.path('playingVideo'), { context: this, asArray: false, then(video) {
   		const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
+  		console.log(playingVideo);
   		this.setState({ playingVideo });
   	}});
   	base.listenTo(this.path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
   }
 
   roomPath() {
-  	return `rooms/${this.state.room.id}`;
+  	return `/rooms/${this.state.room.key}`;
 	}
 
 	path(path) {
-  	return `${this.roomPath()}/${path}`;
+  	return `${this.roomPath()}/${path}/`;
 	}
 
   onKeyPressForSearch(e) {
@@ -200,7 +206,6 @@ class Room extends React.Component {
 							playing={this.state.isPlaying}
 							volume={this.state.volume}
 							youtubeConfig={this.state.youtubeConfig}
-							fileConfig={this.state.fileConfig}
 							onReady={() => console.log('Ready')}
 							onPlay={() => console.log('Play')}
 							onPause={() => console.log('Pause')}
@@ -214,11 +219,12 @@ class Room extends React.Component {
 					{/*Comment*/}
 					<Comments
 						currentUser={this.state.currentUser}
-						roomId={this.state.room.id}
+						roomId={this.state.room.key}
 					/>
 
           {/*SearchResult*/}
 					<SearchResult
+						roomId={this.state.room.key}
 						que={this.state.que}
 						searchResult={this.state.searchResult}
 						currentUser={this.state.currentUser}

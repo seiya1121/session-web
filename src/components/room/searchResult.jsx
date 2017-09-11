@@ -6,26 +6,34 @@ import { CommentType, commentObj } from './utils/constants.js';
 const videoObject = (video, user) => Object.assign(video, { user });
 
 class SearchResult extends React.Component {
-  static goTargetVideo(video) {
-    post('playingVideo', video);
-    post('playingVideo', video);
-    post('startTime', 0);
-    remove(`que/${video.key}`);
-    push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
-  }
-
   constructor(props) {
     super(props);
+    this.goTargetVideo = this.goTargetVideo.bind(this);
     this.onClickSetQue = this.onClickSetQue.bind(this);
   }
+
+	roomPath() {
+		return `/rooms/${this.props.roomId}`;
+	}
+
+	path(path) {
+		return `${this.roomPath()}/${path}/`;
+	}
+
+	goTargetVideo(video) {
+		post(this.path('playingVideo'), video);
+		post(this.path('startTime'), 0);
+		remove(this.path(`que/${video.key}`));
+		push(this.path('comments'), commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
+	}
 
   onClickSetQue(video) {
     const { currentUser, isNoPlayingVideo } = this.props;
     const targetVideo = videoObject(video, currentUser);
     if (this.props.que.length === 0 && isNoPlayingVideo ) {
-      SearchResult.goTargetVideo(targetVideo);
+      this.goTargetVideo(targetVideo);
     } else {
-      push('que', targetVideo);
+      push(this.path('que'), targetVideo);
     }
   }
 
@@ -34,7 +42,7 @@ class SearchResult extends React.Component {
       <li key={video.key} className="list-group-item">
         <div
           className="list-group-item__click"
-          onClick={() =>SearchResult.goTargetVideo(video)}
+          onClick={() => this.goTargetVideo(video)}
         >
           <img
             className="list-group-item__thumbnail"
@@ -46,7 +54,7 @@ class SearchResult extends React.Component {
             <p className="list-group-item__name">added by {video.user.displayName}</p>
           </div>
         </div>
-        <div className="list-group-item__close" onClick={() => remove(`que/${video.key}`)}>
+        <div className="list-group-item__close" onClick={() => remove(this.path(`que/${video.key}`))}>
         </div>
       </li>
     ))
@@ -97,6 +105,7 @@ class SearchResult extends React.Component {
 }
 
 SearchResult.propTypes = {
+  roomId: React.PropTypes.string,
   que: React.PropTypes.array,
   searchResult: React.PropTypes.array,
   isSearchActive: React.PropTypes.bool,

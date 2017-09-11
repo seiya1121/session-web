@@ -22,15 +22,16 @@ class Comments extends React.Component {
   }
 
 	roomPath() {
-		return `rooms/${this.props.roomId}`;
+		return `/rooms/${this.props.roomId}`;
 	}
 
 	path(path) {
-		return `${this.roomPath()}/${path}`;
+		return `${this.roomPath()}/${path}/`;
 	}
 
   componentDidMount() {
     base.listenTo(this.path('comments'), { context: this, asArray: true, then(comments) {
+      console.log(comments);
       this.setState({ comments });
     }});
   }
@@ -60,7 +61,7 @@ class Comments extends React.Component {
         CommentType.text,
         ''
       );
-      push('comments', comment);
+      push(this.path('comments'), comment);
       this.setState({ commentText: '' });
     }
     return true;
