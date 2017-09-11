@@ -22,7 +22,7 @@ class Comments extends React.Component {
   }
 
 	roomPath() {
-		return `rooms/${this.props.key}`;
+		return `rooms/${this.props.roomId}`;
 	}
 
 	path(path) {
@@ -145,7 +145,7 @@ class Comments extends React.Component {
 
 Comments.propTypes = {
   currentUser: React.PropTypes.object,
-  key: React.PropTypes.string,
+  roomId: React.PropTypes.string,
 };
 
 export default Comments;

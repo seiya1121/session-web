@@ -58,32 +58,22 @@ class Room extends React.Component {
   }
 
   componentWillMount() {
-  	const { match, location } = this.props;
+  	const { match } = this.props;
   	const { roomName } = match.params;
-  	if (location.state != null && location.state.room != null) {
-  		this.setState({ room: location.state.room });
-  		return true;
-		}
-  	base.fetch('rooms', { context: this, asArray: false})
+  	base.fetch('rooms', { context: this, asArray: true})
 			.then(data => {
-				const room = Object.values(data).find(r => r.name === roomName);
+				const room = data.find(r => r.name === roomName);
 				if(room == null) {
 					this.props.history.push({ pathname: '/' })
 					return false;
 				}
-				console.log(roomName);
-				console.log(Object.keys(data.valueOf(room)[0]));
-				this.setState({
-					room: { name: roomName, key: Object.keys(data.valueOf(room)[0]) }
-				});
-				return true;
+				this.setState({ room });
 			}).catch(err => console.log(err));
 		return true;
 	}
 
   componentDidMount() {
   	base.listenTo(this.path('startTime'), { context: this, asArray: false, then(startTime) {
-  		console.log(startTime);
   		this.setState({ played: startTime });
   		this.player.seekTo(startTime);
   	}});
@@ -91,7 +81,6 @@ class Room extends React.Component {
   		this.setState({ isPlaying: typeof playing === 'object' ? false : playing});
   	}});
   	base.listenTo(this.path('playingVideo'), { context: this, asArray: false, then(video) {
-  		console.log(video);
   		const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
   		this.setState({ playingVideo });
   	}});
@@ -99,7 +88,7 @@ class Room extends React.Component {
   }
 
   roomPath() {
-  	return `rooms/${this.state.room.key}`;
+  	return `rooms/${this.state.room.id}`;
 	}
 
 	path(path) {
@@ -225,7 +214,7 @@ class Room extends React.Component {
 					{/*Comment*/}
 					<Comments
 						currentUser={this.state.currentUser}
-						key={this.state.room.key}
+						roomId={this.state.room.id}
 					/>
 
           {/*SearchResult*/}

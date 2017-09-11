@@ -1,5 +1,5 @@
 import React from 'react';
-import { push } from '../scripts/db';
+import { push, post } from '../scripts/db';
 import { base } from '../config/firebaseApp.js';
 
 class Top extends React.Component {
@@ -19,13 +19,14 @@ class Top extends React.Component {
  }
 
  onClickSubmitRoom() {
-   if (this.state.roomName === '') return false;
-   if (this.state.roomNames.includes(this.state.roomName)) return false;
-   push('rooms', { name: this.state.roomName })
+   const { roomName } = this.state;
+   if (roomName === '') return false;
+   if (this.state.roomNames.includes(roomName)) return false;
+   push('rooms', { name: roomName })
      .then(res => res.key)
-     .then(key => {
-       this.props.history.push({ pathname: `/${this.state.roomName}`, state: {
-         name: this.state.roomName, key } });
+     .then(id => {
+       const room = { id, name: roomName };
+       post(`rooms/${id}`, room).then(()=> this.props.history.push({ pathname: `/${roomName}`}))
 		 })
      .catch(err => console.log(err));
    return true
