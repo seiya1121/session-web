@@ -32,6 +32,7 @@ class Room extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({
+			room: { name: '', key: '' },
       currentUser: DefaultUser,
       playingVideo: DefaultVideo,
       que: [],
@@ -56,20 +57,54 @@ class Room extends React.Component {
     this.progress = this.progress.bind(this);
   }
 
+  componentWillMount() {
+  	const { match, location } = this.props;
+  	const { roomName } = match.params;
+  	if (location.state != null && location.state.room != null) {
+  		this.setState({ room: location.state.room });
+  		return true;
+		}
+  	base.fetch('rooms', { context: this, asArray: false})
+			.then(data => {
+				const room = Object.values(data).find(r => r.name === roomName);
+				if(room == null) {
+					this.props.history.push({ pathname: '/' })
+					return false;
+				}
+				console.log(roomName);
+				console.log(Object.keys(data.valueOf(room)[0]));
+				this.setState({
+					room: { name: roomName, key: Object.keys(data.valueOf(room)[0]) }
+				});
+				return true;
+			}).catch(err => console.log(err));
+		return true;
+	}
+
   componentDidMount() {
-  	base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
+  	base.listenTo(this.path('startTime'), { context: this, asArray: false, then(startTime) {
+  		console.log(startTime);
   		this.setState({ played: startTime });
   		this.player.seekTo(startTime);
   	}});
-  	base.listenTo('playing', { context: this, asArray: false, then(playing) {
-  		this.setState({ isPlaying: playing });
+  	base.listenTo(this.path('playing'), { context: this, asArray: true, then(playing) {
+  		this.setState({ isPlaying: typeof playing === 'object' ? false : playing});
   	}});
-  	base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
+  	base.listenTo(this.path('playingVideo'), { context: this, asArray: false, then(video) {
+  		console.log(video);
   		const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
   		this.setState({ playingVideo });
   	}});
-  	base.listenTo('que', { context: this, asArray: true, then(que) { this.setState({ que }) } });
+  	base.listenTo(this.path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
   }
+
+  roomPath() {
+  	return `rooms/${this.state.room.key}`;
+	}
+
+	path(path) {
+  	return `${this.roomPath()}/${path}`;
+	}
 
   onKeyPressForSearch(e) {
   	if (e.which !== 13) return false;
@@ -108,13 +143,13 @@ class Room extends React.Component {
 	goNext() {
   	const video = this.state.que[0];
   	if (video) {
-  		post('playingVideo', video);
-  		post('startTime', 0);
-  		remove(`que/${video.key}`);
-  		push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
+  		post(this.path('playingVideo'), video);
+  		post(this.path('startTime'), 0);
+  		remove(this.path(`que/${video.key}`));
+  		push(this.path('comments'), commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
   	} else {
-  		post('playingVideo', DefaultVideo);
-  		post('startTime', 0);
+  		post(this.path('playingVideo'), DefaultVideo);
+  		post(this.path('startTime'), 0);
   	}
   }
 
@@ -149,7 +184,7 @@ class Room extends React.Component {
 						placeholder="Search"
 						onChange={(e) => this.setState({ searchText: e.target.value })}
 						onFocus={() => {
-								this.setState({ isSearchActive: true, searchResult: [], isPlaylistActive: false });
+              this.setState({ isSearchActive: true, searchResult: [], isPlaylistActive: false });
 						}}
 						onKeyPress={this.onKeyPressForSearch}
 						value={this.state.searchText}
@@ -188,7 +223,10 @@ class Room extends React.Component {
 					</div>
 
 					{/*Comment*/}
-					<Comments currentUser={this.state.currentUser} />
+					<Comments
+						currentUser={this.state.currentUser}
+						key={this.state.room.key}
+					/>
 
           {/*SearchResult*/}
 					<SearchResult
@@ -210,7 +248,7 @@ class Room extends React.Component {
               	{ 'play-controll__pause': this.state.isPlaying },
                 { 'play-controll__play': !this.state.isPlaying },
               )}
-              onClick={() => post('playing', !this.state.isPlaying)}
+              onClick={() => post(this.path('playing'), !this.state.isPlaying)}
             >&nbsp;
 						</button>
 						<button

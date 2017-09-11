@@ -21,8 +21,16 @@ class Comments extends React.Component {
     this.onKeyPressForComment = this.onKeyPressForComment.bind(this);
   }
 
-		componentDidMount() {
-    base.listenTo('comments', { context: this, asArray: true, then(comments) {
+	roomPath() {
+		return `rooms/${this.props.key}`;
+	}
+
+	path(path) {
+		return `${this.roomPath()}/${path}`;
+	}
+
+  componentDidMount() {
+    base.listenTo(this.path('comments'), { context: this, asArray: true, then(comments) {
       this.setState({ comments });
     }});
   }
@@ -137,6 +145,7 @@ class Comments extends React.Component {
 
 Comments.propTypes = {
   currentUser: React.PropTypes.object,
+  key: React.PropTypes.string,
 };
 
 export default Comments;

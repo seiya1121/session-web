@@ -15,7 +15,7 @@ class Root extends React.Component {
     <Router>
       <div className="contents">
         <Route exact path="/" component={Top} />
-        <Route path="/:groupName" component={Room} />
+        <Route path="/:roomName" component={Room} />
       </div>
     </Router>
   )
