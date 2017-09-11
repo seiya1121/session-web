@@ -197,12 +197,12 @@ class Room extends React.Component {
 				<div className="footer-bar">
 					<div className="play-controll">
 						<button
-							className={classNames(
-								{ 'play-controll__pause': this.state.isPlaying },
-								{ 'play-controll__play': !this.state.isPlaying },
-							)}
-							onClick={() => this.setState({ isPlaying: !this.state.isPlaying })}
-						>&nbsp;
+              className={classNames(
+              	{ 'play-controll__pause': this.state.isPlaying },
+                { 'play-controll__play': !this.state.isPlaying },
+              )}
+              onClick={() => post('playing', !this.state.isPlaying)}
+            >&nbsp;
 						</button>
 						<button
 							className="play-controll__skip"
