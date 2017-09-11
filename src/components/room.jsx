@@ -128,6 +128,8 @@ class Room extends React.Component {
   	const playingVideo = this.state.playingVideo || DefaultVideo;
 		return (
       <div className="contents">
+
+				{/*Header*/}
 				<header className="header-bar">
 					<div className="header-bar__left">
 						<div className="header-bar-prof">
@@ -163,6 +165,7 @@ class Room extends React.Component {
 					</div>
 				</header>
 				<div className="main-display">
+          {/*Player*/}
 					<div className="display-youtube">
 						<ReactPlayer
 							ref={(player) => { this.player = player; }}
@@ -183,7 +186,11 @@ class Room extends React.Component {
 							onDuration={(duration) => this.setState({ duration })}
 						/>
 					</div>
+
+					{/*Comment*/}
 					<Comments currentUser={this.state.currentUser} />
+
+          {/*SearchResult*/}
 					<SearchResult
 						que={this.state.que}
 						searchResult={this.state.searchResult}
@@ -195,6 +202,8 @@ class Room extends React.Component {
 					/>
 				</div>
 				<div className="footer-bar">
+
+					{/*Controll*/}
 					<div className="play-controll">
 						<button
               className={classNames(
@@ -209,6 +218,8 @@ class Room extends React.Component {
 							onClick={this.goNext}
 						>&nbsp;</button>
 					</div>
+
+					{/*ProgressBar*/}
 					<div className="progress-box">
 						{
 							isPostPlayingVideo &&
