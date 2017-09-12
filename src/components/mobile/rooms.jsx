@@ -46,6 +46,7 @@ class Rooms extends React.Component {
       loaded: 0,
       played: 0,
       startTime: 0,
+			pageState: 0,
 		});
 
 		this.room = {};
@@ -101,11 +102,6 @@ class Rooms extends React.Component {
         const roomClass = new Room(room.key, room.name);
 				this.setState({ roomKey: room.key, roomName: room.name });
 				const path = (property) => `rooms/${roomClass.key}/${property}`
-        base.listenTo(path('startTime'), { context: this, asArray: false, then(startTime) {
-          const played = typeof startTime === 'object' ? 0 : startTime;
-          this.setState({ played });
-          this.player.seekTo(played);
-        }});
         base.listenTo(path('isPlaying'), { context: this, asArray: false, then(playing) {
           this.setState({ isPlaying: typeof playing === 'object' ? true : playing});
         }});
@@ -114,6 +110,9 @@ class Rooms extends React.Component {
           this.setState({ playingVideo });
         }});
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
+				base.listenTo(path('comments'), { context: this, asArray: true, then(comments) {
+					this.setState({ comments });
+				}});
 			}).catch(err => console.log(err));
 		return true;
   }
@@ -236,8 +235,8 @@ class Rooms extends React.Component {
 	}
 
 	playbackPage() {
-		const video = this.state.que[0];
-		const musicName = this.video ? video.title : '再生していません';
+		const { playingVideo } = this.state;
+		const musicName = playingVideo ? playingVideo.title : '再生していません';
 		return (
 			<div className="contents">
 				只今流れている音楽：{musicName}
