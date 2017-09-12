@@ -89,20 +89,28 @@ class SearchResult extends React.Component {
   render() {
     return(
       <div>
-        <button onClick={this.onClickSearch}>
-          search
-        </button>
-        <input
-          className={classNames('form-search', { 'is-search-active': this.state.isSearchActive })}
-          type="text"
-          placeholder="Search"
-          onChange={(e) => this.onChangeText(e.target.value)}
-          onFocus={() => {
-            this.setState({ isSearchActive: true, isPlaylistActive: false });
-          }}
-          value={this.state.searchText}
-        >
-        </input>
+        <div className="mobile-search-wrap">
+          <input
+            className={classNames('form-search', { 'is-search-active': this.state.isSearchActive })}
+            type="text"
+            placeholder="Search"
+            onChange={(e) => this.onChangeText(e.target.value)}
+            onFocus={() => {
+              this.setState({ isSearchActive: true, isPlaylistActive: false });
+            }}
+            value={this.state.searchText}
+          >
+          </input>
+          <div
+            className={classNames(
+              'mobile-search-button',
+              { 'is-active': this.state.isSearchActive }
+            )}
+            onClick={this.onClickSearch}
+          >
+            <img src="/images/icon_search.svg" alt=""/>
+          </div>
+        </div>
         <div
           className={classNames(
             'display-control',

@@ -124,8 +124,31 @@ input {
   .is-mobile &{
     float: none;
     background: $color-white !important;
-    width:calc( 100% - 40px ) !important;
+    width:calc( 100% - 80px ) !important;
     margin: 0 0 0 20px;
+  }
+}
+
+.mobile-search-wrap {
+  display: flex;
+}
+
+.mobile-search-button {
+  border: 1px solid $color-bar-bg;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  margin-left: 10px;
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  -webkit-align-items: center; /* Safari */
+  justify-content: center;
+  align-items: center;
+  vertical-align: top;
+
+  img {
+    width: 15px;
+    height: 15px;
   }
 }
 
@@ -440,9 +463,9 @@ input {
   transition: .5s;
 
   .is-mobile & {
-    height: calc( 100% - 105px );
+    height: calc( 100% - 110px );
     right: 0;
-    top: 105px;
+    top: 110px;
     width: 100%;
   }
 
