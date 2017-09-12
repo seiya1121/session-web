@@ -275,15 +275,6 @@ class Rooms extends React.Component {
 					</div>
 					<div
 						className={classNames(
-							"mobile-global-nav__item",
-							{"is-active": this.state.pageState===2 }
-						)}
-						onClick={() => this.setState({ pageState: 2 })}
-					>
-						<img src="/images/icon_search.svg" alt=""/>
-					</div>
-					<div
-						className={classNames(
               "mobile-global-nav__item",
               {"is-active": this.state.pageState === 3 }
             )}
@@ -291,6 +282,16 @@ class Rooms extends React.Component {
 					>
 						<img src="/images/icon_list.svg" alt=""/>
 					</div>
+					<div
+						className={classNames(
+							"mobile-global-nav__item",
+							{"is-active": this.state.pageState===2 }
+						)}
+						onClick={() => this.setState({ pageState: 2 })}
+					>
+						<img src="/images/icon_search.svg" alt=""/>
+					</div>
+
 				</nav>
 				{this.nowPage()}
 			</div>
