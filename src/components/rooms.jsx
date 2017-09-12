@@ -190,6 +190,16 @@ class Rooms extends React.Component {
   	return !this.state.seeking && this.setState(playingStatus);
   }
 
+  renderUsersList() {
+    const users = this.state.users.slice(0, 9);
+    return users.map(u => (
+      <div key={u.uid}>
+        <span>{u.name}</span>
+        <img src={u.photoURL} alt={u.name}/>
+      </div>
+    ))
+  }
+
   render() {
   	const isPostPlayingVideo = this.state.playingVideo !== '';
   	const playingVideo = this.state.playingVideo || DefaultVideo;
@@ -202,8 +212,14 @@ class Rooms extends React.Component {
 						<div className="header-bar-prof">
               <span>{this.state.users.length}</span>
               <span>{this.state.currentUser.name}</span>
-              <img className='header-bar-prof__icon' src={this.state.currentUser.photoURL} />
+              <img
+                className='header-bar-prof__icon'
+                src={this.state.currentUser.photoURL}
+                alt={this.state.currentUser.name}
+              />
 						</div>
+            {this.renderUsersList()}
+            {(this.state.users.length >= 10) && <p>+ 10</p>}
 					</div>
 					<div
 						className={classNames('button-search-list', { 'is-search-active': this.state.isSearchActive })}
