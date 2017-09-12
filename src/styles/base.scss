@@ -118,6 +118,36 @@ input {
     width: calc( 30% - 55px );
     transition: .5s;
   }
+
+  .is-mobile &{
+    float: none;
+    background: $color-white !important;
+    width:calc( 100% - 80px ) !important;
+    margin: 0 0 0 20px;
+  }
+}
+
+.mobile-search-wrap {
+  display: flex;
+}
+
+.mobile-search-button {
+  border: 1px solid $color-bar-bg;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  margin-left: 10px;
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  -webkit-align-items: center; /* Safari */
+  justify-content: center;
+  align-items: center;
+  vertical-align: top;
+
+  img {
+    width: 15px;
+    height: 15px;
+  }
 }
 
 // profile
@@ -278,7 +308,6 @@ input {
   cursor: pointer;
 }
 
-
 // button-playlist-list
 .button-playlist-list {
   float: right;
@@ -323,6 +352,10 @@ input {
   padding: 0;
   overflow: auto;
 
+  .is-mobile & {
+    width: calc( 100% - 40px );
+  }
+
   .comment-input {
     -webkit-app-region: no-drag;
 
@@ -342,8 +375,12 @@ input {
     &.is-active {
       color: $color-black;
       background: $color-white;
-      width: calc( 30% - 40px );
+      width: calc( 50% - 40px );
       transition: .5s;
+    }
+
+    .is-mobile &.is-active {
+      width: calc( 100% );
     }
   }
 }
@@ -442,6 +479,10 @@ input {
   .comment-single {
     color: $color-black;
     font-size: 22px;
+
+    .is-mobile & {
+      font-size: 16px;
+    }
   }
 
   .comment-author {
@@ -450,8 +491,7 @@ input {
   }
 }
 
-// include .display-search and .display-list
-
+// 右側のリスト群
 .display-control {
   width: 60%;
   height: 100%;
@@ -462,6 +502,13 @@ input {
   background: transparentize($color-black, .4);
 
   transition: .5s;
+
+  .is-mobile & {
+    height: calc( 100% - 110px );
+    right: 0;
+    top: 110px;
+    width: 100%;
+  }
 
   &.is-quelist-list {
     right: -30%;
@@ -481,11 +528,20 @@ input {
   height: 100%;
   overflow: hidden;
   padding: 20px;
+
+  .is-mobile &{
+    border: none;
+    width: 100%;
+  }
 }
 
 .display-list {
   @extend %display-control__child;
   right: 50%;
+
+  .is-mobile & {
+    display: none;
+  }
 }
 
 .display-search {
@@ -640,15 +696,21 @@ input {
   height: 25px;
   display: block;
   float: left;
-
   margin: 0 5px;
-
   border-radius: 50%;
   border: solid 1px $color-white;
   background: $color-bar-bg;
   cursor: pointer;
-
   position: relative;
+
+  .is-mobile & {
+    background: $color-black;
+    border: solid 1px $color-bar-bg;
+    height: 100px;
+    float: none;
+    margin: 60px 20px 0;
+    width: 100px;
+  }
 }
 
 .play-controll {
@@ -656,6 +718,14 @@ input {
   width: 150px;
   box-sizing: border-box;
   padding: 25px 40px;
+
+  .is-mobile & {
+    float: none;
+    display: flex;
+    -webkit-justify-content: center; /* Safari */
+    justify-content: center;
+    width: auto;
+  }
 
   &__play {
     @extend %controll-default;
@@ -671,6 +741,16 @@ input {
       border: 5px solid transparent;
       border-left: 8px solid $color-key;
       line-height: 0;
+
+      .is-mobile & {
+        left: 36px;
+        top: 29px;
+        content: "";
+        width: 40px;
+        height: 0;
+        border: 20px solid transparent;
+        border-left: 32px solid $color-key;
+      }
     }
   }
 
@@ -687,14 +767,28 @@ input {
       width: 2px;
       height: 8px;
       background: $color-key;
+
+      .is-mobile & {
+        top: 32px;
+        width: 8px;
+        height: 32px;
+      }
     }
 
     &:before {
       left: 13px;
+
+      .is-mobile & {
+        left: 56px;
+      }
     }
 
     &:after {
       left: 8px;
+
+      .is-mobile & {
+        left: 36px;
+      }
     }
   }
 
@@ -709,18 +803,34 @@ input {
       top: 7px;
       width: 0;
       height: 0;
+
+      .is-mobile & {
+        top: 32px;
+      }
     }
 
     &:before {
       border: 4px solid transparent;
       border-left: 5px solid $color-key;
       left: 7px;
+
+      .is-mobile & {
+        border: 16px solid transparent;
+        border-left: 20px solid $color-key;
+        left: 32px;
+      }
     }
 
     &:after {
       left: 14px;
       border-right: 2px solid $color-key;
       height: 8px;
+
+      .is-mobile & {
+        left: 60px;
+        border-right: 8px solid $color-key;
+        height: 32px;
+      }
     }
 
   }
@@ -846,5 +956,85 @@ input {
     z-index: 5;
 
     background: #CCCCCC;
+  }
+}
+
+/* for Mobile */
+// nav-bar
+.mobile-global-nav {
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  justify-content: center;
+  position: relative;
+  z-index: 100;
+
+  &__item {
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    -webkit-justify-content: center; /* Safari */
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin: 10px 5px;
+    border: solid 1px $color-bar-bg;
+    background: $color-black;
+
+    &.is-active {
+      border: solid 1px $color-white;
+    }
+
+    img {
+      width: 20px;
+      height: auto;
+    }
+  }
+}
+
+.mobile-control {
+  padding: 20px;
+  height: calc( 100% - 72px);
+}
+
+.mobile-style-title {
+  border-bottom: solid 1px $color-bar-bg;
+  border-top: solid 1px $color-bar-bg;
+
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  -webkit-align-items: center; /* Safari */
+  justify-content: center;
+  align-items: center;
+
+  height: 40%;
+  text-align: center;
+}
+
+.mobile-wave-locator {
+  bottom: 90px;
+  position: absolute;
+  right: 20px;
+  z-index: 100;
+}
+
+.mobile-wave-button{
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  margin: 10px 5px;
+  border: solid 1px $color-bar-bg;
+  background: transparentize($color-black,.4);
+
+  &.is-active {
+    border: solid 1px $color-white;
+  }
+
+  img {
+    width: 35px;
+    height: auto;
   }
 }
