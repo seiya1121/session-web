@@ -2,7 +2,6 @@ import React from 'react';
 import classNames from 'classnames';
 import { push } from '../../scripts/db.js';
 import { base } from '../../config/firebaseApp';
-import {VelocityComponent, VelocityTransitionGroup} from 'velocity-react';
 
 class Wave extends React.Component {
   constructor(props) {
@@ -21,13 +20,7 @@ class Wave extends React.Component {
   }
 
   doWave(num) {
-    return (
-      <VelocityTransitionGroup enter={{animation: "slideDown"}} leave={{animation: "slideUp"}} runOnMount={true}>
-        <h1 style={{marginRight: 'auto', marginLeft: 'auto', textAlign: 'center', position: 'relative'}}>
-          Modal test
-        </h1>
-      </VelocityTransitionGroup>
-    )
+    return ('')
   }
 
   render() {
