@@ -15,9 +15,12 @@ class Top extends React.Component {
   this.state = {
     roomNames: [],
     roomName: '',
+    isShowCreateRoomButton: true,
   };
 
   this.onClickSubmitRoom = this.onClickSubmitRoom.bind(this);
+  this.onClickRedirectRoom = this.onClickRedirectRoom.bind(this);
+  this.onClickToggleButtonArea = this.onClickToggleButtonArea.bind(this);
  }
 
  componentWillMount() {
@@ -39,6 +42,58 @@ class Top extends React.Component {
    return true
  }
 
+ onClickRedirectRoom() {
+   const { roomName } = this.state;
+   if (roomName === '') return false;
+   if (!this.state.roomNames.includes(roomName)) return false;
+   this.props.history.push({ pathname: `/${roomName}`})
+ }
+
+ onClickToggleButtonArea() {
+   this.setState({ isShowCreateRoomButton: !this.state.isShowCreateRoomButton })
+ }
+
+ renderButtonArea() {
+   if (this.state.isShowCreateRoomButton) {
+     return (
+       <div className="create-room-box">
+         <p>Create a room link</p>
+         <span>session/</span>
+         <input
+           type="text"
+           placeholder="type-room-name"
+           onChange={(e) => this.setState({ roomName: e.target.value })}
+           value={this.state.roomName}
+           className="create-room-input"
+         >
+         </input>
+         <button onClick={this.onClickSubmitRoom} className="create-room-btn">
+           Create new room
+         </button>
+         <a href="#" onClick={this.onClickToggleButtonArea}>Enter a existing room</a>
+       </div>
+     )
+   }
+   return (
+     <div className="create-room-box">
+       <p>Enter a room</p>
+       <span>session/</span>
+       <input
+         type="text"
+         placeholder="type-room-name"
+         onChange={(e) => this.setState({ roomName: e.target.value })}
+         value={this.state.roomName}
+         className="create-room-input"
+       >
+       </input>
+       <button onClick={this.onClickRedirectRoom} className="create-room-btn">
+         Enter a room
+       </button>
+       <a href="#" onClick={this.onClickToggleButtonArea}>Create a new room</a>
+     </div>
+   )
+ }
+
  render() {
   return (
     <div className="img-wrap">
@@ -48,21 +103,7 @@ class Top extends React.Component {
           <p className="first-copy">Why not chill out and share your taste with your fellows?</p>
           <p className="second-copy">Enjoy your "SESSION" anytime, anywhere.</p>
         </div>
-        <div className="create-room-box">
-          <p>Create a room link</p>
-          <span>session/</span>
-          <input
-            type="text"
-            placeholder="type-room-name"
-            onChange={(e) => this.setState({ roomName: e.target.value })}
-            value={this.state.roomName}
-            className="create-room-input"
-          >
-          </input>
-          <button onClick={this.onClickSubmitRoom} className="create-room-btn">
-             Create new room
-          </button>
-        </div>
+        {this.renderButtonArea()}
       </div>
       <ReactPlayer
         ref={(player) => { this.player = player; }}
