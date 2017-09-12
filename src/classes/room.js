@@ -3,7 +3,7 @@ import { firebaseDB } from '../config/firebaseApp.js';
 
 export default class Room {
 	constructor(
-		key, name, comments = [], isPlaying = false, playingVideo = DefaultVideo, users = [],
+		key, name, comments = [], isPlaying = true, playingVideo = DefaultVideo, users = [],
     que = [], startTime = ''
 	) {
 		this.key = key;

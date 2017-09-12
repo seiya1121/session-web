@@ -13,15 +13,19 @@ class Comments extends React.Component {
     this.state = {
       commentText: '',
       isCommentActive: false,
-      comments: [],
+      comments: props.comments,
     };
 
     this.setGifUrl = this.setGifUrl.bind(this);
     this.onKeyPressForComment = this.onKeyPressForComment.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({ comments: nextProps.comments })
+  }
+
 	roomPath() {
-		return `rooms/${this.state.roomKey}`;
+		return `rooms/${this.props.roomKey}`;
 	}
 
 	path(path) {
@@ -61,7 +65,7 @@ class Comments extends React.Component {
 
   render() {
     const comments = (this.state.isCommentActive) ?
-     this.props.comments : this.props.comments.slice(this.props.comments.length - 3, this.props.comments.length);
+     this.state.comments : this.state.comments.slice(this.state.comments.length - 3, this.state.comments.length);
 
     const commentClass = (type, index) => (
       (type === CommentType.log) ?
@@ -138,7 +142,8 @@ class Comments extends React.Component {
 
 Comments.propTypes = {
   currentUser: React.PropTypes.object,
-  roomId: React.PropTypes.string,
+  roomKey: React.PropTypes.string,
+  comments: React.PropTypes.array,
 };
 
 export default Comments;
