@@ -39,23 +39,40 @@ class Room extends React.Component {
       isPlaylistActive: false,
       isPlaying: true,
       seeking: false,
-      duration: 0,
       loaded: 0,
-      volume: 0.8,
       played: 0,
-      startTime: 0,
+			pageState: 0,
 		});
 
     this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
     this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
     this.goNext = this.goNext.bind(this);
-    this.progress = this.progress.bind(this);
   }
+
+	isCommentPage() {
+		return this.state.pageState === 0
+	}
+
+	isPlaybackPage() {
+		return this.state.pageState === 1
+	}
+
+	isSearchPage() {
+		return this.state.pageState === 2
+	}
+
+	nowPage() {
+		if (this.isCommentPage()) {
+			return this.commentPage();
+		} else if (this.isPlaybackPage()) {
+			return this.playbackPage();
+		}
+		return this.searchPage();
+	}
 
   componentDidMount() {
   	base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
   		this.setState({ played: startTime });
-  		this.player.seekTo(startTime);
   	}});
   	base.listenTo('playing', { context: this, asArray: false, then(playing) {
   		this.setState({ isPlaying: playing });
@@ -86,8 +103,7 @@ class Room extends React.Component {
   	youTubeNode.search(searchText, 50,
 			(error, result) => {
   		  if (error) {
-  		  	console.log(error);
-  		  } else {
+				} else {
   		  	const searchResult = result.items.map(item => ({
 						id: item.id.videoId,
 						title: item.snippet.title,
@@ -113,16 +129,8 @@ class Room extends React.Component {
   	}
   }
 
-  progress({ played, loaded }) {
-  	const playingStatus = (loaded) ? { played, loaded } : { played };
-  	return !this.state.seeking && this.setState(playingStatus);
-  }
-
 	stop() {
-		const video = this.state.que[0];
-		if (video) {
-			post('playing', !this.state.isPlaying);
-		}
+		if (this.state.que[0]) post('playing', !this.state.isPlaying);
 	}
 
 	render() {
@@ -130,6 +138,61 @@ class Room extends React.Component {
 		const playingVideo = this.state.playingVideo || DefaultVideo;
 		return (
 			<div className="contents">
+				<button
+					onClick={() => this.setState({ pageState: 0 })}
+				>
+					コメントページ
+				</button>
+				<button
+					onClick={() => this.setState({ pageState: 1 })}
+				>
+					再生ページ
+				</button>
+				<button
+					onClick={() => this.setState({ pageState: 2 })}
+				>
+					検索
+				</button>
+				{ this.nowPage() }
+			</div>
+		);
+	}
+
+	searchPage() {
+		return (
+			<div>
+				<input
+					className={classNames('form-search', { 'is-search-active': this.state.isSearchActive })}
+					type="text"
+					placeholder="Search"
+					onChange={(e) => this.setState({ searchText: e.target.value })}
+					onFocus={() => {
+						this.setState({ isSearchActive: true, searchResult: [], isPlaylistActive: false });
+					}}
+					onKeyPress={this.onKeyPressForSearch}
+					value={this.state.searchText}
+					>
+				</input>
+
+				<SearchResult
+					que={this.state.que}
+					searchResult={this.state.searchResult}
+					currentUser={this.state.currentUser}
+					searchedText={this.state.searchedText}
+					isSearchActive={this.state.isSearchActive}
+					isQueListActive={this.state.isQueListActive}
+					isNoPlayingVideo={this.state.playingVideo.title === ''}
+				/>
+			</div>
+		)
+	}
+
+	playbackPage() {
+		const video = this.state.que[0];
+		const musicName = this.video ? video.title : '再生していません';
+		return (
+			<div className="contents">
+				只今流れている音楽：{musicName}
 				<button
 					onClick={() => this.stop()}
 				>
@@ -141,6 +204,12 @@ class Room extends React.Component {
 					次へ
 				</button>
 			</div>
+		);
+	}
+
+	commentPage() {
+		return (
+			<Comments currentUser={this.state.currentUser} />
 		);
 	}
 }
