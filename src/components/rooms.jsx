@@ -213,8 +213,8 @@ class Rooms extends React.Component {
 
   renderUsersList() {
     const users = this.state.users.slice(0, 9);
-    return users.map(u => (
-      <div key={u.uid} className="header-bar-prof__unit">
+    return users.map((u, i) => (
+      <div key={i} className="header-bar-prof__unit">
         <img className="header-bar-prof__icon" src={u.photoURL} alt={u.name}/>
         <span className="header-bar-prof__name">{u.name}</span>
       </div>
