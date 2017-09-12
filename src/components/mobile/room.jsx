@@ -10,6 +10,7 @@ import { post, remove, push } from '../../scripts/db';
 // Components
 import SearchResult from '../room/searchResult';
 import Comments from '../room/comments';
+import Wave from '../room/wave';
 
 // Styles
 import '../../styles/base.scss';
@@ -43,6 +44,9 @@ class Room extends React.Component {
       played: 0,
 			pageState: 0,
 		});
+		const audio = new Audio();
+		audio.src = '../../../lamb.mp3'
+		audio.play();
 
     this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
     this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
@@ -207,10 +211,14 @@ class Room extends React.Component {
 		);
 	}
 
+	addWave() {
+
+	}
+
 	commentPage() {
 		return (
 			<div>
-				<button>wave</button>
+				<Wave id='1234' wave='0'/>
 				<Comments currentUser={this.state.currentUser} />
 			</div>
 		);
