@@ -7,7 +7,6 @@ import { DefaultVideoWave } from '../../constants.js';
 class Wave extends React.Component {
   constructor(props) {
     super(props);
-    console.log('new');
     this.state = {
       videoWave: {
         videoId: props.playingVideo.id
