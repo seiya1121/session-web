@@ -641,6 +641,7 @@ input {
 
   .is-mobile & {
     background: $color-black;
+    border: solid 1px $color-bar-bg;
     height: 100px;
     float: none;
     margin: 60px 20px 0;
