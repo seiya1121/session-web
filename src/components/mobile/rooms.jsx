@@ -183,7 +183,7 @@ class Rooms extends React.Component {
 
 	quePage() {
 		return (
-			<div className="display-control is-quelist-list">
+			<div className="display-control">
 				<div className="display-list">
 					<div className="list-group-title">
 						Up Coming <span className="list-group-title__number">{this.state.que.length}</span>
@@ -275,6 +275,15 @@ class Rooms extends React.Component {
 					</div>
 					<div
 						className={classNames(
+              "mobile-global-nav__item",
+              {"is-active": this.state.pageState === 3 }
+            )}
+						onClick={() => this.setState({ pageState: 3 })}
+					>
+						<img src="/images/icon_list.svg" alt=""/>
+					</div>
+					<div
+						className={classNames(
 							"mobile-global-nav__item",
 							{"is-active": this.state.pageState===2 }
 						)}
@@ -282,15 +291,7 @@ class Rooms extends React.Component {
 					>
 						<img src="/images/icon_search.svg" alt=""/>
 					</div>
-					<div
-						className={classNames(
-              "mobile-global-nav__item",
-              {"is-active": this.state.pageState === 3 }
-            )}
-						onClick={() => this.setState({ pageState: 3 })}
-					>
-						<img src="/images/icon_search.svg" alt=""/>
-					</div>
+
 				</nav>
 				{this.nowPage()}
 			</div>
