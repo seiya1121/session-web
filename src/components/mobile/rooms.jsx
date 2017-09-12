@@ -183,7 +183,7 @@ class Rooms extends React.Component {
 
 	quePage() {
 		return (
-			<div className="display-control is-quelist-list">
+			<div className="display-control">
 				<div className="display-list">
 					<div className="list-group-title">
 						Up Coming <span className="list-group-title__number">{this.state.que.length}</span>
@@ -289,7 +289,7 @@ class Rooms extends React.Component {
             )}
 						onClick={() => this.setState({ pageState: 3 })}
 					>
-						<img src="/images/icon_search.svg" alt=""/>
+						<img src="/images/icon_list.svg" alt=""/>
 					</div>
 				</nav>
 				{this.nowPage()}

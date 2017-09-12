@@ -540,7 +540,7 @@ input {
   right: 50%;
 
   .is-mobile & {
-    display: none;
+    right: 0;
   }
 }
 
