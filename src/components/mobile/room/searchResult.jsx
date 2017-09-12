@@ -17,10 +17,18 @@ class SearchResult extends React.Component {
       searchText: '',
       searchedText: '',
     };
+    this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
     this.onClickSearch = this.onClickSearch.bind(this);
     this.goTargetVideo = this.goTargetVideo.bind(this);
     this.onClickSetQue = this.onClickSetQue.bind(this);
     this.onChangeText = this.onChangeText.bind(this);
+  }
+
+  onKeyPressForSearch(e) {
+    if (e.which !== 13) return false;
+    e.preventDefault();
+    this.onClickSearch();
+    return true;
   }
 
   roomPath() {
@@ -98,6 +106,7 @@ class SearchResult extends React.Component {
             onFocus={() => {
               this.setState({ isSearchActive: true, isPlaylistActive: false });
             }}
+            onKeyPress={this.onKeyPressForSearch}
             value={this.state.searchText}
           >
           </input>
