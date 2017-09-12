@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="734.062 -102.835 18.875 10.171">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #fff;
+        stroke-miterlimit: 10;
+      }
+    </style>
+  </defs>
+  <g id="グループ化_11" data-name="グループ化 11" transform="translate(734.062 -102.835)">
+    <line id="線_15" data-name="線 15" class="cls-1" y2="6.595" transform="translate(18.376 3.575)"/>
+    <line id="線_16" data-name="線 16" class="cls-1" y2="8.136" transform="translate(15.417 2.034)"/>
+    <line id="線_17" data-name="線 17" class="cls-1" y2="5.856" transform="translate(12.396 4.315)"/>
+    <line id="線_18" data-name="線 18" class="cls-1" y2="10.171" transform="translate(9.438)"/>
+    <line id="線_19" data-name="線 19" class="cls-1" y2="7.089" transform="translate(6.479 3.082)"/>
+    <line id="線_20" data-name="線 20" class="cls-1" y2="8.136" transform="translate(3.459 2.034)"/>
+    <line id="線_21" data-name="線 21" class="cls-1" y2="4.931" transform="translate(0.5 5.239)"/>
+  </g>
+</svg>

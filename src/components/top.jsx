@@ -15,9 +15,12 @@ class Top extends React.Component {
   this.state = {
     roomNames: [],
     roomName: '',
+    isShowCreateRoomButton: true,
   };
 
   this.onClickSubmitRoom = this.onClickSubmitRoom.bind(this);
+  this.onClickRedirectRoom = this.onClickRedirectRoom.bind(this);
+  this.onClickToggleButtonArea = this.onClickToggleButtonArea.bind(this);
  }
 
  componentWillMount() {
@@ -39,6 +42,58 @@ class Top extends React.Component {
    return true
  }
 
+ onClickRedirectRoom() {
+   const { roomName } = this.state;
+   if (roomName === '') return false;
+   if (!this.state.roomNames.includes(roomName)) return false;
+   this.props.history.push({ pathname: `/${roomName}`})
+ }
+
+ onClickToggleButtonArea() {
+   this.setState({ isShowCreateRoomButton: !this.state.isShowCreateRoomButton })
+ }
+
+ renderButtonArea() {
+   if (this.state.isShowCreateRoomButton) {
+     return (
+       <div className="create-room-box">
+         <p>Create a room link</p>
+         <span>session/</span>
+         <input
+           type="text"
+           placeholder="type-room-name"
+           onChange={(e) => this.setState({ roomName: e.target.value })}
+           value={this.state.roomName}
+           className="create-room-input"
+         >
+         </input>
+         <button onClick={this.onClickSubmitRoom} className="create-room-btn">
+           Create new room
+         </button>
+         <p className="top-or">OR<a href="#" onClick={this.onClickToggleButtonArea} className="toggle-url-form">Enter existing room</a> </p>
+       </div>
+     )
+   }
+   return (
+     <div className="create-room-box">
+       <p>Enter room</p>
+       <span>session/</span>
+       <input
+         type="text"
+         placeholder="type-room-name"
+         onChange={(e) => this.setState({ roomName: e.target.value })}
+         value={this.state.roomName}
+         className="create-room-input"
+       >
+       </input>
+       <button onClick={this.onClickRedirectRoom} className="create-room-btn">
+         Enter room
+       </button>
+       <p className="top-or">OR<a href="#" onClick={this.onClickToggleButtonArea} className="toggle-url-form">Create a new room</a></p>
+     </div>
+   )
+ }
+
  render() {
   return (
     <div className="img-wrap">
@@ -48,22 +103,23 @@ class Top extends React.Component {
           <p className="first-copy">Why not chill out and share your taste with your fellows?</p>
           <p className="second-copy">Enjoy your "SESSION" anytime, anywhere.</p>
         </div>
-        <div className="create-room-box">
-          <p>Create a room link</p>
-          <span>session/</span>
-          <input
-            type="text"
-            placeholder="type-room-name"
-            onChange={(e) => this.setState({ roomName: e.target.value })}
-            value={this.state.roomName}
-            className="create-room-input"
-          >
-          </input>
-          <button onClick={this.onClickSubmitRoom} className="create-room-btn">
-             Create new room
-          </button>
-        </div>
+        {this.renderButtonArea()}
       </div>
+      {/* <ReactPlayer
+        ref={(player) => { this.player = player; }}
+        className="react-player top-bg-movie"
+        width={"110%"}
+        height={"110%"}
+        url={'https://www.youtube.com/watch?v=qNMTGTJ0ovA'}
+        playing={true}
+        volume={0}
+        onReady={() => console.log('Ready')}
+        onPlay={() => console.log('Play')}
+        onPause={() => console.log('Pause')}
+        onEnded={() => console.log('Pause')}
+        onError={() => console.log('Pause')}
+        onProgress={() => console.log('Pause')}
+      /> */}
       <img src="/images/temporary-top-image.jpg" alt="PlaceHolder" className="top-bg-img" />
     </div>
   )
