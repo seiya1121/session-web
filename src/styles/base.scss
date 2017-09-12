@@ -640,8 +640,11 @@ input {
   position: relative;
 
   .is-mobile & {
+    background: $color-black;
+    height: 100px;
     float: none;
     margin: 60px 20px 0;
+    width: 100px;
   }
 }
 
@@ -673,6 +676,16 @@ input {
       border: 5px solid transparent;
       border-left: 8px solid $color-key;
       line-height: 0;
+
+      .is-mobile & {
+        left: 36px;
+        top: 29px;
+        content: "";
+        width: 40px;
+        height: 0;
+        border: 20px solid transparent;
+        border-left: 32px solid $color-key;
+      }
     }
   }
 
@@ -689,14 +702,28 @@ input {
       width: 2px;
       height: 8px;
       background: $color-key;
+
+      .is-mobile & {
+        top: 32px;
+        width: 8px;
+        height: 32px;
+      }
     }
 
     &:before {
       left: 13px;
+
+      .is-mobile & {
+        left: 56px;
+      }
     }
 
     &:after {
       left: 8px;
+
+      .is-mobile & {
+        left: 36px;
+      }
     }
   }
 
@@ -711,18 +738,34 @@ input {
       top: 7px;
       width: 0;
       height: 0;
+
+      .is-mobile & {
+        top: 32px;
+      }
     }
 
     &:before {
       border: 4px solid transparent;
       border-left: 5px solid $color-key;
       left: 7px;
+
+      .is-mobile & {
+        border: 16px solid transparent;
+        border-left: 20px solid $color-key;
+        left: 32px;
+      }
     }
 
     &:after {
       left: 14px;
       border-right: 2px solid $color-key;
       height: 8px;
+
+      .is-mobile & {
+        left: 60px;
+        border-right: 8px solid $color-key;
+        height: 32px;
+      }
     }
 
   }
