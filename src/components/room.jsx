@@ -25,7 +25,7 @@ const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, user, type, keyword) => (
 	Object.assign({ content, user, type, keyword })
 );
-const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url: '' }, displayName: '' });
+const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url: '' }, displayName: '', wave: 0 });
 const DefaultUser = Object.assign({ name: '', photoURL: '', accessToken: '', uid: '' });
 
 class Room extends React.Component {
