@@ -47,14 +47,10 @@ class Rooms extends React.Component {
       played: 0,
       startTime: 0,
 			pageState: 0,
+			videoWaves: [],
 		});
 
 		this.room = {};
-
-		// const audio = new Audio();
-		// audio.src = '../../../lamb.mp3'
-		// audio.play();
-
     this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
     this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
     this.goNext = this.goNext.bind(this);
@@ -89,6 +85,17 @@ class Rooms extends React.Component {
 		return this.searchPage();
 	}
 
+	callWave(num) {
+		const audio = new Audio();
+		if (num > 0) {
+			for (const i = 0; i < num; i++) {
+				//console.log('メー');
+				audio.src = '../../../lamb.mp3'
+				audio.play();
+			}
+		}
+	}
+
   componentDidMount() {
 		const { match } = this.props;
   	const { roomName } = match.params;
@@ -100,6 +107,7 @@ class Rooms extends React.Component {
 					return false;
 				}
         const roomClass = new Room(room.key, room.name);
+
 				this.setState({ roomKey: room.key, roomName: room.name });
 				const path = (property) => `rooms/${roomClass.key}/${property}`
         base.listenTo(path('isPlaying'), { context: this, asArray: false, then(playing) {
@@ -112,6 +120,12 @@ class Rooms extends React.Component {
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
 				base.listenTo(path('comments'), { context: this, asArray: true, then(comments) {
 					this.setState({ comments });
+				}});
+				base.listenTo(path('videoWaves'), { context: this, asArray: true, then(videoWaves) {
+					const localNum = this.state.videoWaves.filter((vw) => vw.videoId === this.state.playingVideo.id ).length;
+					const allNum = videoWaves.filter((vw) => vw.videoId === this.state.playingVideo.id ).length;
+					if (allNum - localNum !== 0 ) this.callWave(allNum-localNum);
+					this.setState({ videoWaves });
 				}});
 			}).catch(err => console.log(err));
 		return true;
@@ -254,19 +268,18 @@ class Rooms extends React.Component {
 		);
 	}
 
-	addWave() {
-
-	}
-
 	commentPage() {
 		return (
 			<div>
-				<Wave id='1234' wave='0'/>
-				<Comments
+				<Wave
+					playingVideo={this.state.playingVideo}
+					roomKey={this.state.roomKey}
+					/>
+				{/* <Comments
 					currentUser={this.state.currentUser}
 					comments={this.state.comments}
 					roomKey={this.state.roomKey}
-				/>
+				/> */}
 			</div>
 		);
 	}
