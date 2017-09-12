@@ -12,6 +12,7 @@ import Room from '../classes/room.js';
 // Components
 import SearchResult from './room/searchResult';
 import Comments from './room/comments';
+import Wave from './room/wave';
 
 // Styles
 import '../styles/normalize.scss';
@@ -51,6 +52,7 @@ class Rooms extends React.Component {
       volume: 0.8,
       played: 0,
       startTime: 0,
+			videoWaves: [],
 		});
 
     this.room = {};
@@ -61,6 +63,17 @@ class Rooms extends React.Component {
     this.progress = this.progress.bind(this);
     this.onClickTogglePlay = this.onClickTogglePlay.bind(this);
   }
+
+	callWave(num) {
+		const audio = new Audio();
+		if (num > 0) {
+			for (let i = 0; i < num; i++) {
+				//console.log('メー');
+				audio.src = '../../../lamb.mp3'
+				audio.play();
+			}
+		}
+	}
 
   componentDidMount() {
   	const { match } = this.props;
@@ -88,6 +101,12 @@ class Rooms extends React.Component {
           const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
           this.setState({ playingVideo });
         }});
+				base.listenTo(path('videoWaves'), { context: this, asArray: true, then(videoWaves) {
+					const localNum = this.state.videoWaves.filter((vw) => vw.videoId === this.state.playingVideo.id ).length;
+					const allNum = videoWaves.filter((vw) => vw.videoId === this.state.playingVideo.id ).length;
+					if (allNum - localNum !== 0 ) this.callWave(allNum-localNum);
+					this.setState({ videoWaves });
+				}});
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
 			}).catch(err => console.log(err));
 		return true;
@@ -219,7 +238,10 @@ class Rooms extends React.Component {
 							onDuration={(duration) => this.setState({ duration })}
 						/>
 					</div>
-
+					<Wave
+						playingVideo={this.state.playingVideo}
+						roomKey={this.state.roomKey}
+					/>
 					{/*Comment*/}
 					<Comments
 						currentUser={this.state.currentUser}
