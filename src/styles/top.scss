@@ -2,28 +2,33 @@
 // bg img
 .img-wrap {
   position: relative;
+  width: 100%;
+  height: 100%;
 
   &::before {
     content: "";
     width: 100%;
     height: 100%;
-    background-color: transparent;
+    background-color: rgba(0,0,0,0.25);
     background-image: radial-gradient(rgba(0,0,0,0.15) 5%, transparent 20%);
     background-size: 3px 3px;
+    margin-top: 30px;
     position: absolute;
   }
 
-  .top-bg-img {
-    width: 100%;
+  .top-bg-movie {
+    margin-left: calc(50% - 55%);
+    margin-top: -30px;
   }
 }
 
 // unique items
 .top-content-box {
-  width: 960px;
+  width: 80%;
   margin: 0 auto;
+  margin-top: 30px;
   position: absolute;
-  left: calc(50% - 480px);
+  left: calc(50% - 40%);
 
   p {
     margin-top: 0;
@@ -42,7 +47,6 @@
       font-weight: 600;
     }
   }
-
 
   // create room box
   .create-room-box {
