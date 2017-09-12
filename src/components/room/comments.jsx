@@ -2,7 +2,6 @@ import React from 'react';
 import classNames from 'classnames';
 import giphy from 'giphy-api';
 import { push } from '../../scripts/db.js';
-import { base } from '../../config/firebaseApp';
 import { CommentType, commentObj } from './utils/constants.js';
 
 const CommandType = { giphy: '/giphy ' };
@@ -21,11 +20,13 @@ class Comments extends React.Component {
     this.onKeyPressForComment = this.onKeyPressForComment.bind(this);
   }
 
-		componentDidMount() {
-    base.listenTo('comments', { context: this, asArray: true, then(comments) {
-      this.setState({ comments });
-    }});
-  }
+	roomPath() {
+		return `rooms/${this.state.roomKey}`;
+	}
+
+	path(path) {
+		return `${this.roomPath()}/${path}`;
+	}
 
   setGifUrl(keyword) {
     const key = keyword.replace(CommandType.giphy, '');
@@ -52,7 +53,7 @@ class Comments extends React.Component {
         CommentType.text,
         ''
       );
-      push('comments', comment);
+      push(this.path('comments'), comment);
       this.setState({ commentText: '' });
     }
     return true;
@@ -60,7 +61,7 @@ class Comments extends React.Component {
 
   render() {
     const comments = (this.state.isCommentActive) ?
-     this.state.comments : this.state.comments.slice(this.state.comments.length - 3, this.state.comments.length);
+     this.props.comments : this.props.comments.slice(this.props.comments.length - 3, this.props.comments.length);
 
     const commentClass = (type, index) => (
       (type === CommentType.log) ?
@@ -137,6 +138,7 @@ class Comments extends React.Component {
 
 Comments.propTypes = {
   currentUser: React.PropTypes.object,
+  roomId: React.PropTypes.string,
 };
 
 export default Comments;

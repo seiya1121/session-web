@@ -6,6 +6,8 @@ import ReactPlayer from 'react-player';
 import { YOUTUBE_API_KEY } from '../config/apiKey';
 import YouTubeNode from 'youtube-node';
 import { post, remove, push } from '../scripts/db';
+import { DefaultVideo, DefaultUser } from '../constants.js';
+import Room from '../classes/room.js'
 
 // Components
 import SearchResult from './room/searchResult';
@@ -25,17 +27,18 @@ const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, user, type, keyword) => (
 	Object.assign({ content, user, type, keyword })
 );
-const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url: '' }, displayName: '' });
-const DefaultUser = Object.assign({ name: '', photoURL: '', accessToken: '', uid: '' });
 
-class Room extends React.Component {
+class Rooms extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({
+      roomKey: '',
+			roomName: '',
       currentUser: DefaultUser,
       playingVideo: DefaultVideo,
       que: [],
       searchResult: [],
+      comments: [],
       searchText: '',
       searchedText: '',
       isSearchActive: false,
@@ -50,26 +53,54 @@ class Room extends React.Component {
       startTime: 0,
 		});
 
+    this.room = {};
+
     this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
     this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
     this.goNext = this.goNext.bind(this);
     this.progress = this.progress.bind(this);
   }
 
-  componentDidMount() {
-  	base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
-  		this.setState({ played: startTime });
-  		this.player.seekTo(startTime);
-  	}});
-  	base.listenTo('playing', { context: this, asArray: false, then(playing) {
-  		this.setState({ isPlaying: playing });
-  	}});
-  	base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
-  		const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
-  		this.setState({ playingVideo });
-  	}});
-  	base.listenTo('que', { context: this, asArray: true, then(que) { this.setState({ que }) } });
-  }
+  componentWillMount() {
+  	const { match } = this.props;
+  	const { roomName } = match.params;
+  	base.fetch('rooms', { context: this, asArray: true})
+			.then(data => {
+				const room = data.find(r => r.name === roomName);
+				if(room == null) {
+					this.props.history.push({ pathname: '/' });
+					return false;
+				}
+        const roomClass = new Room(room.key, room.name);
+				this.setState({ roomKey: room.key, roomName: room.name });
+				const path = (property) => `rooms/${roomClass.key}/${property}`
+        base.listenTo(path('startTime'), { context: this, asArray: false, then(startTime) {
+          const played = typeof startTime === 'object' ? 0 : startTime;
+          this.setState({ played });
+          this.player.seekTo(played);
+        }});
+        base.listenTo(path('playing'), { context: this, asArray: true, then(playing) {
+          this.setState({ isPlaying: typeof playing === 'object' ? true : playing});
+        }});
+        base.listenTo(path('playingVideo'), { context: this, asArray: false, then(video) {
+          const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
+          this.setState({ playingVideo });
+        }});
+        base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
+        base.listenTo(path('comments'), { context: this, asArray: true, then(comments) {
+          this.setState({ comments });
+        }});
+			}).catch(err => console.log(err));
+		return true;
+	}
+
+  roomPath() {
+  	return `rooms/${this.state.roomKey}`;
+	}
+
+	path(path) {
+  	return `${this.roomPath()}/${path}`;
+	}
 
   onKeyPressForSearch(e) {
   	if (e.which !== 13) return false;
@@ -107,14 +138,15 @@ class Room extends React.Component {
 
 	goNext() {
   	const video = this.state.que[0];
+  	console.log(this.roomPath());
   	if (video) {
-  		post('playingVideo', video);
-  		post('startTime', 0);
-  		remove(`que/${video.key}`);
-  		push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
+  		post(this.path('playingVideo'), video);
+  		post(this.path('startTime'), 0);
+  		remove(this.path(`que/${video.key}`));
+  		push(this.path('comments'), commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
   	} else {
-  		post('playingVideo', DefaultVideo);
-  		post('startTime', 0);
+  		post(this.path('playingVideo'), DefaultVideo);
+  		post(this.path('startTime'), 0);
   	}
   }
 
@@ -149,7 +181,7 @@ class Room extends React.Component {
 						placeholder="Search"
 						onChange={(e) => this.setState({ searchText: e.target.value })}
 						onFocus={() => {
-								this.setState({ isSearchActive: true, searchResult: [], isPlaylistActive: false });
+              this.setState({ isSearchActive: true, searchResult: [], isPlaylistActive: false });
 						}}
 						onKeyPress={this.onKeyPressForSearch}
 						value={this.state.searchText}
@@ -176,7 +208,6 @@ class Room extends React.Component {
 							playing={this.state.isPlaying}
 							volume={this.state.volume}
 							youtubeConfig={this.state.youtubeConfig}
-							fileConfig={this.state.fileConfig}
 							onReady={() => console.log('Ready')}
 							onPlay={() => console.log('Play')}
 							onPause={() => console.log('Pause')}
@@ -188,10 +219,15 @@ class Room extends React.Component {
 					</div>
 
 					{/*Comment*/}
-					<Comments currentUser={this.state.currentUser} />
+					<Comments
+						currentUser={this.state.currentUser}
+            comments={this.state.comments}
+						roomId={this.state.roomKey}
+					/>
 
           {/*SearchResult*/}
 					<SearchResult
+						roomId={this.state.roomKey}
 						que={this.state.que}
 						searchResult={this.state.searchResult}
 						currentUser={this.state.currentUser}
@@ -210,7 +246,7 @@ class Room extends React.Component {
               	{ 'play-controll__pause': this.state.isPlaying },
                 { 'play-controll__play': !this.state.isPlaying },
               )}
-              onClick={() => post('playing', !this.state.isPlaying)}
+              onClick={() => post(this.path('playing'), !this.state.isPlaying)}
             >&nbsp;
 						</button>
 						<button
@@ -267,4 +303,4 @@ class Room extends React.Component {
   }
 }
 
-export default Room;
+export default Rooms;
