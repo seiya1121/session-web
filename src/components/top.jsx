@@ -76,7 +76,7 @@ class Top extends React.Component {
    }
    return (
      <div className="create-room-box">
-       <p>Enter a room</p>
+       <p>Enter room</p>
        <span>session/</span>
        <input
          type="text"
@@ -89,7 +89,7 @@ class Top extends React.Component {
        <button onClick={this.onClickRedirectRoom} className="create-room-btn">
          Enter room
        </button>
-       <a href="#" onClick={this.onClickToggleButtonArea}>Create a new room</a>
+       <p className="top-or">OR<a href="#" onClick={this.onClickToggleButtonArea} className="toggle-url-form">Create a new room</a></p>
      </div>
    )
  }
@@ -105,7 +105,7 @@ class Top extends React.Component {
         </div>
         {this.renderButtonArea()}
       </div>
-      <ReactPlayer
+      {/* <ReactPlayer
         ref={(player) => { this.player = player; }}
         className="react-player top-bg-movie"
         width={"110%"}
@@ -119,7 +119,8 @@ class Top extends React.Component {
         onEnded={() => console.log('Pause')}
         onError={() => console.log('Pause')}
         onProgress={() => console.log('Pause')}
-      />
+      /> */}
+      <img src="/images/temporary-top-image.jpg" alt="PlaceHolder" className="top-bg-img" />
     </div>
   )
  }

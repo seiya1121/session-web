@@ -12,8 +12,12 @@
     background-color: rgba(0,0,0,0.25);
     background-image: radial-gradient(rgba(0,0,0,0.15) 5%, transparent 20%);
     background-size: 3px 3px;
-    margin-top: 30px;
+    // margin-top: 30px; （Topがyoutube動画の時のみ必要）
     position: absolute;
+  }
+
+  .top-bg-img {
+    width: 100%;
   }
 
   .top-bg-movie {
@@ -26,7 +30,7 @@
 .top-content-box {
   width: 80%;
   margin: 0 auto;
-  margin-top: 30px;
+  // margin-top: 30px; (Topがyoutube動画の時のみ必要)
   position: absolute;
   left: calc(50% - 40%);
 
