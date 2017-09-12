@@ -901,3 +901,32 @@ input {
   height: 40%;
   text-align: center;
 }
+
+.mobile-wave-locator {
+  bottom: 90px;
+  position: absolute;
+  right: 20px;
+  z-index: 100;
+}
+
+.mobile-wave-button{
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  margin: 10px 5px;
+  border: solid 1px $color-bar-bg;
+  background: transparentize($color-black,.4);
+
+  &.is-active {
+    border: solid 1px $color-white;
+  }
+
+  img {
+    width: 35px;
+    height: auto;
+  }
+}

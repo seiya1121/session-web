@@ -31,14 +31,13 @@ class Wave extends React.Component {
 
   render() {
     return(
-      <div>
-        <button
-          onClick={(e) => this.doWave(e) }
-          style={{ background: 'white' }}
-        >
-          wave
-        </button>
+      <div
+        onClick={(e) => this.doWave(e) }
+        className="mobile-wave-button"
+      >
+        <img src="/images/yeah.svg" alt=""/>
       </div>
+
     )
   }
 }

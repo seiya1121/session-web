@@ -88,7 +88,7 @@ class Rooms extends React.Component {
 	callWave(num) {
 		const audio = new Audio();
 		if (num > 0) {
-			for (const i = 0; i < num; i++) {
+			for (let i = 0; i < num; i++) {
 				//console.log('メー');
 				audio.src = '../../../lamb.mp3'
 				audio.play();
@@ -277,10 +277,12 @@ class Rooms extends React.Component {
 	commentPage() {
 		return (
 			<div>
-				<Wave
-					playingVideo={this.state.playingVideo}
-					roomKey={this.state.roomKey}
-					/>
+				<div className="mobile-wave-locator">
+					<Wave
+						playingVideo={this.state.playingVideo}
+						roomKey={this.state.roomKey}
+						/>
+				</div>
 				<Comments
 					currentUser={this.state.currentUser}
 					comments={this.state.comments}
