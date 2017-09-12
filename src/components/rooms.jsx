@@ -88,6 +88,7 @@ class Rooms extends React.Component {
           this.setState({ playingVideo });
         }});
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
+        base.listenTo(path('comments'), { context: this, asArray: true, then(comments) { this.setState({ comments }) } });
 			}).catch(err => console.log(err));
 		return true;
 	}
