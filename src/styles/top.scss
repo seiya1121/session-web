@@ -116,6 +116,11 @@
 
 @media screen and (max-width: 414px) {
 
+  .img-wrap {
+    background-image:url("/images/temporary-top-image.jpg");
+    background-size: contain;
+  }
+
   .top-content-box {
     width: calc(100% - 40px);
     margin: 0 auto;
