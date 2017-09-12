@@ -107,8 +107,8 @@ class Rooms extends React.Component {
         const roomClass = new Room(room.key, room.name);
 				this.setState({ roomKey: room.key, roomName: room.name });
 				const path = (property) => `rooms/${roomClass.key}/${property}`;
-        base.listenTo(path('isPlaying'), { context: this, asArray: false, then(playing) {
-          this.setState({ isPlaying: typeof playing === 'object' ? true : playing});
+        base.listenTo(path('isPlaying'), { context: this, asArray: false, then(isPlaying) {
+          this.setState({ isPlaying: typeof playing === 'object' ? true : isPlaying});
         }});
         base.listenTo(path('playingVideo'), { context: this, asArray: false, then(video) {
           const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
@@ -155,7 +155,7 @@ class Rooms extends React.Component {
   }
 
 	stop() {
-		if (this.state.que[0]) post(this.path('playing'), !this.state.isPlaying);
+		if (this.state.que[0]) post(this.path('isPlaying'), !this.state.isPlaying);
 	}
 
 	queNode() {
