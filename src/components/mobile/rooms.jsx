@@ -88,7 +88,7 @@ class Rooms extends React.Component {
 	callWave(num) {
 		const audio = new Audio();
 		if (num > 0) {
-			for (const i = 0; i < num; i++) {
+			for (let i = 0; i < num; i++) {
 				//console.log('メー');
 				audio.src = '../../../lamb.mp3'
 				audio.play();
