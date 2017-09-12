@@ -59,9 +59,10 @@ class Rooms extends React.Component {
     this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
     this.goNext = this.goNext.bind(this);
     this.progress = this.progress.bind(this);
+    this.onClickTogglePlay = this.onClickTogglePlay.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
   	const { match } = this.props;
   	const { roomName } = match.params;
   	base.fetch('rooms', { context: this, asArray: true})
@@ -79,7 +80,7 @@ class Rooms extends React.Component {
           this.setState({ played });
           this.player.seekTo(played);
         }});
-        base.listenTo(path('playing'), { context: this, asArray: true, then(playing) {
+        base.listenTo(path('isPlaying'), { context: this, asArray: false, then(playing) {
           this.setState({ isPlaying: typeof playing === 'object' ? true : playing});
         }});
         base.listenTo(path('playingVideo'), { context: this, asArray: false, then(video) {
@@ -87,9 +88,6 @@ class Rooms extends React.Component {
           this.setState({ playingVideo });
         }});
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
-        base.listenTo(path('comments'), { context: this, asArray: true, then(comments) {
-          this.setState({ comments });
-        }});
 			}).catch(err => console.log(err));
 		return true;
 	}
@@ -134,6 +132,10 @@ class Rooms extends React.Component {
   		  }
   	  }
 		);
+  }
+
+  onClickTogglePlay() {
+    post(this.path('isPlaying'), !this.state.isPlaying)
   }
 
 	goNext() {
@@ -222,7 +224,7 @@ class Rooms extends React.Component {
 					<Comments
 						currentUser={this.state.currentUser}
             comments={this.state.comments}
-						roomId={this.state.roomKey}
+						roomKey={this.state.roomKey}
 					/>
 
           {/*SearchResult*/}
@@ -246,7 +248,7 @@ class Rooms extends React.Component {
               	{ 'play-controll__pause': this.state.isPlaying },
                 { 'play-controll__play': !this.state.isPlaying },
               )}
-              onClick={() => post(this.path('playing'), !this.state.isPlaying)}
+              onClick={this.onClickTogglePlay}
             >&nbsp;
 						</button>
 						<button
