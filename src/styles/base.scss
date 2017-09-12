@@ -446,10 +446,9 @@ input {
   transition: .5s;
 
   .is-mobile & {
-    $offset: 120px;
-    height: calc( 100% - $offset );
+    height: calc( 100% - 105px );
     right: 0;
-    top: $offset;
+    top: 105px;
     width: 100%;
   }
 
@@ -482,7 +481,7 @@ input {
   @extend %display-control__child;
   right: 50%;
 
-  .is-mobile {
+  .is-mobile & {
     display: none;
   }
 }
