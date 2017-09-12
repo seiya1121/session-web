@@ -46,6 +46,7 @@ class Rooms extends React.Component {
       isSearchActive: false,
       isQueListActive: false,
       isPlaylistActive: false,
+      isShowingMembers: false,
       isPlaying: true,
       seeking: false,
       duration: 0,
@@ -193,9 +194,9 @@ class Rooms extends React.Component {
   renderUsersList() {
     const users = this.state.users.slice(0, 9);
     return users.map(u => (
-      <div key={u.uid}>
-        <span>{u.name}</span>
-        <img src={u.photoURL} alt={u.name}/>
+      <div key={u.uid} className="header-bar-prof__unit">
+        <img className="header-bar-prof__icon" src={u.photoURL} alt={u.name}/>
+        <span className="header-bar-prof__name">{u.name}</span>
       </div>
     ))
   }
@@ -210,16 +211,32 @@ class Rooms extends React.Component {
 				<header className="header-bar">
 					<div className="header-bar__left">
 						<div className="header-bar-prof">
-              <span>{this.state.users.length}</span>
-              <span>{this.state.currentUser.name}</span>
               <img
                 className='header-bar-prof__icon'
                 src={this.state.currentUser.photoURL}
                 alt={this.state.currentUser.name}
               />
+              <div className="header-bar-prof__name">
+                {this.state.currentUser.name}
+              </div>
+              <div
+                className="header-bar-prof__numbers"
+                onMouseEnter={() => this.setState({isShowingMembers:true})}
+                onMouseLeave={() => this.setState({isShowingMembers:false})}
+              >
+                + {this.state.users.length - 1}
+                <div
+                  className={classNames(
+                    "header-bar-prof__members",
+                    {"is-active":this.state.isShowingMembers}
+                  )}
+                >
+                  {this.renderUsersList()}
+                </div>
+
+              </div>
 						</div>
-            {this.renderUsersList()}
-            {(this.state.users.length >= 10) && <p>+ 10</p>}
+            {/* {(this.state.users.length >= 10) && <p>+ 10</p>} */}
 					</div>
 					<div
 						className={classNames('button-search-list', { 'is-search-active': this.state.isSearchActive })}
