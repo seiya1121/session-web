@@ -2,6 +2,7 @@ import React from 'react';
 import { push, post } from '../scripts/db';
 import { base } from '../config/firebaseApp.js';
 import Room from '../classes/room.js';
+import ReactPlayer from 'react-player';
 
 // Styles
 import '../styles/base.scss';
