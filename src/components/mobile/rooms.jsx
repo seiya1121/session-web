@@ -6,6 +6,8 @@ import ReactPlayer from 'react-player';
 import { YOUTUBE_API_KEY } from '../../config/apiKey';
 import YouTubeNode from 'youtube-node';
 import { post, remove, push } from '../../scripts/db';
+import { DefaultVideo, DefaultUser } from '../../constants.js';
+import Room from '../../classes/room.js'
 
 // Components
 import SearchResult from '../room/searchResult';
@@ -22,17 +24,18 @@ const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, user, type, keyword) => (
 	Object.assign({ content, user, type, keyword })
 );
-const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url: '' }, displayName: '', wave: 0 });
-const DefaultUser = Object.assign({ name: '', photoURL: '', accessToken: '', uid: '' });
 
-class Room extends React.Component {
+class Rooms extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({
+			roomKey: '',
+			roomName: '',
       currentUser: DefaultUser,
       playingVideo: DefaultVideo,
       que: [],
       searchResult: [],
+      comments: [],
       searchText: '',
       searchedText: '',
       isSearchActive: false,
@@ -42,16 +45,27 @@ class Room extends React.Component {
       seeking: false,
       loaded: 0,
       played: 0,
-			pageState: 0,
+      startTime: 0,
 		});
-		const audio = new Audio();
-		audio.src = '../../../lamb.mp3'
-		audio.play();
+
+		this.room = {};
+
+		// const audio = new Audio();
+		// audio.src = '../../../lamb.mp3'
+		// audio.play();
 
     this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
     this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
     this.goNext = this.goNext.bind(this);
   }
+
+	roomPath() {
+		return `rooms/${this.state.roomKey}`;
+	}
+
+	path(path) {
+		return `${this.roomPath()}/${path}`;
+	}
 
 	isCommentPage() {
 		return this.state.pageState === 0
@@ -75,17 +89,33 @@ class Room extends React.Component {
 	}
 
   componentDidMount() {
-  	base.listenTo('startTime', { context: this, asArray: false, then(startTime) {
-  		this.setState({ played: startTime });
-  	}});
-  	base.listenTo('playing', { context: this, asArray: false, then(playing) {
-  		this.setState({ isPlaying: playing });
-  	}});
-  	base.listenTo('playingVideo', { context: this, asArray: false, then(video) {
-  		const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
-  		this.setState({ playingVideo });
-  	}});
-  	base.listenTo('que', { context: this, asArray: true, then(que) { this.setState({ que }) } });
+		const { match } = this.props;
+  	const { roomName } = match.params;
+  	base.fetch('rooms', { context: this, asArray: true})
+			.then(data => {
+				const room = data.find(r => r.name === roomName);
+				if(room == null) {
+					this.props.history.push({ pathname: '/' });
+					return false;
+				}
+        const roomClass = new Room(room.key, room.name);
+				this.setState({ roomKey: room.key, roomName: room.name });
+				const path = (property) => `rooms/${roomClass.key}/${property}`
+        base.listenTo(path('startTime'), { context: this, asArray: false, then(startTime) {
+          const played = typeof startTime === 'object' ? 0 : startTime;
+          this.setState({ played });
+          this.player.seekTo(played);
+        }});
+        base.listenTo(path('isPlaying'), { context: this, asArray: false, then(playing) {
+          this.setState({ isPlaying: typeof playing === 'object' ? true : playing});
+        }});
+        base.listenTo(path('playingVideo'), { context: this, asArray: false, then(video) {
+          const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
+          this.setState({ playingVideo });
+        }});
+        base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
+			}).catch(err => console.log(err));
+		return true;
   }
 
   onKeyPressForSearch(e) {
@@ -121,20 +151,20 @@ class Room extends React.Component {
   }
 
 	goNext() {
-  	const video = this.state.que[0];
+		const video = this.state.que[0];
   	if (video) {
-  		post('playingVideo', video);
-  		post('startTime', 0);
-  		remove(`que/${video.key}`);
-  		push('comments', commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
+  		post(this.path('playingVideo'), video);
+  		post(this.path('startTime'), 0);
+  		remove(this.path(`que/${video.key}`));
+  		push(this.path('comments'), commentObj(`# ${video.title}`, video.user, CommentType.log, ''));
   	} else {
-  		post('playingVideo', DefaultVideo);
-  		post('startTime', 0);
+  		post(this.path('playingVideo'), DefaultVideo);
+  		post(this.path('startTime'), 0);
   	}
   }
 
 	stop() {
-		if (this.state.que[0]) post('playing', !this.state.isPlaying);
+		if (this.state.que[0]) post(this.path('playing'), !this.state.isPlaying);
 	}
 
 	render() {
@@ -219,10 +249,14 @@ class Room extends React.Component {
 		return (
 			<div>
 				<Wave id='1234' wave='0'/>
-				<Comments currentUser={this.state.currentUser} />
+				<Comments
+					currentUser={this.state.currentUser}
+					comments={this.state.comments}
+					roomKey={this.state.roomKey}
+				/>
 			</div>
 		);
 	}
 }
 
-export default Room;
+export default Rooms;
