@@ -237,7 +237,6 @@ input {
   cursor: pointer;
 }
 
-
 // button-playlist-list
 .button-playlist-list {
   float: right;
@@ -282,6 +281,10 @@ input {
   padding: 0;
   overflow: auto;
 
+  .is-mobile & {
+    width: calc( 100% - 40px );
+  }
+
   .comment-input {
     -webkit-app-region: no-drag;
 
@@ -301,8 +304,12 @@ input {
     &.is-active {
       color: $color-black;
       background: $color-white;
-      width: calc( 30% - 40px );
+      width: calc( 50% - 40px );
       transition: .5s;
+    }
+
+    .is-mobile &.is-active {
+      width: calc( 100% );
     }
   }
 }
@@ -401,6 +408,10 @@ input {
   .comment-single {
     color: $color-black;
     font-size: 22px;
+
+    .is-mobile & {
+      font-size: 16px;
+    }
   }
 
   .comment-author {
@@ -806,4 +817,37 @@ input {
 
     background: #CCCCCC;
   }
+}
+
+/* for Mobile */
+// nav-bar
+.mobile-global-nav {
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  justify-content: center;
+  position: relative;
+  z-index: 100;
+
+  &__item {
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    -webkit-justify-content: center; /* Safari */
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin: 10px 5px;
+    border: solid 1px $color-bar-bg;
+    background: transparentize($color-black, .4);
+
+    &.is-active {
+      border: solid 1px $color-white;
+    }
+
+    img {
+      width: 20px;
+      height: auto;
+    }
+  }
+
 }

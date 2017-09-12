@@ -12,8 +12,8 @@ import SearchResult from '../room/searchResult';
 import Comments from '../room/comments';
 
 // Styles
-import '../../styles/base.scss';
 import '../../styles/normalize.scss';
+import '../../styles/base.scss';
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 
@@ -137,22 +137,36 @@ class Room extends React.Component {
 		const isPostPlayingVideo = this.state.playingVideo !== '';
 		const playingVideo = this.state.playingVideo || DefaultVideo;
 		return (
-			<div className="contents">
-				<button
-					onClick={() => this.setState({ pageState: 0 })}
-				>
-					コメントページ
-				</button>
-				<button
-					onClick={() => this.setState({ pageState: 1 })}
-				>
-					再生ページ
-				</button>
-				<button
-					onClick={() => this.setState({ pageState: 2 })}
-				>
-					検索
-				</button>
+			<div className="contents is-mobile">
+				<nav className="mobile-global-nav">
+					<div
+						className={classNames(
+							"mobile-global-nav__item",
+							{"is-active":(this.state.pageState===0)}
+						)}
+						onClick={() => this.setState({ pageState: 0 })}
+					>
+						<img src="/images/icon_comment.svg" alt=""/>
+					</div>
+					<div
+						className={classNames(
+							"mobile-global-nav__item",
+							{"is-active":(this.state.pageState===1)}
+						)}
+						onClick={() => this.setState({ pageState: 1 })}
+					>
+						<img src="/images/icon_equalizer.svg" alt=""/>
+					</div>
+					<div
+						className={classNames(
+							"mobile-global-nav__item",
+							{"is-active":(this.state.pageState===2)}
+						)}
+						onClick={() => this.setState({ pageState: 2 })}
+					>
+						<img src="/images/icon_search.svg" alt=""/>
+					</div>
+				</nav>
 				{ this.nowPage() }
 			</div>
 		);
