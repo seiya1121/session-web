@@ -1,5 +1,5 @@
 import React from 'react';
-import { base } from '../config/firebaseApp.js';
+import { base, firebaseAuth } from '../config/firebaseApp.js';
 import 'whatwg-fetch';
 import classNames from 'classnames';
 import ReactPlayer from 'react-player';
@@ -19,9 +19,9 @@ import '../styles/normalize.scss';
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 
-// const userObj = ({ displayName, photoURL, uid, isAnonymous }, overrideState) => Object.assign(
-//   { displayName, photoURL, uid, isAnonymous }, overrideState
-// );
+const parseUser = ({ displayName, photoURL, uid, isAnonymous }, overrideState) => Object.assign(
+  { displayName, photoURL, uid, isAnonymous }, overrideState
+);
 
 const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, user, type, keyword) => (
@@ -73,8 +73,16 @@ class Rooms extends React.Component {
 					return false;
 				}
         const roomClass = new Room(room.key, room.name);
-				this.setState({ roomKey: room.key, roomName: room.name });
-				const path = (property) => `rooms/${roomClass.key}/${property}`
+        this.setState({ roomKey: room.key, roomName: room.name });
+        const path = (property) => `rooms/${roomClass.key}/${property}`
+        this.signIn();
+        firebaseAuth.onAuthStateChanged(u => {
+          if(u) {
+            push(path('users'), parseUser(u))
+          }else{
+            console.log('sign out');
+          }
+        });
         base.listenTo(path('startTime'), { context: this, asArray: false, then(startTime) {
           const played = typeof startTime === 'object' ? 0 : startTime;
           this.setState({ played });
@@ -88,9 +96,27 @@ class Rooms extends React.Component {
           this.setState({ playingVideo });
         }});
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
+        base.listenTo(path('comments'), { context: this, asArray: true, then(comments) { this.setState({ comments }) } });
 			}).catch(err => console.log(err));
 		return true;
 	}
+
+	signIn() {
+    firebaseAuth.signInAnonymously().catch(function(error) {
+      console.log(error);
+    });
+  }
+
+  checkSignUser(){
+    firebaseAuth.onAuthStateChanged(user=> {
+      if(user) {
+        push(`rooms/`)
+      }else{
+
+      }
+      console.log(user);
+    })
+  }
 
   roomPath() {
   	return `rooms/${this.state.roomKey}`;
