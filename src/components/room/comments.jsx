@@ -1,13 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
 import giphy from 'giphy-api';
-import { push } from '../scripts/db.js';
-import { base } from '../config/firebaseApp';
+import { push } from '../../scripts/db.js';
+import { CommentType, commentObj } from './utils/constants.js';
 
-const CommentType = { text: 'text', log: 'log', gif: 'gif' };
-const commentObj = (content, user, type, keyword) => (
-		Object.assign({ content, user, type, keyword })
-);
 const CommandType = { giphy: '/giphy ' };
 
 class Comments extends React.Component {
@@ -15,20 +11,26 @@ class Comments extends React.Component {
     super(props);
 
     this.state = {
-						commentText: '',
-						isCommentActive: false,
-						comments: [],
+      commentText: '',
+      isCommentActive: false,
+      comments: props.comments,
     };
 
     this.setGifUrl = this.setGifUrl.bind(this);
     this.onKeyPressForComment = this.onKeyPressForComment.bind(this);
   }
 
-		componentDidMount() {
-				base.listenTo('comments', { context: this, asArray: true, then(comments) {
-						this.setState({ comments });
-				}});
+  componentWillReceiveProps(nextProps) {
+    this.setState({ comments: nextProps.comments })
   }
+
+	roomPath() {
+		return `rooms/${this.props.roomKey}`;
+	}
+
+	path(path) {
+		return `${this.roomPath()}/${path}`;
+	}
 
   setGifUrl(keyword) {
     const key = keyword.replace(CommandType.giphy, '');
@@ -55,8 +57,8 @@ class Comments extends React.Component {
         CommentType.text,
         ''
       );
-						push('comments', comment);
-						this.setState({ commentText: '' });
+      push(this.path('comments'), comment);
+      this.setState({ commentText: '' });
     }
     return true;
   }
@@ -140,6 +142,8 @@ class Comments extends React.Component {
 
 Comments.propTypes = {
   currentUser: React.PropTypes.object,
+  roomKey: React.PropTypes.string,
+  comments: React.PropTypes.array,
 };
 
 export default Comments;

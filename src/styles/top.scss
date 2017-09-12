@@ -1,0 +1,90 @@
+
+// bg img
+.img-wrap {
+  position: relative;
+
+  &::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-image: radial-gradient(rgba(0,0,0,0.15) 5%, transparent 20%);
+    background-size: 3px 3px;
+    position: absolute;
+  }
+
+  .top-bg-img {
+    width: 100%;
+  }
+}
+
+// unique items
+.top-content-box {
+  width: 80%;
+  margin: 0 auto;
+  position: absolute;
+  left: calc(50% - 40%);
+
+  p {
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+
+  .session-logo {
+    height: 30px;
+    margin-top: 30px;
+  }
+
+  .copy-box {
+    margin-top: 100px;
+
+    .second-copy {
+      font-weight: 600;
+    }
+  }
+
+
+  // create room box
+  .create-room-box {
+    background-color: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.5);
+    display: inline-block;
+    margin-top: 20px;
+    padding: 30px 60px;
+
+    p {
+      font-size: 20px;
+    }
+
+    span {
+      color: #bac4c4;
+      font-size: 14px;
+    }
+
+    .create-room-input {
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      height: 30px;
+      margin-left: 10px;
+      min-width: 240px;
+      padding: 0 10px;
+    }
+
+    .create-room-btn {
+      background-color: #26BFBA;
+      border: none;
+      border-radius: 2px;
+      color: white;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      margin-top: 20px;
+      padding: 10px 100px;
+
+      &:hover {
+        box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+      }
+    }
+  }
+}

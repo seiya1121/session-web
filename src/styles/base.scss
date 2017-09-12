@@ -68,13 +68,11 @@ input {
   box-sizing: border-box;
   height: $header-height;
   padding: 6px 0;
-
   background: $color-bar-bg;
-
-  overflow: hidden;
   font-size: 12px;
-
   border-bottom:solid 1px #333333;
+  position: relative;
+  z-index: 100;
 
   &__left {
     float: left;
@@ -136,8 +134,51 @@ input {
   }
 
   &__name {
+    float: left;
     margin: 0px 0px 0 55px;
     padding: 12px 10px;
+  }
+
+  &__numbers {
+    border:1px solid $color-key;
+    float: left;
+    height: 28px;
+    margin: 4px 0px 0 10px;
+    padding: 0px 10px;
+    position: relative;
+
+    border-radius: 14px;
+    display: flex;
+    -webkit-justify-content: center; /* Safari */
+    justify-content: center;
+    -webkit-align-items: center; /* Safari */
+    align-items: center;
+  }
+
+  &__members {
+    background: $color-black;
+    border-radius: 5px;
+    position: absolute;
+    left: 0;
+    top: 30px;
+
+    opacity: 0;
+
+    &.is-active {
+      opacity: 1;
+      transition: .5s;
+    }
+  }
+
+  &__unit {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 2px 0;
+
+    & + & {
+      border-top: solid 1px $color-bar-bg;
+    }
   }
 
   &__sign {
