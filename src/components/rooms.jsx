@@ -6,6 +6,8 @@ import ReactPlayer from 'react-player';
 import { YOUTUBE_API_KEY } from '../config/apiKey';
 import YouTubeNode from 'youtube-node';
 import { post, remove, push } from '../scripts/db';
+import { DefaultVideo, DefaultUser } from '../constants.js';
+import Room from '../classes/room.js'
 
 // Components
 import SearchResult from './room/searchResult';
@@ -25,18 +27,18 @@ const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, user, type, keyword) => (
 	Object.assign({ content, user, type, keyword })
 );
-const DefaultVideo = Object.assign({ id: '', title: '', thumbnail: { url: '' }, displayName: '' });
-const DefaultUser = Object.assign({ name: '', photoURL: '', accessToken: '', uid: '' });
 
-class Room extends React.Component {
+class Rooms extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({
-			room: { name: '', id: '' },
+      roomKey: '',
+			roomName: '',
       currentUser: DefaultUser,
       playingVideo: DefaultVideo,
       que: [],
       searchResult: [],
+      comments: [],
       searchText: '',
       searchedText: '',
       isSearchActive: false,
@@ -51,6 +53,8 @@ class Room extends React.Component {
       startTime: 0,
 		});
 
+    this.room = {};
+
     this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
     this.onKeyPressForSearch = this.onKeyPressForSearch.bind(this);
     this.goNext = this.goNext.bind(this);
@@ -63,42 +67,39 @@ class Room extends React.Component {
   	base.fetch('rooms', { context: this, asArray: true})
 			.then(data => {
 				const room = data.find(r => r.name === roomName);
-				console.log(room);
 				if(room == null) {
-					this.props.history.push({ pathname: '/' })
+					this.props.history.push({ pathname: '/' });
 					return false;
 				}
-				this.setState({ room });
+        const roomClass = new Room(room.key, room.name);
+				this.setState({ roomKey: room.key, roomName: room.name });
+				const path = (property) => `rooms/${roomClass.key}/${property}`
+        base.listenTo(path('startTime'), { context: this, asArray: false, then(startTime) {
+          const played = typeof startTime === 'object' ? 0 : startTime;
+          this.setState({ played });
+          this.player.seekTo(played);
+        }});
+        base.listenTo(path('playing'), { context: this, asArray: true, then(playing) {
+          this.setState({ isPlaying: typeof playing === 'object' ? true : playing});
+        }});
+        base.listenTo(path('playingVideo'), { context: this, asArray: false, then(video) {
+          const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
+          this.setState({ playingVideo });
+        }});
+        base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
+        base.listenTo(path('comments'), { context: this, asArray: true, then(comments) {
+          this.setState({ comments });
+        }});
 			}).catch(err => console.log(err));
 		return true;
 	}
 
-  componentDidMount() {
-		base.listenTo(this.roomPath(), { context: this, asArray: false, then(room) {
-		//	ここで各プロパティにsetState
-		}});
-  	base.listenTo(this.path('startTime'), { context: this, asArray: false, then(startTime) {
-  		const played = typeof startTime === 'object' ? 0 : startTime;
-  		this.setState({ played });
-  		this.player.seekTo(played);
-  	}});
-  	base.listenTo(this.path('playing'), { context: this, asArray: true, then(playing) {
-  		this.setState({ isPlaying: typeof playing === 'object' ? false : playing});
-  	}});
-  	base.listenTo(this.path('playingVideo'), { context: this, asArray: false, then(video) {
-  		const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
-  		console.log(playingVideo);
-  		this.setState({ playingVideo });
-  	}});
-  	base.listenTo(this.path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
-  }
-
   roomPath() {
-  	return `/rooms/${this.state.room.key}`;
+  	return `rooms/${this.state.roomKey}`;
 	}
 
 	path(path) {
-  	return `${this.roomPath()}/${path}/`;
+  	return `${this.roomPath()}/${path}`;
 	}
 
   onKeyPressForSearch(e) {
@@ -137,6 +138,7 @@ class Room extends React.Component {
 
 	goNext() {
   	const video = this.state.que[0];
+  	console.log(this.roomPath());
   	if (video) {
   		post(this.path('playingVideo'), video);
   		post(this.path('startTime'), 0);
@@ -219,12 +221,13 @@ class Room extends React.Component {
 					{/*Comment*/}
 					<Comments
 						currentUser={this.state.currentUser}
-						roomId={this.state.room.key}
+            comments={this.state.comments}
+						roomId={this.state.roomKey}
 					/>
 
           {/*SearchResult*/}
 					<SearchResult
-						roomId={this.state.room.key}
+						roomId={this.state.roomKey}
 						que={this.state.que}
 						searchResult={this.state.searchResult}
 						currentUser={this.state.currentUser}
@@ -300,4 +303,4 @@ class Room extends React.Component {
   }
 }
 
-export default Room;
+export default Rooms;

@@ -1,6 +1,7 @@
 import React from 'react';
-import { push } from '../scripts/db';
+import { push, post } from '../scripts/db';
 import { base } from '../config/firebaseApp.js';
+import Room from '../classes/room.js';
 
 class Top extends React.Component {
  constructor(props) {
@@ -15,7 +16,7 @@ class Top extends React.Component {
 
  componentWillMount() {
 	 base.fetch('rooms', { context: this, asArray: true})
-     .then(data => this.setState({ roomNames: data.map(({name}) => name) }))
+     .then(data => this.setState({ roomNames: data.map(({ name }) => name) }))
  }
 
  onClickSubmitRoom() {
@@ -23,6 +24,10 @@ class Top extends React.Component {
    if (roomName === '') return false;
    if (this.state.roomNames.includes(roomName)) return false;
    push('rooms', { name: roomName })
+     .then(res => {
+       const room  = new Room(res.key, roomName);
+       post(`rooms/${res.key}`, room)
+     })
      .then(this.props.history.push({ pathname: `/${roomName}`}))
      .catch(err => console.log(err));
    return true

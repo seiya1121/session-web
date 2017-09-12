@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom'
 
 // Component
-import Room from './components/room.jsx';
+import Rooms from './components/rooms.jsx';
 import Top from './components/top.jsx';
 
 class Root extends React.Component {
@@ -15,7 +15,7 @@ class Root extends React.Component {
     <Router>
       <div className="contents">
         <Route exact path="/" component={Top} />
-        <Route path="/:roomName" component={Room} />
+        <Route path="/:roomName" component={Rooms} />
       </div>
     </Router>
   )

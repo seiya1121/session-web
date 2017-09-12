@@ -2,7 +2,6 @@ import React from 'react';
 import classNames from 'classnames';
 import giphy from 'giphy-api';
 import { push } from '../../scripts/db.js';
-import { base } from '../../config/firebaseApp';
 import { CommentType, commentObj } from './utils/constants.js';
 
 const CommandType = { giphy: '/giphy ' };
@@ -22,19 +21,12 @@ class Comments extends React.Component {
   }
 
 	roomPath() {
-		return `/rooms/${this.props.roomId}`;
+		return `rooms/${this.state.roomKey}`;
 	}
 
 	path(path) {
-		return `${this.roomPath()}/${path}/`;
+		return `${this.roomPath()}/${path}`;
 	}
-
-  componentDidMount() {
-    base.listenTo(this.path('comments'), { context: this, asArray: true, then(comments) {
-      console.log(comments);
-      this.setState({ comments });
-    }});
-  }
 
   setGifUrl(keyword) {
     const key = keyword.replace(CommandType.giphy, '');
@@ -69,7 +61,7 @@ class Comments extends React.Component {
 
   render() {
     const comments = (this.state.isCommentActive) ?
-     this.state.comments : this.state.comments.slice(this.state.comments.length - 3, this.state.comments.length);
+     this.props.comments : this.props.comments.slice(this.props.comments.length - 3, this.props.comments.length);
 
     const commentClass = (type, index) => (
       (type === CommentType.log) ?

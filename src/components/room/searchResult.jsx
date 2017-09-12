@@ -13,11 +13,11 @@ class SearchResult extends React.Component {
   }
 
 	roomPath() {
-		return `/rooms/${this.props.roomId}`;
+		return `rooms/${this.props.roomId}`;
 	}
 
 	path(path) {
-		return `${this.roomPath()}/${path}/`;
+		return `${this.roomPath()}/${path}`;
 	}
 
 	goTargetVideo(video) {
@@ -28,6 +28,7 @@ class SearchResult extends React.Component {
 	}
 
   onClickSetQue(video) {
+    console.log(this.roomPath());
     const { currentUser, isNoPlayingVideo } = this.props;
     const targetVideo = videoObject(video, currentUser);
     if (this.props.que.length === 0 && isNoPlayingVideo ) {
