@@ -1,5 +1,5 @@
 import React from 'react';
-import { base } from '../config/firebaseApp.js';
+import { base, firebaseAuth } from '../config/firebaseApp.js';
 import 'whatwg-fetch';
 import classNames from 'classnames';
 import ReactPlayer from 'react-player';
@@ -8,6 +8,7 @@ import YouTubeNode from 'youtube-node';
 import { post, remove, push } from '../scripts/db';
 import { DefaultVideo, DefaultUser } from '../constants.js';
 import Room from '../classes/room.js'
+import unload from 'unload';
 
 // Components
 import SearchResult from './room/searchResult';
@@ -19,9 +20,9 @@ import '../styles/normalize.scss';
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 
-// const userObj = ({ displayName, photoURL, uid, isAnonymous }, overrideState) => Object.assign(
-//   { displayName, photoURL, uid, isAnonymous }, overrideState
-// );
+const parseUser = ({ uid, isAnonymous }, overRideState = {}) => Object.assign({
+  uid, isAnonymous, name: 'Chris', photoURL: 'avatar.png',
+}, overRideState);
 
 const CommentType = { text: 'text', log: 'log', gif: 'gif' };
 const commentObj = (content, user, type, keyword) => (
@@ -39,6 +40,7 @@ class Rooms extends React.Component {
       que: [],
       searchResult: [],
       comments: [],
+      users: [],
       searchText: '',
       searchedText: '',
       isSearchActive: false,
@@ -60,9 +62,11 @@ class Rooms extends React.Component {
     this.goNext = this.goNext.bind(this);
     this.progress = this.progress.bind(this);
     this.onClickTogglePlay = this.onClickTogglePlay.bind(this);
+    this.signOut = this.signOut.bind(this);
   }
 
   componentDidMount() {
+    unload.add(this.signOut);
   	const { match } = this.props;
   	const { roomName } = match.params;
   	base.fetch('rooms', { context: this, asArray: true})
@@ -73,8 +77,18 @@ class Rooms extends React.Component {
 					return false;
 				}
         const roomClass = new Room(room.key, room.name);
-				this.setState({ roomKey: room.key, roomName: room.name });
-				const path = (property) => `rooms/${roomClass.key}/${property}`
+        this.setState({ roomKey: room.key, roomName: room.name });
+        const path = (property) => `rooms/${roomClass.key}/${property}`;
+        this.signIn();
+        firebaseAuth.onAuthStateChanged(u => {
+          if(u) {
+            push(path('users'), parseUser(u)).then(({key}) => {
+              this.setState({ currentUser: parseUser(u, {key}) })
+            })
+          }else{
+            console.log('sign out');
+          }
+        });
         base.listenTo(path('startTime'), { context: this, asArray: false, then(startTime) {
           const played = typeof startTime === 'object' ? 0 : startTime;
           this.setState({ played });
@@ -89,9 +103,28 @@ class Rooms extends React.Component {
         }});
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
         base.listenTo(path('comments'), { context: this, asArray: true, then(comments) { this.setState({ comments }) } });
+        base.listenTo(path('users'), { context: this, asArray: true, then(users) { this.setState({ users }) } });
 			}).catch(err => console.log(err));
 		return true;
 	}
+
+  componentWillUnmount() {
+    unload.removeAll();
+  }
+
+	signIn() {
+    firebaseAuth.signInAnonymously().catch(function(error) {
+      console.log(error);
+    });
+  }
+
+  signOut() {
+    const user = firebaseAuth.currentUser;
+    alert(`${this.path('users')}/${this.state.currentUser.key}`);
+    remove(`${this.path('users')}/${this.state.currentUser.key}`);
+    user.delete();
+  }
+
 
   roomPath() {
   	return `rooms/${this.state.roomKey}`;
@@ -141,7 +174,6 @@ class Rooms extends React.Component {
 
 	goNext() {
   	const video = this.state.que[0];
-  	console.log(this.roomPath());
   	if (video) {
   		post(this.path('playingVideo'), video);
   		post(this.path('startTime'), 0);
@@ -168,6 +200,9 @@ class Rooms extends React.Component {
 				<header className="header-bar">
 					<div className="header-bar__left">
 						<div className="header-bar-prof">
+              <span>{this.state.users.length}</span>
+              <span>{this.state.currentUser.name}</span>
+              <img className='header-bar-prof__icon' src={this.state.currentUser.photoURL} />
 						</div>
 					</div>
 					<div
