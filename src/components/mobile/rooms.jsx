@@ -275,11 +275,11 @@ class Rooms extends React.Component {
 					playingVideo={this.state.playingVideo}
 					roomKey={this.state.roomKey}
 					/>
-				{/* <Comments
+				<Comments
 					currentUser={this.state.currentUser}
 					comments={this.state.comments}
 					roomKey={this.state.roomKey}
-				/> */}
+				/>
 			</div>
 		);
 	}
