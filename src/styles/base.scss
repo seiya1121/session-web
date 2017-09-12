@@ -123,15 +123,9 @@ input {
 
   .is-mobile &{
     float: none;
-    background: $color-bar-bg;
+    background: $color-white !important;
+    width:calc( 100% - 40px ) !important;
     margin: 0 0 0 20px;
-    width:calc( 50% - 40px );
-
-    &:focus,
-    &.is-search-active {
-      background: $color-white;
-      width:calc( 100% - 40px );
-    }
   }
 }
 
@@ -638,15 +632,17 @@ input {
   height: 25px;
   display: block;
   float: left;
-
   margin: 0 5px;
-
   border-radius: 50%;
   border: solid 1px $color-white;
   background: $color-bar-bg;
   cursor: pointer;
-
   position: relative;
+
+  .is-mobile & {
+    float: none;
+    margin: 60px 20px 0;
+  }
 }
 
 .play-controll {
@@ -654,6 +650,14 @@ input {
   width: 150px;
   box-sizing: border-box;
   padding: 25px 40px;
+
+  .is-mobile & {
+    float: none;
+    display: flex;
+    -webkit-justify-content: center; /* Safari */
+    justify-content: center;
+    width: auto;
+  }
 
   &__play {
     @extend %controll-default;
@@ -877,5 +881,23 @@ input {
       height: auto;
     }
   }
+}
 
+.mobile-control {
+  padding: 20px;
+  height: calc( 100% - 72px);
+}
+
+.mobile-style-title {
+  border-bottom: solid 1px $color-bar-bg;
+  border-top: solid 1px $color-bar-bg;
+
+  display: flex;
+  -webkit-justify-content: center; /* Safari */
+  -webkit-align-items: center; /* Safari */
+  justify-content: center;
+  align-items: center;
+
+  height: 40%;
+  text-align: center;
 }

@@ -238,18 +238,24 @@ class Rooms extends React.Component {
 		const { playingVideo } = this.state;
 		const musicName = playingVideo ? playingVideo.title : '再生していません';
 		return (
-			<div className="contents">
-				只今流れている音楽：{musicName}
-				<button
-					onClick={() => this.stop()}
-				>
-					一時停止/再生
-				</button>
-				<button
-					onClick={() => this.goNext()}
-				>
-					次へ
-				</button>
+			<div className="mobile-control">
+				<div className="mobile-style-title">{musicName}</div>
+				<nav className="mobile-control-buttons">
+					<div className="play-controll">
+						<button
+							className="play-controll__pause"
+							onClick={() => this.stop()}
+						>
+							&nbsp;
+						</button>
+						<button
+							className="play-controll__skip"
+							onClick={() => this.goNext()}
+						>
+							&nbsp;
+						</button>
+					</div>
+				</nav>
 			</div>
 		);
 	}
