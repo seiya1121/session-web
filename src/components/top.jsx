@@ -70,7 +70,7 @@ class Top extends React.Component {
          <button onClick={this.onClickSubmitRoom} className="create-room-btn">
            Create new room
          </button>
-         <a href="#" onClick={this.onClickToggleButtonArea}>Enter a existing room</a>
+         <p className="top-or">OR<a href="#" onClick={this.onClickToggleButtonArea} className="toggle-url-form">Enter existing room</a> </p>
        </div>
      )
    }
@@ -87,7 +87,7 @@ class Top extends React.Component {
        >
        </input>
        <button onClick={this.onClickRedirectRoom} className="create-room-btn">
-         Enter a room
+         Enter room
        </button>
        <a href="#" onClick={this.onClickToggleButtonArea}>Create a new room</a>
      </div>
