@@ -7,16 +7,17 @@ import { YOUTUBE_API_KEY } from '../config/apiKey';
 import YouTubeNode from 'youtube-node';
 import { post, remove, push } from '../scripts/db';
 import { DefaultVideo, DefaultUser } from '../constants.js';
-import Room from '../classes/room.js'
+import Room from '../classes/room.js';
 import unload from 'unload';
 
 // Components
 import SearchResult from './room/searchResult';
 import Comments from './room/comments';
+import Wave from './room/wave';
 
 // Styles
-import '../styles/base.scss';
 import '../styles/normalize.scss';
+import '../styles/base.scss';
 
 const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 
@@ -53,6 +54,7 @@ class Rooms extends React.Component {
       volume: 0.8,
       played: 0,
       startTime: 0,
+			videoWaves: [],
 		});
 
     this.room = {};
@@ -65,10 +67,22 @@ class Rooms extends React.Component {
     this.signOut = this.signOut.bind(this);
   }
 
+	callWave(num) {
+		const audio = new Audio();
+		if (num > 0) {
+			for (let i = 0; i < num; i++) {
+				//console.log('メー');
+				audio.src = '../../../lamb.mp3'
+				audio.play();
+			}
+		}
+	}
+
   componentDidMount() {
     unload.add(this.signOut);
   	const { match } = this.props;
   	const { roomName } = match.params;
+		console.log(match.params);
   	base.fetch('rooms', { context: this, asArray: true})
 			.then(data => {
 				const room = data.find(r => r.name === roomName);
@@ -101,6 +115,12 @@ class Rooms extends React.Component {
           const playingVideo = Object.keys(video).length === 0 ? DefaultVideo : video;
           this.setState({ playingVideo });
         }});
+				base.listenTo(path('videoWaves'), { context: this, asArray: true, then(videoWaves) {
+					const localNum = this.state.videoWaves.filter((vw) => vw.videoId === this.state.playingVideo.id ).length;
+					const allNum = videoWaves.filter((vw) => vw.videoId === this.state.playingVideo.id ).length;
+					if (allNum - localNum !== 0 ) this.callWave(allNum-localNum);
+					this.setState({ videoWaves });
+				}});
         base.listenTo(path('que'), { context: this, asArray: true, then(que) { this.setState({ que }) } });
         base.listenTo(path('comments'), { context: this, asArray: true, then(comments) { this.setState({ comments }) } });
         base.listenTo(path('users'), { context: this, asArray: true, then(users) { this.setState({ users }) } });
@@ -271,7 +291,10 @@ class Rooms extends React.Component {
 							onDuration={(duration) => this.setState({ duration })}
 						/>
 					</div>
-
+					<Wave
+						playingVideo={this.state.playingVideo}
+						roomKey={this.state.roomKey}
+					/>
 					{/*Comment*/}
 					<Comments
 						currentUser={this.state.currentUser}
