@@ -64,7 +64,21 @@ class Top extends React.Component {
           </button>
         </div>
       </div>
-      <img src="/images/temporary-top-image.jpg" alt="PlaceHolder" className="top-bg-img" />
+      <ReactPlayer
+        ref={(player) => { this.player = player; }}
+        className="react-player top-bg-movie"
+        width={"110%"}
+        height={"110%"}
+        url={'https://www.youtube.com/watch?v=qNMTGTJ0ovA'}
+        playing={true}
+        volume={0}
+        onReady={() => console.log('Ready')}
+        onPlay={() => console.log('Play')}
+        onPause={() => console.log('Pause')}
+        onEnded={() => console.log('Pause')}
+        onError={() => console.log('Pause')}
+        onProgress={() => console.log('Pause')}
+      />
     </div>
   )
  }
