@@ -72,8 +72,7 @@ class Rooms extends React.Component {
 		const audio = new Audio();
 		if (num > 0) {
 			for (let i = 0; i < num; i++) {
-				//console.log('メー');
-				audio.src = '../../../lamb.mp3'
+				audio.src = '../../../lamb.mp3';
 				audio.play();
 			}
 		}

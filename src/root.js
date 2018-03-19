@@ -1,9 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
- BrowserRouter as Router,
- Route,
-} from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import Media from 'react-media';
 
 // Component
@@ -16,18 +13,18 @@ class Root extends React.Component {
   return (
     <Media query={{ maxWidth: 768 }}>
       {matches => matches
-        ? <Router>
+        ? <BrowserRouter>
             <div className="contents">
               <Route exact path="/" component={Top} />
               <Route path="/:roomName" component={Mobile} />
             </div>
-          </Router>
-        : <Router>
+          </BrowserRouter>
+        : <BrowserRouter>
             <div className="contents">
               <Route exact path="/" component={Top} />
               <Route path="/:roomName" component={Rooms} />
             </div>
-          </Router>
+          </BrowserRouter>
       }
    </Media>
   )
