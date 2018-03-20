@@ -19,7 +19,7 @@ import Wave from './room/wave';
 import '../styles/normalize.scss';
 import '../styles/base.scss';
 
-const youtubeUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
+const youtubeUrl = (id) => `https://www.youtube.com/embed/${id}`;
 
 const parseUser = ({ uid, isAnonymous }, overRideState = {}) => Object.assign({
   uid, isAnonymous, name: 'Chris', photoURL: 'avatar.png',
